@@ -212,15 +212,25 @@ public final class DragStressTest {
         else { return nil }
         folders.append(folder)
         let element = AXUIElementCreateApplication(finder.processIdentifier)
-        let before = element.attribute(kAXWindowsAttribute) as? [AXUIElement] ?? []
+        let before = standardWindows(of: element)
         NSWorkspace.shared.open(folder)
         for _ in 0..<Self.windowLookups {
             await wait(Self.windowWait)
-            let windows = element.attribute(kAXWindowsAttribute) as? [AXUIElement] ?? []
-            let new = windows.first { window in !before.contains { CFEqual($0, window) } }
-            if let new { return AccessibilityWindow(element: new) }
+            let new = standardWindows(of: element).filter { window in
+                !before.contains { CFEqual($0, window) }
+            }
+            // More than one could be a window of the user's, which must not be touched.
+            if new.count == 1 { return AccessibilityWindow(element: new[0]) }
+            if new.count > 1 { return nil }
         }
         return nil
+    }
+
+    private func standardWindows(of app: AXUIElement) -> [AXUIElement] {
+        let windows = app.attribute(kAXWindowsAttribute) as? [AXUIElement] ?? []
+        return windows.filter {
+            $0.attribute(kAXSubroleAttribute) as? String == kAXStandardWindowSubrole
+        }
     }
 
     private func place(_ window: AccessibilityWindow, at origin: ScreenPoint) async {
