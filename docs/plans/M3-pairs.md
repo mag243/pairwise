@@ -8,8 +8,8 @@ Not in this milestone: the plug-in (M4), distribution, top and bottom pairs, mor
 ## Tasks
 
 ### 1. Reach the system through a seam
-- [ ] ADR: a thin seam around the Accessibility, window server and capture calls.
-- [ ] Put the calls behind small protocols inside `PairwiseWindowSystem`, and test the logic with fakes, up to the 75 % target. The calls themselves stay untested by plain tests, and the stress test covers them.
+- [x] ADR: a thin seam around the Accessibility, window server and capture calls.
+- [x] Put the calls behind small protocols inside `PairwiseWindowSystem`, and test the logic with fakes, up to the 75 % target. The calls themselves stay untested by plain tests, and the stress test covers them.
 
 Done first because everything below adds code to this module.
 

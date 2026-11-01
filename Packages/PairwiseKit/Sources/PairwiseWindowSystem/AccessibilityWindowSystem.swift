@@ -16,16 +16,18 @@ public final class AccessibilityWindowSystem: WindowSystemProviding {
     var pinnedPartner: AccessibilityWindow?
 
     private let access: any SystemAccess
+    private let capture: WindowCapture
     private var holdingTap: HoldingTap?
     private var ticker: DisplayTicker?
     private var timer: Timer?
 
     public convenience init() {
-        self.init(access: LiveSystemAccess())
+        self.init(access: LiveSystemAccess(), captureService: LiveCaptureService())
     }
 
-    init(access: any SystemAccess) {
+    init(access: any SystemAccess, captureService: any CaptureService) {
         self.access = access
+        capture = WindowCapture(service: captureService)
     }
 
     public var isAccessibilityGranted: Bool { AXIsProcessTrusted() }
@@ -69,7 +71,7 @@ public final class AccessibilityWindowSystem: WindowSystemProviding {
                 return
             }
             completion(
-                await WindowCapture.standIn(
+                await capture.standIn(
                     of: [first, second], framesPerSecond: liveFramesPerSecond))
         }
     }
@@ -125,7 +127,7 @@ public final class AccessibilityWindowSystem: WindowSystemProviding {
         let tap = HoldingTap(decide: decide)
         try tap.start()
         holdingTap = tap
-        Task { await WindowCapture.prepare() }
+        Task { await capture.prepare() }
     }
 
     public func stopHoldingDrags() {

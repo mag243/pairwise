@@ -8,11 +8,10 @@ import ScreenCaptureKit
 /// leaves the last picture on the layer, as the drag does not depend on this.
 @MainActor
 final class LiveStream: NSObject {
-    /// The layer that shows the frames.
-    var layer: CALayer?
+    /// What shows the frames.
+    let picture = LivePicture()
     /// How many frames showed a change.
-    var frames: Int { counter.changes }
-    private var counter = ChangedFrameCounter()
+    var frames: Int { picture.changes }
 
     private let filter: SCContentFilter
     private let configuration = SCStreamConfiguration()
@@ -44,14 +43,6 @@ final class LiveStream: NSObject {
         stream?.stopCapture { _ in }
         stream = nil
     }
-
-    fileprivate func show(_ surface: IOSurfaceRef, centrePixel: UInt32?) {
-        counter.note(centrePixel)
-        CATransaction.begin()
-        CATransaction.setDisableActions(true)
-        layer?.contents = surface
-        CATransaction.commit()
-    }
 }
 
 extension LiveStream: SCStreamOutput {
@@ -71,11 +62,11 @@ extension LiveStream: SCStreamOutput {
         else { return }
         nonisolated(unsafe) let frame = surface
         let pixel = Self.centrePixel(of: buffer)
-        MainActor.assumeIsolated { show(frame, centrePixel: pixel) }
+        MainActor.assumeIsolated { picture.show(frame, centrePixel: pixel) }
     }
 
     /// The pixel at the centre of a 32-bit frame.
-    private nonisolated static func centrePixel(of buffer: CVPixelBuffer) -> UInt32? {
+    nonisolated static func centrePixel(of buffer: CVPixelBuffer) -> UInt32? {
         CVPixelBufferLockBaseAddress(buffer, .readOnly)
         defer { CVPixelBufferUnlockBaseAddress(buffer, .readOnly) }
         guard let base = CVPixelBufferGetBaseAddress(buffer) else { return nil }

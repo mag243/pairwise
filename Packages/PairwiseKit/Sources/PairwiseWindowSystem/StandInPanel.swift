@@ -39,7 +39,7 @@ final class StandInPanel: WindowStandIn {
             layer.contentsGravity = .resize
             layer.frame = layout.frames[index]
             view.layer?.addSublayer(layer)
-            if streams.indices.contains(index) { streams[index].layer = layer }
+            if streams.indices.contains(index) { streams[index].picture.layer = layer }
         }
         panel.contentView = view
     }

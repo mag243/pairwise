@@ -10,12 +10,14 @@ import Testing
     private static let rect = CGRect(x: 100, y: 100, width: 300, height: 200)
     private static let onWindow = ScreenPoint(x: 150, y: 110)
     private static let finder = "com.apple.finder"
+    private static let windowFrame = WindowFrame(x: 100, y: 100, width: 300, height: 200)
 
     private let access = FakeSystemAccess()
     private let system: AccessibilityWindowSystem
 
     init() {
-        system = AccessibilityWindowSystem(access: access)
+        system = AccessibilityWindowSystem(
+            access: access, captureService: FakeCaptureService())
     }
 
     /// An app with process `process` and one window at `rect`, on the screen.
@@ -100,6 +102,49 @@ import Testing
             PartnerApp(bundleIdentifier: "a", name: "Arc"),
         ]
         #expect(system.partnerApps.map(\.name) == ["Arc", "Zed"])
+    }
+
+    @Test func ticksCanStartAndStop() {
+        system.startTicking(every: 1) {}
+        system.stopTicking()
+    }
+
+    @Test func holdingCanEndWithoutHavingStarted() {
+        system.stopHoldingDrags()
+    }
+
+    @Test func aPairStandInComesFromThePictures() async {
+        let service = FakeCaptureService()
+        service.windows = [FakeCapturable(processID: 1, frame: Self.windowFrame)]
+        let system = AccessibilityWindowSystem(access: access, captureService: service)
+        let first = AccessibilityWindow(
+            element: FakeElement.window(frame: Self.rect), access: access)
+        let second = AccessibilityWindow(
+            element: FakeElement.window(frame: Self.rect), access: access)
+        let succeeded = await withCheckedContinuation { continuation in
+            system.makePairStandIn(of: first, beside: second) { result in
+                if case .success = result {
+                    continuation.resume(returning: true)
+                } else {
+                    continuation.resume(returning: false)
+                }
+            }
+        }
+        #expect(succeeded)
+    }
+
+    @Test func aWindowOfAnotherKindHasNoPicture() async {
+        let plain = FakePlainWindow()
+        let failed = await withCheckedContinuation { continuation in
+            system.makePairStandIn(of: plain, beside: plain) { result in
+                if case .failure(.captureFailed) = result {
+                    continuation.resume(returning: true)
+                } else {
+                    continuation.resume(returning: false)
+                }
+            }
+        }
+        #expect(failed)
     }
 
     @Test func parkingIsPastAllDisplays() {

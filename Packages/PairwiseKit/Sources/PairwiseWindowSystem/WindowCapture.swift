@@ -1,53 +1,49 @@
 import PairwiseCore
-import ScreenCaptureKit
 
-/// Takes pictures of other apps' windows through ScreenCaptureKit (ADR 0024).
+/// Takes pictures of other apps' windows (ADR 0024). Finds each window in the system's list
+/// by its app, its size and the closest origin, as the Accessibility API gives no number.
 @MainActor
-enum WindowCapture {
+final class WindowCapture {
+    private let service: any CaptureService
     /// The system's list of windows from the last call. Asking for it takes the longest,
     /// and a window that has moved is still found in an older list.
-    private static var knownContent: SCShareableContent?
+    private var known: [any CapturableWindow]?
+
+    init(service: any CaptureService) {
+        self.service = service
+    }
 
     /// Fetches the list of windows ahead of the first picture; a failure is for later.
-    static func prepare() async {
-        knownContent = try? await SCShareableContent.excludingDesktopWindows(
-            false, onScreenWindowsOnly: true)
+    func prepare() async {
+        known = try? await service.onScreenWindows()
     }
 
     /// A stand-in showing `windows` side by side as they look now. The pictures are taken
     /// at the same time, as each of them waits on the system.
-    static func standIn(
+    func standIn(
         of windows: [AccessibilityWindow], framesPerSecond: Int
-    ) async -> Result<
-        any WindowStandIn, WindowSystemError
-    > {
+    ) async -> Result<any WindowStandIn, WindowSystemError> {
         do {
-            let content = try await content(for: windows)
-            let found = try windows.map { window in
-                let frame = try window.frame()
-                guard let match = onScreenWindow(of: window, frame: frame, in: content) else {
+            let frames = try windows.map { window throws(WindowSystemError) in try window.frame() }
+            let list = try await list(holding: windows, frames: frames)
+            let found = try zip(windows, frames).map { window, frame in
+                guard let match = Self.match(window, frame: frame, in: list) else {
                     throw WindowSystemError.captureFailed
                 }
-                return (match: match, frame: frame)
+                return (window: match, frame: frame)
             }
             let tasks = found.map { window in
                 // swiftlint:disable:next unhandled_throwing_task - the value below rethrows it
-                Task { try await picture(of: window.match, frame: window.frame) }
+                Task { try await service.picture(of: window.window, frame: window.frame) }
             }
             var pictures: [StandInPanel.Picture] = []
             for task in tasks {
                 pictures.append(try await task.value)
             }
             Task { await prepare() }
-            let streams =
-                framesPerSecond > 0
-                ? found.map {
-                    LiveStream(
-                        window: $0.match, width: pixelWidth($0.frame, of: $0.match),
-                        height: pixelHeight($0.frame, of: $0.match),
-                        framesPerSecond: framesPerSecond)
-                } : []
-            return .success(StandInPanel(pictures: pictures, streams: streams))
+            return .success(
+                service.standIn(
+                    pictures: pictures, windows: found, framesPerSecond: framesPerSecond))
         } catch let error as WindowSystemError {
             return .failure(error)
         } catch {
@@ -56,56 +52,24 @@ enum WindowCapture {
     }
 
     /// The known list when it holds all of `windows`, or else a fresh one.
-    private static func content(
-        for windows: [AccessibilityWindow]
-    ) async throws -> SCShareableContent {
-        if let knownContent, windows.allSatisfy({ holds($0, in: knownContent) }) {
-            return knownContent
+    private func list(
+        holding windows: [AccessibilityWindow], frames: [WindowFrame]
+    ) async throws -> [any CapturableWindow] {
+        if let known,
+            zip(windows, frames).allSatisfy({ Self.match($0, frame: $1, in: known) != nil })
+        {
+            return known
         }
-        let fresh = try await SCShareableContent.excludingDesktopWindows(
-            false, onScreenWindowsOnly: true)
-        knownContent = fresh
+        let fresh = try await service.onScreenWindows()
+        known = fresh
         return fresh
     }
 
-    private static func holds(
-        _ window: AccessibilityWindow, in content: SCShareableContent
-    ) -> Bool {
-        guard let frame = try? window.frame() else { return false }
-        return onScreenWindow(of: window, frame: frame, in: content) != nil
-    }
-
-    private static func picture(
-        of window: SCWindow, frame: WindowFrame
-    ) async throws -> StandInPanel.Picture {
-        let filter = SCContentFilter(desktopIndependentWindow: window)
-        let configuration = SCStreamConfiguration()
-        configuration.width = pixelWidth(frame, of: window)
-        configuration.height = pixelHeight(frame, of: window)
-        configuration.ignoreShadowsSingleWindow = true
-        configuration.showsCursor = false
-        let image = try await SCScreenshotManager.captureImage(
-            contentFilter: filter, configuration: configuration)
-        let size = CGSize(width: frame.size.width, height: frame.size.height)
-        return StandInPanel.Picture(image: image, size: size)
-    }
-
-    private static func pixelWidth(_ frame: WindowFrame, of window: SCWindow) -> Int {
-        let filter = SCContentFilter(desktopIndependentWindow: window)
-        return Int(frame.size.width * Double(filter.pointPixelScale))
-    }
-
-    private static func pixelHeight(_ frame: WindowFrame, of window: SCWindow) -> Int {
-        let filter = SCContentFilter(desktopIndependentWindow: window)
-        return Int(frame.size.height * Double(filter.pointPixelScale))
-    }
-
-    private static func onScreenWindow(
-        of window: AccessibilityWindow, frame: WindowFrame, in content: SCShareableContent
-    ) -> SCWindow? {
+    private static func match(
+        _ window: AccessibilityWindow, frame: WindowFrame, in list: [any CapturableWindow]
+    ) -> (any CapturableWindow)? {
         let processID = window.element.processID
-        let candidates = content.windows.filter { $0.owningApplication?.processID == processID }
-        let frames = candidates.map { WindowFrame(origin: $0.frame.origin, size: $0.frame.size) }
-        return WindowMatch.index(of: frame, among: frames).map { candidates[$0] }
+        let candidates = list.filter { $0.processID == processID }
+        return WindowMatch.index(of: frame, among: candidates.map(\.frame)).map { candidates[$0] }
     }
 }
