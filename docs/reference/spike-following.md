@@ -88,6 +88,19 @@ In step with the display (ADR 0021), with and without prediction:
 | 12 | Yes | 509 | 107.9 | 3.06 | 4.85 | 6.83 | 1.3 | 65.4 |
 | 12 | No | 242 | 107.1 | 3.72 | 7.27 | 7.48 | 2.1 | 49.5 |
 
+Holding back a drag (ADR 0023): the pointer ended 13.7 points from the press with 65 events withheld, and the window moved 0 points.
+
+One window while dragging (ADR 0024). "Panel after" runs from the press, so it includes any wait before the pointer moves:
+
+| Moves | Moves per second | Mean move (ms) | Longest move (ms) | Panel after (ms) |
+|---|---|---|---|---|
+| 751 | 105.5 | 0.30 | 1.80 | 223 |
+| 16 | 86.1 | 0.26 | 1.36 | 74 |
+| 428 | 104.8 | 0.40 | 2.39 | 246 |
+| 416 | 89.4 | 0.37 | 0.97 | 1084 |
+| 549 | 81.3 | 0.36 | 0.69 | 1537 |
+| 301 | 90.1 | 0.37 | 2.28 | 2018 |
+
 **By hand, first run:** a little lag remains, the Finder window sometimes stands a small distance from the dragged window, the swap is not seen, and after the release the Finder window is behind another window. ADR 0015 answers these.
 
 **By hand, second run, on drag events:** less lag, with a short delay at the start of a drag. While dragging, the stand-in sometimes stands a small distance from the dragged window and sometimes overlaps it; after the release the two are tight. ADR 0016 answers these.
