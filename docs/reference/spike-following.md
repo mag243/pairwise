@@ -66,6 +66,14 @@ Looking ahead (ADR 0019), with the place's changes and the pointer's together in
 | 8 | 319 | 93.1 | 1.97 | 3.37 | 12.20 | 1.5 | 21.9 |
 | 8 | 184 | 85.6 | 1.33 | 2.15 | 11.21 | 0.5 | 34.7 |
 
+Comparing the two (ADR 0020), both looking ahead 8 ms:
+
+| What moves | Moves | Moves per second | Mean move (ms) | 95th percentile (ms) | Longest move (ms) | Most slip (points) |
+|---|---|---|---|---|---|---|
+| Picture | 453 | 97.2 | 1.74 | 7.76 | 9.31 | 53.5 |
+| Real window | 1281 | 97.4 | 2.39 | 4.63 | 12.36 | 42.8 |
+| Real window | 758 | 84.4 | 2.14 | 3.30 | 10.84 | 28.1 |
+
 **By hand, first run:** a little lag remains, the Finder window sometimes stands a small distance from the dragged window, the swap is not seen, and after the release the Finder window is behind another window. ADR 0015 answers these.
 
 **By hand, second run, on drag events:** less lag, with a short delay at the start of a drag. While dragging, the stand-in sometimes stands a small distance from the dragged window and sometimes overlaps it; after the release the two are tight. ADR 0016 answers these.
