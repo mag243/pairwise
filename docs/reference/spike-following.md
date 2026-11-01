@@ -123,6 +123,8 @@ One window while dragging (ADR 0024). "Panel after" runs from the press, so it i
 
 **By hand, holding back a drag (ADR 0023):** while the test runs, windows cannot be dragged by their title bars, so withholding drag events stops a window drag. Clicks keep working.
 
+**By hand, moving as one:** when dragging starts straight after the press, only the held window moves. After a short wait the other window comes along, and then it looks very smooth.
+
 **Is the real partner out of sight during the drag?** Not answered yet.
 
 **Verdict:** not given yet.

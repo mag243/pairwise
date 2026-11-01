@@ -96,8 +96,11 @@ public final class PairDragModel {
 
     private func receive(_ result: Result<any WindowStandIn, WindowSystemError>) {
         guard case .pressed(var pressed) = drag else { return }
+        let elapsed = system.uptime - pressed.startTime
+        Self.logger.info("pictures after \(elapsed) s, dragging already \(pressed.isDrag)")
         switch result {
         case .failure(let error):
+            Self.logger.info("no pictures: \(String(describing: error), privacy: .public)")
             problem = error
             letDragPass()
         case .success(let standIn):
@@ -115,6 +118,7 @@ public final class PairDragModel {
             guard DragHoldRule.mayWaitForPictures(after: system.uptime - pressed.startTime)
             else {
                 if pressed.standIn == nil {
+                    Self.logger.info("pictures took too long: the drag passes")
                     problem = .captureFailed
                     letDragPass()
                     return false

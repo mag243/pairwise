@@ -140,6 +140,7 @@ public final class AccessibilityWindowSystem: WindowSystemProviding {
         let tap = HoldingTap(decide: decide)
         try tap.start()
         holdingTap = tap
+        Task { await WindowCapture.prepare() }
     }
 
     public func stopHoldingDrags() {

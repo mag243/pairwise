@@ -6,7 +6,7 @@ import PairwiseCore
 @MainActor
 final class StandInPanel: WindowStandIn {
     /// A picture and the size in points of the window it shows.
-    struct Picture {
+    struct Picture: Sendable {
         let image: CGImage
         let size: CGSize
     }
