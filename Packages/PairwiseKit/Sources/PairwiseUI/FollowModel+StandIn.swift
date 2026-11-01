@@ -7,7 +7,6 @@ extension FollowModel {
     /// partner is no problem yet: this press may be a click.
     func prepareStandIn(for window: any MovableWindow) {
         guard
-            usesStandIn,
             system.isScreenRecordingGranted,
             let partner = try? system.partner(for: window)
         else { return }
@@ -39,7 +38,6 @@ extension FollowModel {
             let now = system.uptime
             following.standIn = standIn
             following.lastTarget = nil
-            motion = MotionPrediction()
             following.standInDelay = now - following.startTime
             following.startTime = now
             stats = FollowStats()

@@ -1,6 +1,6 @@
 # 0021. Predicting the stand-in, in step with the display
 
-- **Status:** Accepted
+- **Status:** Superseded by 0022
 - **Date:** 2026-11-01
 - **Milestone:** M2
 

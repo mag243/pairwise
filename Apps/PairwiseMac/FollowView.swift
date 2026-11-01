@@ -59,12 +59,6 @@ struct FollowView: View {
                     Text(verbatim: app.name).tag(app.bundleIdentifier)
                 }
             }
-            if model.isScreenRecordingGranted {
-                Toggle("Use a picture of the partner", isOn: usesPicture)
-                if model.usesStandIn {
-                    Toggle("Predict the picture's movement", isOn: predictsPicture)
-                }
-            }
             Stepper(
                 value: lookAheadMilliseconds, in: Self.lookAheadRange, step: Self.lookAheadStep
             ) {
@@ -92,32 +86,15 @@ struct FollowView: View {
         }
     }
 
-    private var predictsPicture: Binding<Bool> {
-        Binding {
-            model.predictsStandIn
-        } set: {
-            model.predictsStandIn = $0
-        }
-    }
-
-    private var usesPicture: Binding<Bool> {
-        Binding {
-            model.usesStandIn
-        } set: {
-            model.usesStandIn = $0
-        }
-    }
-
-    private var isPictureInUse: Bool { model.usesStandIn && model.isScreenRecordingGranted }
-
     /// The value for what the next drag moves: the picture or the window itself.
     private var lookAheadMilliseconds: Binding<Int> {
         Binding {
-            let seconds = isPictureInUse ? model.standInLookAhead : model.partnerLookAhead
+            let seconds =
+                model.isScreenRecordingGranted ? model.standInLookAhead : model.partnerLookAhead
             return Int((seconds * Self.millisecondsPerSecond).rounded())
         } set: { milliseconds in
             let seconds = Double(milliseconds) / Self.millisecondsPerSecond
-            if isPictureInUse {
+            if model.isScreenRecordingGranted {
                 model.standInLookAhead = seconds
             } else {
                 model.partnerLookAhead = seconds

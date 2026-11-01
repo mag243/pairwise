@@ -106,6 +106,8 @@ In step with the display (ADR 0021), with and without prediction:
 
 **The owner's choice:** the stand-in stays, without the check with a slower app.
 
+**By hand, predicting:** no positive effect, at any look-ahead tried. ADR 0022 drops it.
+
 **Is the real partner out of sight during the drag?** Not answered yet.
 
 **Verdict:** not given yet.

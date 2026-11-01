@@ -22,7 +22,6 @@ import Testing
         model = FollowModel(system: system)
         model.standInLookAhead = 0
         model.partnerLookAhead = 0
-        model.predictsStandIn = false
     }
 
     private func moveWindow(toX x: Double, y: Double = 100) {
@@ -105,58 +104,6 @@ import Testing
         moveWindow(toX: 110)
         system.tick()
         #expect(partner.moves.last == ScreenPoint(x: 530, y: 100))
-    }
-
-    @Test func withThePictureOffNoneIsTaken() {
-        model.usesStandIn = false
-        model.start()
-        system.press(at: Self.grab)
-        #expect(system.standInRequests == 0)
-    }
-
-    @Test func withThePictureOffThePartnerFollowsAsItself() {
-        model.usesStandIn = false
-        model.start()
-        system.press(at: Self.grab)
-        moveWindow(toX: 101)
-        system.tick()
-        moveWindow(toX: 130)
-        system.tick()
-        #expect(partner.moves == [ScreenPoint(x: 530, y: 100)])
-    }
-
-    @Test func aPredictedStandInSettlesExactlyBesideTheWindow() {
-        model.predictsStandIn = true
-        model.standInLookAhead = 0.016
-        startDragWithStandIn()
-        for frame in 1...180 {
-            system.uptime = Double(frame) / 60
-            system.tick()
-        }
-        #expect(standIn.moves.last == ScreenPoint(x: 501, y: 100))
-    }
-
-    @Test func aPredictedStandInMovesAheadWithThePointer() throws {
-        model.predictsStandIn = true
-        model.standInLookAhead = 0.016
-        startDragWithStandIn()
-        for frame in 1...60 {
-            let x = 101 + Double(frame) * 10
-            system.uptime = Double(frame) / 60
-            system.pointerLocation = ScreenPoint(x: 150 + Double(frame) * 10, y: 110)
-            moveWindow(toX: x)
-            system.tick()
-        }
-        let last = try #require(standIn.moves.last)
-        #expect(last.x > 701 + 400)
-    }
-
-    @Test func predictionIsOnByDefault() {
-        #expect(FollowModel(system: system).predictsStandIn)
-    }
-
-    @Test func thePictureIsOnByDefault() {
-        #expect(model.usesStandIn)
     }
 
     @Test func aWindowThatHangsHoldsTheStandInStill() {

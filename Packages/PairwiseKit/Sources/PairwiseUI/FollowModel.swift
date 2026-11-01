@@ -17,10 +17,6 @@ public final class FollowModel {
     static let placingPatience: TimeInterval = 0.5
     static let logger = Logger(subsystem: "me.m-domain.pairwise", category: "follow")
 
-    /// Whether a drag uses a picture of the partner, when the permission allows (ADR 0020).
-    public var usesStandIn = true
-    /// Whether a stand-in moves by prediction, or looks ahead only (ADR 0021).
-    public var predictsStandIn = true
     /// How far ahead a stand-in looks with the pointer's movement, in seconds (ADR 0019).
     public var standInLookAhead: TimeInterval = 0.008
     /// How far ahead a partner moving as itself looks, in seconds (ADR 0020).
@@ -50,7 +46,6 @@ public final class FollowModel {
     @ObservationIgnored var earlyPicture: Result<any WindowStandIn, WindowSystemError>?
     @ObservationIgnored var mostSlip: Double?
     @ObservationIgnored var pointerLead = PointerLead()
-    @ObservationIgnored var motion = MotionPrediction()
     /// Tells a picture that arrives late from the one this drag asked for.
     @ObservationIgnored var standInRequest = 0
 
@@ -202,12 +197,7 @@ public final class FollowModel {
         from place: ScreenPoint, for following: FollowDrag.Following, _ serverFrame: WindowFrame?,
         _ pointer: ScreenPoint?, at time: TimeInterval
     ) -> ScreenPoint {
-        guard let serverFrame, let pointer else { return place }
-        if following.standIn != nil, predictsStandIn {
-            let window = following.placeBeside(serverFrame)
-            return motion.place(
-                forWindowAt: window, pointer: pointer, at: time, lookingAhead: standInLookAhead)
-        }
+        guard serverFrame != nil, let pointer else { return place }
         return pointerLead.ahead(
             of: place, pointer: pointer, at: time, lookingAhead: lookAhead(for: following))
     }
