@@ -2,7 +2,7 @@
 # Verifies the import rules of ADR 0001 that Package.swift cannot express:
 #   - PairwiseCore imports only Foundation (no UI frameworks, no other module).
 #   - PairwiseWindowSystem imports neither SwiftUI nor PairwiseUI.
-#   - The Accessibility API and event taps appear only in PairwiseWindowSystem,
+#   - The Accessibility API, event taps and ScreenCaptureKit appear only in PairwiseWindowSystem,
 #     the one place that touches another app's windows.
 # Package.swift already enforces the dependency direction between the modules.
 set -euo pipefail
@@ -11,7 +11,7 @@ source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
 SOURCES="$PACKAGE_DIR/Sources"
 WINDOW_SYSTEM_FORBIDDEN='SwiftUI|UIKit|PairwiseUI'
-WINDOW_SYSTEM_ONLY='AXUIElement|AXObserver|CGEvent\.tapCreate'
+WINDOW_SYSTEM_ONLY='AXUIElement|AXObserver|CGEvent\.tapCreate|ScreenCaptureKit|SCScreenshotManager'
 
 # Prints "file:line: import" for every import in the Swift files under [1].
 imports_in() {
@@ -46,6 +46,6 @@ report "PairwiseWindowSystem may not import SwiftUI, UIKit or PairwiseUI" \
 
 outside="$(grep -rnE --include='*.swift' "$WINDOW_SYSTEM_ONLY" "$SOURCES" "$ROOT_DIR/Apps" 2>/dev/null |
   grep -v "$SOURCES/PairwiseWindowSystem/" | sed "s|^$ROOT_DIR/||" || true)"
-report "Only PairwiseWindowSystem may use the Accessibility API or event taps" "$outside"
+report "Only PairwiseWindowSystem may use the Accessibility API, event taps or ScreenCaptureKit" "$outside"
 
 ((found == 0)) || exit 1

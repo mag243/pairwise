@@ -20,5 +20,6 @@ macOS keeps the Accessibility permission against the app's designated requiremen
 
 ## Consequences
 - Positive: the permission survives rebuilds, to be confirmed by hand in M1.
+- `tools/build.sh run` starts the app through Launch Services: started from the shell, macOS asks for permissions on behalf of the terminal, so the grant would not reach Pairwise.
 - Negative / risks: a build needs the certificate in the keychain; another machine has to set up its own or pass the ad hoc settings.
 - Changes now: the Debug settings in `Pairwise.xcodeproj`, the CI case in `tools/build.sh`, open decision 1 in `PLAN.md`.
