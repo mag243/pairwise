@@ -25,11 +25,12 @@ Measured on 2026-11-01. The partner is a Finder window, and the dragged windows 
 
 ## The stand-in (M2)
 
-Measured by hand with the stand-in of ADR 0014. "Stand-in after" is the time from seeing the drag to showing the picture.
+Measured by hand on 2026-11-01 with the stand-in of ADR 0014, with a Finder window as the partner. "Stand-in after" is the time from seeing the drag to showing the picture.
 
 | Dragged window | Moves | Moves per second | Mean move (ms) | Longest move (ms) | Stand-in after (ms) |
 |---|---|---|---|---|---|
-| Not measured yet | | | | | |
+| Not noted | 660 | 120.1 | 0.18 | 2.11 | 107.8 |
+| Not noted | 2021 | 120.0 | 0.15 | 1.79 | 47.9 |
 
 **Is the real partner out of sight during the drag?** Not tried yet.
 

@@ -17,7 +17,7 @@ Not in this milestone: joining, the shared seam, coming apart, choosing a partne
 - [ ] By hand: the stand-in moves beside the dragged window without visible lag, and the owner's verdict is in `docs/reference/spike-following.md`.
 - [ ] By hand: the real partner is out of sight during the drag (the assumption of ADR 0014), and ends level beside the dragged window after the release.
 - [ ] By hand: without Screen Recording the partner follows as in M1.
-- [ ] Measured and written down: how long the stand-in takes to appear, and how its moves hold up.
+- [x] Measured and written down: how long the stand-in takes to appear, and how its moves hold up.
 - [ ] `tools/build.sh ci` is green (when the owner says so, ADR 0011).
 
 ## Trying it
