@@ -16,6 +16,14 @@ final class AccessibilityWindow: MovableWindow {
         element.limitMessagingTime()
     }
 
+    /// Precondition: `element` is the window the window server numbers `serverWindowNumber`.
+    init(element: AXUIElement, serverWindowNumber: CGWindowID) {
+        self.element = element
+        self.serverWindowNumber = serverWindowNumber
+        hasLookedUpWindowNumber = true
+        element.limitMessagingTime()
+    }
+
     func frame() throws(WindowSystemError) -> WindowFrame {
         let origin = try read(kAXPositionAttribute, as: .cgPoint, initial: CGPoint.zero)
         let size = try read(kAXSizeAttribute, as: .cgSize, initial: CGSize.zero)

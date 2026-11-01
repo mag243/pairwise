@@ -131,6 +131,8 @@ With the window list kept and the pictures taken together, over 13 drags: the pi
 
 **By hand, moving as one, later:** pressing at a new place on the title bar and dragging at once sometimes moves only the held window; after a short wait both go along every time. A small flash at the release, not very noticeable.
 
+**From the log of that run:** 11 presses gave "no window under the pointer", within about a millisecond and in clusters, so those drags were not taken over. ADR 0026 answers this. Deciding on the other presses took 5 to 32 ms.
+
 **Is the real partner out of sight during the drag?** Not answered yet.
 
 **Verdict:** not given yet.

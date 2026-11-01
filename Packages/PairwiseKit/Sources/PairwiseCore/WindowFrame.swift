@@ -12,6 +12,11 @@ public struct WindowFrame: Equatable, Sendable {
         self.init(origin: ScreenPoint(x: x, y: y), size: WindowSize(width: width, height: height))
     }
 
+    /// Whether `point` is on the window, its edges included.
+    public func contains(_ point: ScreenPoint) -> Bool {
+        point.x >= origin.x && point.x <= maxX && point.y >= origin.y && point.y <= maxY
+    }
+
     /// The x of the window's right edge.
     public var maxX: Double { origin.x + size.width }
 

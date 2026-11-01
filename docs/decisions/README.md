@@ -31,3 +31,4 @@ Use `0000-template.md` as the basis.
 | 0023 | Testing whether a window drag can be held back | Accepted |
 | 0024 | One window of Pairwise's own while dragging | Accepted |
 | 0025 | The panel waits a moment after placing | Accepted |
+| 0026 | The window under the pointer comes from the window server | Accepted |

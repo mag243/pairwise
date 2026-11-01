@@ -8,15 +8,12 @@ import PairwiseCore
 public final class AccessibilityWindowSystem: WindowSystemProviding {
     public var partnerBundleIdentifier = "com.apple.finder"
 
-    private let systemWide = AXUIElementCreateSystemWide()
     private var tap: PointerTap?
     private var holdingTap: HoldingTap?
     private var ticker: DisplayTicker?
     private var timer: Timer?
 
-    public init() {
-        systemWide.limitMessagingTime()
-    }
+    public init() {}
 
     public var isAccessibilityGranted: Bool { AXIsProcessTrusted() }
 
@@ -86,15 +83,20 @@ public final class AccessibilityWindowSystem: WindowSystemProviding {
     }
 
     public func window(at point: ScreenPoint) -> (any MovableWindow)? {
-        var hit: AXUIElement?
-        let result = AXUIElementCopyElementAtPosition(
-            systemWide, Float(point.x), Float(point.y), &hit)
-        guard result == .success, let hit else { return nil }
-        // A call from Pairwise to itself would wait on the thread that has to answer it.
-        guard hit.processID != ProcessInfo.processInfo.processIdentifier else { return nil }
-        let isWindow = hit.attribute(kAXRoleAttribute) as? String == kAXWindowRole
-        let element = isWindow ? hit : hit.elementAttribute(kAXWindowAttribute)
-        return element.map(AccessibilityWindow.init(element:))
+        guard
+            let top = WindowServer.topWindow(
+                at: point, excludingProcess: ProcessInfo.processInfo.processIdentifier)
+        else { return nil }
+        let app = AXUIElementCreateApplication(top.processID)
+        app.limitMessagingTime()
+        let elements = app.attribute(kAXWindowsAttribute) as? [AXUIElement] ?? []
+        let windows = elements.map(AccessibilityWindow.init(element:))
+        let frames = windows.map {
+            (try? $0.frame()) ?? WindowFrame(x: 0, y: 0, width: 0, height: 0)
+        }
+        return WindowMatch.index(of: top.frame, among: frames).map {
+            AccessibilityWindow(element: elements[$0], serverWindowNumber: top.number)
+        }
     }
 
     public func partner(

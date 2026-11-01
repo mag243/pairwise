@@ -126,15 +126,12 @@ public final class PairDragModel {
         case .none, .passing, .placing, .settling:
             return false
         case .pressed(var pressed):
-            guard DragHoldRule.mayWaitForPictures(after: system.uptime - pressed.startTime)
-            else {
-                if pressed.standIn == nil {
-                    Self.logger.info("pictures took too long: the drag passes")
-                    problem = .captureFailed
-                    letDragPass()
-                    return false
-                }
-                return holds(&pressed, at: point)
+            let elapsed = system.uptime - pressed.startTime
+            if pressed.standIn == nil, !DragHoldRule.mayWaitForPictures(after: elapsed) {
+                Self.logger.info("pictures took too long: the drag passes")
+                problem = .captureFailed
+                letDragPass()
+                return false
             }
             return holds(&pressed, at: point)
         case .moving(var moving):
@@ -215,6 +212,11 @@ public final class PairDragModel {
 
     private func release(at point: ScreenPoint) {
         guard case .moving(let moving) = drag else {
+            if case .pressed(let pressed) = drag {
+                Self.logger.info(
+                    "released with no panel, dragging \(pressed.isDrag), pictures \(pressed.standIn != nil)"
+                )
+            }
             endDrag()
             return
         }

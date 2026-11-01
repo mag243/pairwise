@@ -19,4 +19,52 @@ import Testing
     @Test func aDescriptionWithoutBoundsGivesNoFrame() {
         #expect(WindowServer.frame(from: [:]) == nil)
     }
+
+    private func description(
+        number: Int, process: Int, level: Int = 0, x: Double = 0
+    ) -> [String: Any] {
+        let rect = CGRect(x: x, y: 0, width: 100, height: 100)
+        return [
+            kCGWindowBounds as String: rect.dictionaryRepresentation,
+            kCGWindowNumber as String: NSNumber(value: number),
+            kCGWindowOwnerPID as String: NSNumber(value: process),
+            kCGWindowLayer as String: NSNumber(value: level),
+        ]
+    }
+
+    private static let point = ScreenPoint(x: 50, y: 50)
+    private static let own: pid_t = 9
+
+    @Test func theFrontmostWindowAtThePointIsOnTop() {
+        let top = WindowServer.topWindow(
+            at: Self.point, excludingProcess: Self.own,
+            in: [
+                description(number: 1, process: 1, x: 500),
+                description(number: 2, process: 2),
+                description(number: 3, process: 3),
+            ])
+        #expect(top?.number == 2)
+        #expect(top?.processID == 2)
+    }
+
+    @Test func nothingAtThePointIsNoWindow() {
+        let top = WindowServer.topWindow(
+            at: Self.point, excludingProcess: Self.own,
+            in: [description(number: 1, process: 1, x: 500)])
+        #expect(top == nil)
+    }
+
+    @Test func pairwisesOwnWindowOnTopIsNoWindow() {
+        let top = WindowServer.topWindow(
+            at: Self.point, excludingProcess: Self.own,
+            in: [description(number: 1, process: 9), description(number: 2, process: 2)])
+        #expect(top == nil)
+    }
+
+    @Test func aMenuOnTopIsNoWindow() {
+        let top = WindowServer.topWindow(
+            at: Self.point, excludingProcess: Self.own,
+            in: [description(number: 1, process: 1, level: 25), description(number: 2, process: 2)])
+        #expect(top == nil)
+    }
 }
