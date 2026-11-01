@@ -137,6 +137,8 @@ With the window list kept and the pictures taken together, over 13 drags: the pi
 
 **From the log after the window server's list:** every drag that reached the panel was fine, but some presses show "released with no panel" about 4 ms after the press, with the button still down. The tap sees a press before the system counts the button as down, so the check for a lost release ended those presses, and their drags passed. This matches the owner's report that sometimes only the held window moves. Fixed with a failing test first.
 
+**The stress test (ADR 0027), 40 drags of Finder windows with posted events:** with the button check as fixed, both windows moved 40 times out of 40. With the fault put back for one run, both moved 11 times, only the held window 25 times, and nothing 4 times. So the test catches this fault, and the symptom is the one the owner reported.
+
 **Is the real partner out of sight during the drag?** Not answered yet.
 
 **Verdict:** not given yet.
