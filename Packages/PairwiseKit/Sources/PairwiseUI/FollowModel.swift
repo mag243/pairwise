@@ -17,8 +17,12 @@ public final class FollowModel {
     static let placingPatience: TimeInterval = 0.5
     static let logger = Logger(subsystem: "me.m-domain.pairwise", category: "follow")
 
+    /// Whether a drag uses a picture of the partner, when the permission allows (ADR 0020).
+    public var usesStandIn = true
     /// How far ahead a stand-in looks with the pointer's movement, in seconds (ADR 0019).
     public var standInLookAhead: TimeInterval = 0.008
+    /// How far ahead a partner moving as itself looks, in seconds (ADR 0020).
+    public var partnerLookAhead: TimeInterval = 0.016
 
     public private(set) var isAccessibilityGranted: Bool
     public private(set) var isScreenRecordingGranted: Bool
@@ -186,9 +190,12 @@ public final class FollowModel {
         _ pointer: ScreenPoint?, at time: TimeInterval
     ) -> ScreenPoint {
         guard serverFrame != nil, let pointer else { return place }
-        let ahead = pointerLead.ahead(
-            of: place, pointer: pointer, at: time, lookingAhead: standInLookAhead)
-        return following.standIn == nil ? place : ahead
+        return pointerLead.ahead(
+            of: place, pointer: pointer, at: time, lookingAhead: lookAhead(for: following))
+    }
+
+    func lookAhead(for following: FollowDrag.Following) -> TimeInterval {
+        following.standIn == nil ? partnerLookAhead : standInLookAhead
     }
 
     private func noteSlip(

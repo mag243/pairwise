@@ -78,6 +78,8 @@ Looking ahead (ADR 0019), with the place's changes and the pointer's together in
 
 **By hand, looking ahead:** 4 to 8 ms looks best, and a visible effect remains.
 
+**The owner asks what the stand-in adds,** since it knows the window's place as late as a real partner. ADR 0020 compares the two.
+
 **Is the real partner out of sight during the drag?** Not answered yet.
 
 **Verdict:** not given yet.

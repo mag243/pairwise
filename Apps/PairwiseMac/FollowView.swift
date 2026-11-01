@@ -55,12 +55,13 @@ struct FollowView: View {
                     .foregroundStyle(.secondary)
             }
             if model.isScreenRecordingGranted {
-                Stepper(
-                    value: lookAheadMilliseconds, in: Self.lookAheadRange, step: Self.lookAheadStep
-                ) {
-                    LabeledContent("Look ahead (ms)") {
-                        Text(lookAheadMilliseconds.wrappedValue, format: .number).monospacedDigit()
-                    }
+                Toggle("Use a picture of the partner", isOn: usesPicture)
+            }
+            Stepper(
+                value: lookAheadMilliseconds, in: Self.lookAheadRange, step: Self.lookAheadStep
+            ) {
+                LabeledContent("Look ahead (ms)") {
+                    Text(lookAheadMilliseconds.wrappedValue, format: .number).monospacedDigit()
                 }
             }
             Button(model.isWatching ? "Stop" : "Start") {
@@ -75,11 +76,28 @@ struct FollowView: View {
         }
     }
 
+    private var usesPicture: Binding<Bool> {
+        Binding {
+            model.usesStandIn
+        } set: {
+            model.usesStandIn = $0
+        }
+    }
+
+    private var isPictureInUse: Bool { model.usesStandIn && model.isScreenRecordingGranted }
+
+    /// The value for what the next drag moves: the picture or the window itself.
     private var lookAheadMilliseconds: Binding<Int> {
         Binding {
-            Int((model.standInLookAhead * Self.millisecondsPerSecond).rounded())
+            let seconds = isPictureInUse ? model.standInLookAhead : model.partnerLookAhead
+            return Int((seconds * Self.millisecondsPerSecond).rounded())
         } set: { milliseconds in
-            model.standInLookAhead = Double(milliseconds) / Self.millisecondsPerSecond
+            let seconds = Double(milliseconds) / Self.millisecondsPerSecond
+            if isPictureInUse {
+                model.standInLookAhead = seconds
+            } else {
+                model.partnerLookAhead = seconds
+            }
         }
     }
 

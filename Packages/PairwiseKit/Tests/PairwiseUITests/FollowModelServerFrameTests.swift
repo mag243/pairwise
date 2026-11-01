@@ -21,6 +21,7 @@ import Testing
         dragged.currentServerFrame = Self.start
         model = FollowModel(system: system)
         model.standInLookAhead = 0
+        model.partnerLookAhead = 0
     }
 
     private func moveWindow(toX x: Double, y: Double = 100) {
@@ -84,20 +85,47 @@ import Testing
         #expect(standIn.moves.last == ScreenPoint(x: 520, y: 100))
     }
 
-    @Test func thePartnerAsItselfDoesNotLookAhead() {
+    @Test func thePartnerAsItselfLooksAheadWithItsOwnValue() {
         system.isScreenRecordingGranted = false
-        model.standInLookAhead = 0.016
+        model.standInLookAhead = 0
+        model.partnerLookAhead = 0.016
         model.start()
         system.press(at: Self.grab)
         moveWindow(toX: 101)
         system.tick()
+        system.uptime = 0.1
         system.pointerLocation = ScreenPoint(x: 170, y: 110)
         system.tick()
-        system.uptime = 0.1
+        system.uptime = 0.11
+        system.pointerLocation = ScreenPoint(x: 180, y: 110)
+        system.tick()
+        system.uptime = 0.12
         system.pointerLocation = ScreenPoint(x: 190, y: 110)
-        moveWindow(toX: 130)
+        moveWindow(toX: 110)
         system.tick()
         #expect(partner.moves.last == ScreenPoint(x: 530, y: 100))
+    }
+
+    @Test func withThePictureOffNoneIsTaken() {
+        model.usesStandIn = false
+        model.start()
+        system.press(at: Self.grab)
+        #expect(system.standInRequests == 0)
+    }
+
+    @Test func withThePictureOffThePartnerFollowsAsItself() {
+        model.usesStandIn = false
+        model.start()
+        system.press(at: Self.grab)
+        moveWindow(toX: 101)
+        system.tick()
+        moveWindow(toX: 130)
+        system.tick()
+        #expect(partner.moves == [ScreenPoint(x: 530, y: 100)])
+    }
+
+    @Test func thePictureIsOnByDefault() {
+        #expect(model.usesStandIn)
     }
 
     @Test func aWindowThatHangsHoldsTheStandInStill() {

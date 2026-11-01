@@ -498,6 +498,23 @@
         }
       }
     },
+    "Use a picture of the partner" : {
+      "comment" : "Switch: move a picture of the partner while dragging, or the real window",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bild des Partners verwenden"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Foto van de partner gebruiken"
+          }
+        }
+      }
+    },
     "Without it, the Finder window itself follows, with some lag." : {
       "comment" : "What happens without Screen Recording",
       "localizations" : {
