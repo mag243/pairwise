@@ -32,3 +32,4 @@ Use `0000-template.md` as the basis.
 | 0024 | One window of Pairwise's own while dragging | Accepted |
 | 0025 | The panel waits a moment after placing | Accepted |
 | 0026 | The window under the pointer comes from the window server | Accepted |
+| 0027 | A stress test of dragging, run by the agent | Accepted |

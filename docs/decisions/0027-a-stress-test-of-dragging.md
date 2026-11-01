@@ -1,0 +1,23 @@
+# 0027. A stress test of dragging, run by the agent
+
+- **Status:** Accepted
+- **Date:** 2026-11-01
+- **Milestone:** M2
+
+## Context
+The partner sometimes does not go along. It happens one time in a number of tries, and each round has cost the owner a series of drags by hand. Whether a drag was taken over can be measured from the windows' places, so a person need not watch.
+
+## Decision
+`tools/build.sh run --drag-stress-test <file>` makes the app test itself and quit. It opens two Finder windows on empty temporary folders of its own, and pins them as the dragged window and the partner, so no other window can move. It posts real mouse events through the system, varying the place on the title bar and the waits before and after the press, and reads from the window server where both windows ended up. Each try is written to the file as both moved, only the held window moved, or nothing moved, with what became of the press. At the end it closes its windows, puts the pointer back and quits.
+
+It takes over the pointer for as long as it runs, so it runs only when the owner has asked for it (as ADR 0011 for UI tests).
+
+## Alternatives
+- **An XCUITest:** an earlier project found that its drags did not move windows.
+- **A script outside the app:** it would need the permission for the terminal, which the owner keeps off.
+- **More logging, by hand:** the rounds this replaces.
+
+## Consequences
+- Positive: the agent can reproduce the fault and count it, without the owner.
+- Negative / risks: it drags Finder windows only, so a fault of another app stays for by hand. Posted events are not a hand on a trackpad. It is not a plain test: it waits on real time and needs permissions, so it is not part of `tools/build.sh`'s gates.
+- Changes now: `PairwiseWindowSystem`, `PairDragModel`, the app's start.

@@ -10,6 +10,8 @@ public final class AccessibilityWindowSystem: WindowSystemProviding {
     private static let logger = Logger(subsystem: "me.m-domain.pairwise", category: "windows")
 
     public var partnerBundleIdentifier = "com.apple.finder"
+    /// The window `partner(for:)` gives whatever the app, for the stress test (ADR 0027).
+    var pinnedPartner: AccessibilityWindow?
 
     private var tap: PointerTap?
     private var holdingTap: HoldingTap?
@@ -110,6 +112,7 @@ public final class AccessibilityWindowSystem: WindowSystemProviding {
     public func partner(
         for window: any MovableWindow
     ) throws(WindowSystemError) -> any MovableWindow {
+        if let pinnedPartner { return pinnedPartner }
         let dragged = (window as? AccessibilityWindow)?.element
         let apps = NSRunningApplication.runningApplications(
             withBundleIdentifier: partnerBundleIdentifier)

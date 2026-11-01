@@ -22,6 +22,8 @@ public final class PairDragModel {
     public private(set) var isRunning = false
     /// Why the last start or drag did not work; cleared by the next one.
     public private(set) var problem: WindowSystemError?
+    /// What became of the last press, in words for the log and the stress test.
+    public private(set) var lastPressOutcome = ""
     /// The measurements of the last drag that moved the panel.
     public private(set) var lastDrag: FollowReport?
 
@@ -86,6 +88,7 @@ public final class PairDragModel {
         hasSeenButtonDown = false
         pressTime = before
         let outcome = takeOverPress(at: point)
+        lastPressOutcome = outcome
         let elapsed = system.uptime - before
         Self.logger.info("press: \(outcome, privacy: .public), deciding took \(elapsed) s")
     }
