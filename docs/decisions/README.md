@@ -34,3 +34,4 @@ Use `0000-template.md` as the basis.
 | 0026 | The window under the pointer comes from the window server | Accepted |
 | 0027 | A stress test of dragging, run by the agent | Accepted |
 | 0028 | One window while dragging is the way; the rest goes | Accepted |
+| 0029 | Live pictures while dragging | Accepted |

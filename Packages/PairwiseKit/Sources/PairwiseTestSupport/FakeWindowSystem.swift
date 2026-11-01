@@ -17,6 +17,7 @@ public final class FakeWindowSystem: WindowSystemProviding {
     public var watchError: WindowSystemError?
     public var partnerApps: [PartnerApp] = []
     public var isPrimaryButtonDown = true
+    public var liveFramesPerSecond = 0
     public var partnerBundleIdentifier = "com.apple.finder"
     public private(set) var accessibilityRequests = 0
     public private(set) var screenRecordingRequests = 0

@@ -12,8 +12,13 @@ final class StandInPanel: WindowStandIn {
     }
 
     private let panel: NSPanel
+    private let streams: [LiveStream]
 
-    init(pictures: [Picture]) {
+    var liveFrames: [Int] { streams.map(\.frames) }
+
+    /// Each stream, if any, updates the picture at the same place in `pictures`.
+    init(pictures: [Picture], streams: [LiveStream]) {
+        self.streams = streams
         let size = CGSize(
             width: pictures.map(\.size.width).reduce(0, +),
             height: pictures.map(\.size.height).max() ?? 0)
@@ -30,7 +35,7 @@ final class StandInPanel: WindowStandIn {
         let view = NSView(frame: CGRect(origin: .zero, size: size))
         view.wantsLayer = true
         var left: CGFloat = 0
-        for picture in pictures {
+        for (index, picture) in pictures.enumerated() {
             let layer = CALayer()
             layer.contents = picture.image
             layer.contentsGravity = .resize
@@ -39,6 +44,7 @@ final class StandInPanel: WindowStandIn {
                 x: left, y: size.height - picture.size.height,
                 width: picture.size.width, height: picture.size.height)
             view.layer?.addSublayer(layer)
+            if streams.indices.contains(index) { streams[index].layer = layer }
             left += picture.size.width
         }
         panel.contentView = view
@@ -47,6 +53,7 @@ final class StandInPanel: WindowStandIn {
     func show(at origin: ScreenPoint) {
         move(to: origin)
         panel.orderFrontRegardless()
+        for stream in streams { stream.start() }
     }
 
     func move(to origin: ScreenPoint) {
@@ -54,6 +61,7 @@ final class StandInPanel: WindowStandIn {
     }
 
     func dismiss() {
+        for stream in streams { stream.stop() }
         panel.close()
     }
 }

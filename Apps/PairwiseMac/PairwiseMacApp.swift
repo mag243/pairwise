@@ -21,8 +21,12 @@ struct PairwiseMacApp: App {
 
     var body: some Scene {
         WindowGroup("Pairwise") {
-            MainView(model: pairDrag)
-                .task { await runStressTestIfAsked() }
+            if CommandLine.arguments.contains(DragStressTest.animatedWindowFlag) {
+                AnimatedTestView()
+            } else {
+                MainView(model: pairDrag)
+                    .task { await runStressTestIfAsked() }
+            }
         }
     }
 
@@ -36,7 +40,8 @@ struct PairwiseMacApp: App {
         let model = pairDrag
         let test = DragStressTest(
             system: system, outputPath: arguments[flag + 1],
-            pressOutcome: { model.lastPressOutcome })
+            pressOutcome: { model.lastPressOutcome },
+            lastLiveFrames: { model.lastDrag?.liveFrames ?? [] })
         await test.run()
         pairDrag.stop()
         NSApplication.shared.terminate(nil)

@@ -6,6 +6,7 @@ public final class FakeStandIn: WindowStandIn {
     public private(set) var shownAt: ScreenPoint?
     public private(set) var moves: [ScreenPoint] = []
     public private(set) var isDismissed = false
+    public var liveFrames: [Int] = []
     /// Runs during each move, to let a test advance time.
     public var duringMove: (() -> Void)?
 

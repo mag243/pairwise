@@ -16,21 +16,38 @@ enum WindowCapture {
 
     /// A stand-in showing `windows` side by side as they look now. The pictures are taken
     /// at the same time, as each of them waits on the system.
-    static func standIn(of windows: [AccessibilityWindow]) async -> Result<
+    static func standIn(
+        of windows: [AccessibilityWindow], framesPerSecond: Int
+    ) async -> Result<
         any WindowStandIn, WindowSystemError
     > {
         do {
             let content = try await content(for: windows)
-            let tasks = windows.map { window in
+            let found = try windows.map { window in
+                let frame = try window.frame()
+                guard let match = onScreenWindow(of: window, frame: frame, in: content) else {
+                    throw WindowSystemError.captureFailed
+                }
+                return (match: match, frame: frame)
+            }
+            let tasks = found.map { window in
                 // swiftlint:disable:next unhandled_throwing_task - the value below rethrows it
-                Task { try await picture(of: window, in: content) }
+                Task { try await picture(of: window.match, frame: window.frame) }
             }
             var pictures: [StandInPanel.Picture] = []
             for task in tasks {
                 pictures.append(try await task.value)
             }
             Task { await prepare() }
-            return .success(StandInPanel(pictures: pictures))
+            let streams =
+                framesPerSecond > 0
+                ? found.map {
+                    LiveStream(
+                        window: $0.match, width: pixelWidth($0.frame, of: $0.match),
+                        height: pixelHeight($0.frame, of: $0.match),
+                        framesPerSecond: framesPerSecond)
+                } : []
+            return .success(StandInPanel(pictures: pictures, streams: streams))
         } catch let error as WindowSystemError {
             return .failure(error)
         } catch {
@@ -59,23 +76,28 @@ enum WindowCapture {
     }
 
     private static func picture(
-        of window: AccessibilityWindow, in content: SCShareableContent
+        of window: SCWindow, frame: WindowFrame
     ) async throws -> StandInPanel.Picture {
-        let frame = try window.frame()
-        guard let match = onScreenWindow(of: window, frame: frame, in: content) else {
-            throw WindowSystemError.captureFailed
-        }
-        let filter = SCContentFilter(desktopIndependentWindow: match)
-        let scale = Double(filter.pointPixelScale)
+        let filter = SCContentFilter(desktopIndependentWindow: window)
         let configuration = SCStreamConfiguration()
-        configuration.width = Int(frame.size.width * scale)
-        configuration.height = Int(frame.size.height * scale)
+        configuration.width = pixelWidth(frame, of: window)
+        configuration.height = pixelHeight(frame, of: window)
         configuration.ignoreShadowsSingleWindow = true
         configuration.showsCursor = false
         let image = try await SCScreenshotManager.captureImage(
             contentFilter: filter, configuration: configuration)
         let size = CGSize(width: frame.size.width, height: frame.size.height)
         return StandInPanel.Picture(image: image, size: size)
+    }
+
+    private static func pixelWidth(_ frame: WindowFrame, of window: SCWindow) -> Int {
+        let filter = SCContentFilter(desktopIndependentWindow: window)
+        return Int(frame.size.width * Double(filter.pointPixelScale))
+    }
+
+    private static func pixelHeight(_ frame: WindowFrame, of window: SCWindow) -> Int {
+        let filter = SCContentFilter(desktopIndependentWindow: window)
+        return Int(frame.size.height * Double(filter.pointPixelScale))
     }
 
     private static func onScreenWindow(

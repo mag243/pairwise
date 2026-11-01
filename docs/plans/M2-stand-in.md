@@ -1,7 +1,7 @@
 # M2 · Moving together while dragging
 
 **Goal:** the two windows move together without visible lag, as pictures in one window of Pairwise's own.
-**ADRs:** 0024, 0025, 0026, 0027, 0028, with 0014 for the picture and parking
+**ADRs:** 0024, 0025, 0026, 0027, 0028, 0029, with 0014 for the picture and parking
 
 Not in this milestone: joining, the shared seam, coming apart, choosing a partner, restoring. Those are M3.
 
@@ -14,6 +14,7 @@ Not in this milestone: joining, the shared seam, coming apart, choosing a partne
 - [x] A test of whether a window drag can be held back (ADR 0023).
 - [x] One window of Pairwise's own while dragging (ADR 0024).
 - [x] The other ways of following removed (ADR 0028).
+- [ ] Live pictures while dragging, with a choice of frame rate (ADR 0029).
 
 ## Acceptance criteria
 - [x] `tools/build.sh verify` is green.
@@ -21,7 +22,8 @@ Not in this milestone: joining, the shared seam, coming apart, choosing a partne
 - [x] By hand: the real windows are out of sight during the drag (the assumption of ADR 0014), and end level and tight after the release.
 - [x] Measured and written down: how long the panel takes to appear, and how its moves hold up.
 - [x] The stress test moves both windows every time (ADR 0027).
-- [x] `tools/build.sh ci` is green (when the owner says so, ADR 0011).
+- [ ] By hand or measured: an animated window stays alive in its picture during a drag (ADR 0029).
+- [ ] `tools/build.sh ci` is green (when the owner says so, ADR 0011).
 
 ## Trying it
 `tools/build.sh run`, allow Accessibility and Screen Recording, quit and run again, press Start, open a window of the partner app, and drag a window of another app by its title bar. `tools/build.sh run --drag-stress-test <file>` makes the app test itself; it takes over the pointer while it runs.

@@ -14,4 +14,6 @@ public struct DragReport: Equatable, Sendable {
     public let longestMove: TimeInterval
     /// How long the panel took to appear after the press.
     public let panelDelay: TimeInterval
+    /// How many live frames arrived during the drag, per window.
+    public let liveFrames: [Int]
 }

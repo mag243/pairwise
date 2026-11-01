@@ -21,14 +21,19 @@ public final class PairDragModel {
     private static let logger = Logger(subsystem: "me.m-domain.pairwise", category: "pair-drag")
 
     /// The running apps a partner can come from; read again by `refreshPermissions`.
-    public private(set) var partnerApps: [PartnerApp]
+    public internal(set) var partnerApps: [PartnerApp]
     /// The app the next drag takes its partner from.
     public var partnerBundleIdentifier: String {
         didSet { system.partnerBundleIdentifier = partnerBundleIdentifier }
     }
 
-    public private(set) var isAccessibilityGranted: Bool
-    public private(set) var isScreenRecordingGranted: Bool
+    /// How many live frames a second the pictures show during a drag; 0 keeps them still.
+    public var liveFramesPerSecond: Int {
+        didSet { system.liveFramesPerSecond = liveFramesPerSecond }
+    }
+
+    public internal(set) var isAccessibilityGranted: Bool
+    public internal(set) var isScreenRecordingGranted: Bool
     public private(set) var isRunning = false
     /// Why the last start or drag did not work; cleared by the next one.
     public private(set) var problem: WindowSystemError?
@@ -37,7 +42,7 @@ public final class PairDragModel {
     /// The measurements of the last drag that moved the panel.
     public private(set) var lastDrag: DragReport?
 
-    @ObservationIgnored private let system: any WindowSystemProviding
+    @ObservationIgnored let system: any WindowSystemProviding
     @ObservationIgnored private var drag = PairDrag.none
     @ObservationIgnored private var stats = DragStats()
     @ObservationIgnored private var hasSeenButtonDown = false
@@ -49,25 +54,9 @@ public final class PairDragModel {
         self.system = system
         partnerApps = system.partnerApps
         partnerBundleIdentifier = system.partnerBundleIdentifier
+        liveFramesPerSecond = system.liveFramesPerSecond
         isAccessibilityGranted = system.isAccessibilityGranted
         isScreenRecordingGranted = system.isScreenRecordingGranted
-    }
-
-    /// Reads the permissions and the apps again; the user grants elsewhere, in System Settings.
-    public func refreshPermissions() {
-        partnerApps = system.partnerApps
-        isAccessibilityGranted = system.isAccessibilityGranted
-        isScreenRecordingGranted = system.isScreenRecordingGranted
-    }
-
-    /// Asks the system to show the user where to grant the Accessibility permission.
-    public func requestAccessibility() {
-        system.requestAccessibility()
-    }
-
-    /// Asks the system for the Screen Recording permission.
-    public func requestScreenRecording() {
-        system.requestScreenRecording()
     }
 
     /// Starts taking over drags; a failure lands in `problem`, and all input passes.
@@ -342,13 +331,15 @@ extension PairDragModel {
 
     private func report(_ moving: PairDrag.Moving) {
         lastDrag = stats.report(
-            elapsed: system.uptime - moving.startTime, panelDelay: moving.panelDelay)
+            elapsed: system.uptime - moving.startTime, panelDelay: moving.panelDelay,
+            liveFrames: moving.standIn.liveFrames)
         guard let lastDrag else { return }
         Self.logger.info(
             """
             drag: \(lastDrag.moves) moves, \(lastDrag.movesPerSecond) per second, \
             mean \(lastDrag.meanMove) s, longest \(lastDrag.longestMove) s, \
-            panel after \(moving.panelDelay) s
+            panel after \(moving.panelDelay) s, \
+            live frames \(lastDrag.liveFrames, privacy: .public)
             """)
     }
 }

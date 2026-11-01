@@ -272,17 +272,4 @@ import Testing
         #expect(window.moves.last == ScreenPoint(x: 140, y: 130))
         #expect(panel.isDismissed)
     }
-
-    @Test func theReportCarriesThePanelsDelay() throws {
-        _ = system.send(.pressed(Self.onTitleBar))
-        system.uptime = 0.05
-        system.finishStandIn(with: .success(panel))
-        _ = system.send(.dragged(Self.further))
-        _ = system.send(.dragged(Self.onTitleBar))
-        system.uptime = 1.05
-        _ = system.send(.released(Self.onTitleBar))
-        let report = try #require(model.lastDrag)
-        #expect(report.moves == 1)
-        #expect(report.panelDelay == 0.05)
-    }
 }

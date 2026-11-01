@@ -58,6 +58,16 @@ import Testing
         #expect(system.partnerBundleIdentifier == "com.example.slow")
     }
 
+    @Test func theSystemsFrameRateIsTheFirstChoice() {
+        system.liveFramesPerSecond = 15
+        #expect(PairDragModel(system: system).liveFramesPerSecond == 15)
+    }
+
+    @Test func choosingAFrameRateGoesToTheSystem() {
+        model.liveFramesPerSecond = 60
+        #expect(system.liveFramesPerSecond == 60)
+    }
+
     @Test func newlyRunningAppsAreSeenOnRefresh() {
         let app = PartnerApp(bundleIdentifier: "com.example.slow", name: "Slow")
         system.partnerApps = [app]

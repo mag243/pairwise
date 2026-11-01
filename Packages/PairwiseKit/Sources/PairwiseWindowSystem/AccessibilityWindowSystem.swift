@@ -8,8 +8,10 @@ import os
 @MainActor
 public final class AccessibilityWindowSystem: WindowSystemProviding {
     private static let logger = Logger(subsystem: "me.m-domain.pairwise", category: "windows")
+    private static let defaultLiveFramesPerSecond = 30
 
     public var partnerBundleIdentifier = "com.apple.finder"
+    public var liveFramesPerSecond = AccessibilityWindowSystem.defaultLiveFramesPerSecond
     /// The window `partner(for:)` gives whatever the app, for the stress test (ADR 0027).
     var pinnedPartner: AccessibilityWindow?
 
@@ -65,7 +67,9 @@ public final class AccessibilityWindowSystem: WindowSystemProviding {
                 completion(.failure(.captureFailed))
                 return
             }
-            completion(await WindowCapture.standIn(of: [first, second]))
+            completion(
+                await WindowCapture.standIn(
+                    of: [first, second], framesPerSecond: liveFramesPerSecond))
         }
     }
 

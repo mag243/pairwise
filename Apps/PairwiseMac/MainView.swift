@@ -9,6 +9,7 @@ struct MainView: View {
     private static let minimumHeight: CGFloat = 420
     private static let millisecondsPerSecond = 1000.0
     private static let fractionDigits = 1
+    private static let frameRates = [15, 30, 60]
 
     let model: PairDragModel
 
@@ -58,6 +59,12 @@ struct MainView: View {
                     Text(verbatim: app.name).tag(app.bundleIdentifier)
                 }
             }
+            Picker("Live pictures", selection: liveFrames) {
+                Text("Still").tag(0)
+                ForEach(Self.frameRates, id: \.self) { rate in
+                    Text("\(rate) frames a second").tag(rate)
+                }
+            }
             Button(model.isRunning ? "Stop" : "Start") {
                 if model.isRunning { model.stop() } else { model.start() }
             }
@@ -67,6 +74,14 @@ struct MainView: View {
             if let problem = model.problem {
                 Text(problem.message).foregroundStyle(.red)
             }
+        }
+    }
+
+    private var liveFrames: Binding<Int> {
+        Binding {
+            model.liveFramesPerSecond
+        } set: {
+            model.liveFramesPerSecond = $0
         }
     }
 
@@ -85,6 +100,11 @@ struct MainView: View {
         row("95th percentile (ms)", report.percentile95Move * Self.millisecondsPerSecond)
         row("Longest move (ms)", report.longestMove * Self.millisecondsPerSecond)
         row("Panel appeared after (ms)", report.panelDelay * Self.millisecondsPerSecond)
+        ForEach(Array(report.liveFrames.enumerated()), id: \.offset) { index, frames in
+            LabeledContent("Live frames, window \(index + 1)") {
+                Text(frames, format: .number)
+            }
+        }
     }
 
     private func row(_ label: LocalizedStringKey, _ value: Double) -> some View {

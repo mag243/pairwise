@@ -1,6 +1,23 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "%lld frames a second" : {
+      "comment" : "Setting: a frame rate of the live pictures",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld Bilder pro Sekunde"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld beelden per seconde"
+          }
+        }
+      }
+    },
     "95th percentile (ms)" : {
       "comment" : "Measurement: duration 95 percent of moves stay within",
       "localizations" : {
@@ -116,6 +133,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Laatste keer slepen"
+          }
+        }
+      }
+    },
+    "Live frames, window %lld" : {
+      "comment" : "Measurement: live frames that arrived for one window",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Live-Bilder, Fenster %lld"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Live beelden, venster %lld"
+          }
+        }
+      }
+    },
+    "Live pictures" : {
+      "comment" : "Setting: how often the pictures update during a drag",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Live-Bilder"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Live foto's"
           }
         }
       }
@@ -358,6 +409,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Start"
+          }
+        }
+      }
+    },
+    "Still" : {
+      "comment" : "Setting: the pictures do not update during a drag",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unbewegt"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stilstaand"
           }
         }
       }

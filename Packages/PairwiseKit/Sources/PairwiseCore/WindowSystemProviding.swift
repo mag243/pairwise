@@ -18,6 +18,9 @@ public protocol WindowSystemProviding: AnyObject {
     /// The bundle identifier of the app that `partner(for:)` takes a window from.
     var partnerBundleIdentifier: String { get set }
 
+    /// How many live frames a second a new stand-in asks for per window; 0 keeps it still.
+    var liveFramesPerSecond: Int { get set }
+
     /// Whether the left mouse button is down now, asked of the system and not of an event.
     var isPrimaryButtonDown: Bool { get }
 

@@ -7,7 +7,12 @@ import PairwiseCore
 /// opens itself on empty folders of its own.
 @MainActor
 public final class DragStressTest {
+    /// Given to a copy of the app, which then shows only an animation.
+    public static let animatedWindowFlag = "--animated-window"
     private static let tries = 40
+    private static let liveTries = 5
+    private static let longDragSteps = 250
+    private static let longDragDrift = 0.5
     private static let origin = ScreenPoint(x: 120, y: 120)
     private static let size = CGSize(width: 520, height: 340)
     private static let partnerX = 700.0
@@ -28,16 +33,19 @@ public final class DragStressTest {
     private let system: AccessibilityWindowSystem
     private let outputPath: String
     private let pressOutcome: () -> String
+    private let lastLiveFrames: () -> [Int]
     private var lines: [String] = []
 
-    /// `pressOutcome` says what became of the last press.
+    /// `pressOutcome` says what became of the last press, and `lastLiveFrames` how many
+    /// live frames per window the last drag got.
     public init(
         system: AccessibilityWindowSystem, outputPath: String,
-        pressOutcome: @escaping () -> String
+        pressOutcome: @escaping () -> String, lastLiveFrames: @escaping () -> [Int]
     ) {
         self.system = system
         self.outputPath = outputPath
         self.pressOutcome = pressOutcome
+        self.lastLiveFrames = lastLiveFrames
     }
 
     /// Runs all tries and writes the file; a failure to set up is written there too.
@@ -60,6 +68,7 @@ public final class DragStressTest {
         }
         system.pinnedPartner = nil
         lines.append("summary: \(counts.sorted { $0.key < $1.key })")
+        await liveTries(dragged: dragged)
         close(dragged)
         close(partner)
     }
@@ -95,6 +104,59 @@ public final class DragStressTest {
             "try \(index): before \(before) ms, after \(after) ms: \(result); "
                 + "press: \(pressOutcome())")
         return result
+    }
+
+    /// Drags beside a helper window that animates, for long enough to count live frames.
+    private func liveTries(dragged: AccessibilityWindow) async {
+        guard let (helper, process) = await openAnimatedWindow() else {
+            lines.append("could not open the animated window")
+            return
+        }
+        defer { process.terminate() }
+        system.pinnedPartner = helper
+        for index in 0..<Self.liveTries {
+            await place(dragged, at: Self.origin)
+            await place(helper, at: ScreenPoint(x: Self.partnerX, y: Self.origin.y))
+            try? helper.raise()
+            try? dragged.raise()
+            await wait(Self.settleWait)
+            await longDrag()
+            await wait(Self.settleWait)
+            lines.append("live try \(index): frames per window \(lastLiveFrames())")
+        }
+        system.pinnedPartner = nil
+    }
+
+    private func longDrag() async {
+        let press = CGPoint(
+            x: Self.origin.x + Double(Self.size.width) / 2, y: Self.origin.y + Self.titleBandY)
+        post(.mouseMoved, at: press)
+        post(.leftMouseDown, at: press)
+        var point = press
+        for step in 0..<Self.longDragSteps {
+            point.x += step % 2 == 0 ? Self.dragStep : -Self.dragStep
+            point.y += Self.longDragDrift
+            post(.leftMouseDragged, at: point)
+            await wait(Self.stepWait)
+        }
+        post(.leftMouseUp, at: point)
+    }
+
+    /// Starts a second copy of this app that shows only an animation (ADR 0029).
+    private func openAnimatedWindow() async -> (AccessibilityWindow, Process)? {
+        guard let path = Bundle.main.executablePath else { return nil }
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: path)
+        process.arguments = [Self.animatedWindowFlag]
+        guard (try? process.run()) != nil else { return nil }
+        let element = AXUIElementCreateApplication(process.processIdentifier)
+        for _ in 0..<Self.windowLookups {
+            await wait(Self.windowWait)
+            let windows = element.attribute(kAXWindowsAttribute) as? [AXUIElement] ?? []
+            if let first = windows.first { return (AccessibilityWindow(element: first), process) }
+        }
+        process.terminate()
+        return nil
     }
 
     private func classify(dragged: AccessibilityWindow, partner: AccessibilityWindow) -> String {

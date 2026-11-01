@@ -24,6 +24,13 @@ import Testing
         #expect(report.panelDelay == 0.08)
     }
 
+    @Test func theReportCarriesTheLiveFrames() throws {
+        var stats = DragStats()
+        stats.record(moveDuration: 0.001)
+        let report = try #require(stats.report(elapsed: 1, panelDelay: 0, liveFrames: [3, 4]))
+        #expect(report.liveFrames == [3, 4])
+    }
+
     @Test func percentileIsTheNearestRank() throws {
         var stats = DragStats()
         for milliseconds in 1...100 {
