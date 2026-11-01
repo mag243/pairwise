@@ -21,3 +21,5 @@ Use `0000-template.md` as the basis.
 | 0013 | How the spike follows the pointer | Accepted |
 | 0014 | A stand-in while dragging | Accepted |
 | 0015 | Moving the stand-in on drag events, and raising the partner | Accepted |
+| 0016 | The picture at the press, and measuring the grip with a still pointer | Accepted |
+| 0017 | Holding the stand-in back | Accepted |

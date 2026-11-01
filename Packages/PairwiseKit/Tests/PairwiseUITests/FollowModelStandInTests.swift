@@ -22,6 +22,7 @@ import Testing
         system.windowUnderPointer = dragged
         system.partnerWindow = partner
         model = FollowModel(system: system)
+        model.standInHoldBack = 0
     }
 
     /// Starts watching, presses on the window, and moves it so the drag is seen.
@@ -43,14 +44,6 @@ import Testing
         startDrag()
         system.tick()
         #expect(system.standInRequests == 1)
-    }
-
-    @Test func aClickAsksForNoStandIn() {
-        model.start()
-        system.press(at: Self.grab)
-        system.tick()
-        system.release(at: Self.grab)
-        #expect(system.standInRequests == 0)
     }
 
     @Test func withoutTheScreenRecordingPermissionThePartnerFollowsAsItself() {

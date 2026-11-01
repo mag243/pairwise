@@ -31,8 +31,16 @@ Measured by hand on 2026-11-01 with the stand-in of ADR 0014, with a Finder wind
 |---|---|---|---|---|---|
 | Not noted | 660 | 120.1 | 0.18 | 2.11 | 107.8 |
 | Not noted | 2021 | 120.0 | 0.15 | 1.79 | 47.9 |
+| Not noted, on drag events | 675 | 204.6 | 0.16 | 1.47 | 116.9 |
+| Not noted, on drag events | 2399 | 202.7 | 0.17 | 6.81 | 61.9 |
+| Not noted, on drag events | 458 | 211.4 | 0.17 | 0.65 | 74.3 |
+| Not noted, on drag events | 319 | 204.8 | 0.15 | 0.57 | 54.2 |
 
 **By hand, first run:** a little lag remains, the Finder window sometimes stands a small distance from the dragged window, the swap is not seen, and after the release the Finder window is behind another window. ADR 0015 answers these.
+
+**By hand, second run, on drag events:** less lag, with a short delay at the start of a drag. While dragging, the stand-in sometimes stands a small distance from the dragged window and sometimes overlaps it; after the release the two are tight. ADR 0016 answers these.
+
+**By hand, direction:** the owner sees a gap open when dragging toward the stand-in, so it runs ahead of the dragged window. ADR 0017 answers this.
 
 **Is the real partner out of sight during the drag?** Not answered yet.
 

@@ -48,14 +48,15 @@ enum FollowDrag {
 
 extension FollowReport {
     /// Writes the measurements to `logger`; a negative number means it is not known.
-    func log(to logger: Logger) {
+    func log(to logger: Logger, standInHoldBack: TimeInterval) {
         logger.info(
             """
             drag: \(moves) moves, \(movesPerSecond) per second, \
             mean \(meanMove) s, p95 \(percentile95Move) s, \
             longest \(longestMove) s, \
             behind mean \(meanPointsBehind), most \(mostPointsBehind), \
-            stand-in after \(standInDelay ?? -1) s, grip offset \(gripOffset ?? -1)
+            stand-in after \(standInDelay ?? -1) s, grip offset \(gripOffset ?? -1), \
+            held back \(standInHoldBack) s
             """)
     }
 }

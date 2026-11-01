@@ -8,6 +8,8 @@ struct FollowView: View {
     private static let minimumHeight: CGFloat = 420
     private static let millisecondsPerSecond = 1000.0
     private static let fractionDigits = 1
+    private static let holdBackRange = 0...60
+    private static let holdBackStep = 4
 
     let model: FollowModel
 
@@ -52,6 +54,15 @@ struct FollowView: View {
                 Text("Without it, the Finder window itself follows, with some lag.")
                     .foregroundStyle(.secondary)
             }
+            if model.isScreenRecordingGranted {
+                Stepper(
+                    value: holdBackMilliseconds, in: Self.holdBackRange, step: Self.holdBackStep
+                ) {
+                    LabeledContent("Hold the picture back (ms)") {
+                        Text(holdBackMilliseconds.wrappedValue, format: .number).monospacedDigit()
+                    }
+                }
+            }
             Button(model.isWatching ? "Stop" : "Start") {
                 if model.isWatching { model.stop() } else { model.start() }
             }
@@ -61,6 +72,14 @@ struct FollowView: View {
             if let problem = model.problem {
                 Text(Self.text(for: problem)).foregroundStyle(.red)
             }
+        }
+    }
+
+    private var holdBackMilliseconds: Binding<Int> {
+        Binding {
+            Int((model.standInHoldBack * Self.millisecondsPerSecond).rounded())
+        } set: { milliseconds in
+            model.standInHoldBack = Double(milliseconds) / Self.millisecondsPerSecond
         }
     }
 

@@ -20,6 +20,7 @@ import Testing
         system.windowUnderPointer = dragged
         system.partnerWindow = partner
         model = FollowModel(system: system)
+        model.standInHoldBack = 0
     }
 
     /// Starts watching, presses on the window, and moves it so the drag is seen.
@@ -72,21 +73,48 @@ import Testing
         #expect(partner.raises == 0)
     }
 
-    @Test func theReportSaysHowFarTheGripWasFromTheRealWindow() throws {
-        startDrag()
+    /// Holds the pointer still for longer than the grip check waits, with ticks.
+    private func holdStill() {
         system.tick()
+        system.uptime += 0.2
+        system.tick()
+    }
+
+    @Test func aStillPointerMeasuresTheGripAgainstTheRealWindow() throws {
+        startDrag()
+        system.pointerLocation = Self.pointer
         dragged.currentFrame.origin = ScreenPoint(x: 203, y: 54)
-        system.uptime = 1
+        holdStill()
         system.release(at: Self.pointer)
         #expect(try #require(model.lastDrag).gripOffset == 5)
+    }
+
+    @Test func theLargestOffsetIsReported() throws {
+        startDrag()
+        system.pointerLocation = Self.pointer
+        dragged.currentFrame.origin = ScreenPoint(x: 203, y: 54)
+        holdStill()
+        system.pointerLocation = ScreenPoint(x: 350, y: 60)
+        dragged.currentFrame.origin = ScreenPoint(x: 300, y: 50)
+        holdStill()
+        system.release(at: ScreenPoint(x: 350, y: 60))
+        #expect(try #require(model.lastDrag).gripOffset == 5)
+    }
+
+    @Test func aDragWithoutAPauseHasNoGripOffset() throws {
+        startDrag()
+        system.pointerLocation = Self.pointer
+        system.tick()
+        system.uptime = 1
+        system.release(at: Self.pointer)
+        #expect(try #require(model.lastDrag).gripOffset == nil)
     }
 
     @Test func aDraggedWindowThatHasGoneLeavesNoGripOffset() throws {
         startDrag()
         system.pointerLocation = Self.pointer
-        system.tick()
         dragged.frameError = .windowGone
-        system.uptime = 1
+        holdStill()
         system.release(at: Self.pointer)
         #expect(try #require(model.lastDrag).gripOffset == nil)
     }
