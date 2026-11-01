@@ -61,10 +61,17 @@ import Testing
         #expect(top == nil)
     }
 
-    @Test func aMenuOnTopIsNoWindow() {
+    @Test func aWindowAtAHigherLevelIsLookedThrough() {
         let top = WindowServer.topWindow(
             at: Self.point, excludingProcess: Self.own,
             in: [description(number: 1, process: 1, level: 25), description(number: 2, process: 2)])
+        #expect(top?.number == 2)
+    }
+
+    @Test func onlyAHigherLevelAtThePointIsNoWindow() {
+        let top = WindowServer.topWindow(
+            at: Self.point, excludingProcess: Self.own,
+            in: [description(number: 1, process: 1, level: 25)])
         #expect(top == nil)
     }
 }

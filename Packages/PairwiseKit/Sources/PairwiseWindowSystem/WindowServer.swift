@@ -5,7 +5,8 @@ import PairwiseCore
 /// What the window server says about windows: places and numbers, without asking their
 /// apps and without a permission (ADR 0018).
 enum WindowServer {
-    /// The level of normal windows, below menus, the Dock and floating panels.
+    /// The level of normal windows. Above it are menus and the Dock, but also windows that
+    /// cannot be seen and cover the whole screen, so being on top there says nothing.
     private static let normalWindowLevel = 0
 
     /// A window on screen, as the window server describes it.
@@ -15,8 +16,8 @@ enum WindowServer {
         let frame: WindowFrame
     }
 
-    /// The window on top at `point`, or `nil` when that is no window of another app at the
-    /// normal level: a window of `ownProcess`, a menu, or nothing.
+    /// The frontmost normal window at `point`, or `nil` when there is none or it is a window
+    /// of `ownProcess`.
     static func topWindow(at point: ScreenPoint, excludingProcess ownProcess: pid_t)
         -> OnScreenWindow?
     {
@@ -29,10 +30,12 @@ enum WindowServer {
     static func topWindow(
         at point: ScreenPoint, excludingProcess ownProcess: pid_t, in descriptions: [[String: Any]]
     ) -> OnScreenWindow? {
-        let top = descriptions.first { frame(from: $0)?.contains(point) == true }
+        let top = descriptions.first { description in
+            description[kCGWindowLayer as String] as? Int == normalWindowLevel
+                && frame(from: description)?.contains(point) == true
+        }
         guard
             let top, let frame = frame(from: top),
-            top[kCGWindowLayer as String] as? Int == normalWindowLevel,
             let number = top[kCGWindowNumber as String] as? CGWindowID,
             let processID = top[kCGWindowOwnerPID as String] as? pid_t,
             processID != ownProcess

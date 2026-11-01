@@ -133,6 +133,8 @@ With the window list kept and the pictures taken together, over 13 drags: the pi
 
 **From the log of that run:** 11 presses gave "no window under the pointer", within about a millisecond and in clusters, so those drags were not taken over. ADR 0026 answers this. Deciding on the other presses took 5 to 32 ms.
 
+**From the log after ADR 0026's first version:** every press gave "no window under the pointer", and the partner never followed. That version stopped at the first window of any level. It now looks only at the normal level.
+
 **Is the real partner out of sight during the drag?** Not answered yet.
 
 **Verdict:** not given yet.

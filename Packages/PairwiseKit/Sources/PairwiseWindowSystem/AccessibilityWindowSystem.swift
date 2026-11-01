@@ -1,11 +1,14 @@
 import AppKit
 import ApplicationServices
 import PairwiseCore
+import os
 
 /// The real window system: the Accessibility API, a listen-only event tap, display ticks and
 /// ScreenCaptureKit, all on the main actor (ADR 0013, 0014).
 @MainActor
 public final class AccessibilityWindowSystem: WindowSystemProviding {
+    private static let logger = Logger(subsystem: "me.m-domain.pairwise", category: "windows")
+
     public var partnerBundleIdentifier = "com.apple.finder"
 
     private var tap: PointerTap?
@@ -86,7 +89,10 @@ public final class AccessibilityWindowSystem: WindowSystemProviding {
         guard
             let top = WindowServer.topWindow(
                 at: point, excludingProcess: ProcessInfo.processInfo.processIdentifier)
-        else { return nil }
+        else {
+            Self.logger.info("no normal window of another app on top at the pointer")
+            return nil
+        }
         let app = AXUIElementCreateApplication(top.processID)
         app.limitMessagingTime()
         let elements = app.attribute(kAXWindowsAttribute) as? [AXUIElement] ?? []
@@ -94,9 +100,11 @@ public final class AccessibilityWindowSystem: WindowSystemProviding {
         let frames = windows.map {
             (try? $0.frame()) ?? WindowFrame(x: 0, y: 0, width: 0, height: 0)
         }
-        return WindowMatch.index(of: top.frame, among: frames).map {
-            AccessibilityWindow(element: elements[$0], serverWindowNumber: top.number)
+        guard let index = WindowMatch.index(of: top.frame, among: frames) else {
+            Self.logger.info("the app's \(elements.count) windows do not match the one on top")
+            return nil
         }
+        return AccessibilityWindow(element: elements[index], serverWindowNumber: top.number)
     }
 
     public func partner(
