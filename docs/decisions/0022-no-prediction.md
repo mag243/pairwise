@@ -1,6 +1,6 @@
 # 0022. No prediction for the stand-in
 
-- **Status:** Accepted
+- **Status:** Superseded by 0028
 - **Date:** 2026-11-01
 - **Milestone:** M2
 

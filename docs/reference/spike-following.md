@@ -139,6 +139,8 @@ With the window list kept and the pictures taken together, over 13 drags: the pi
 
 **The stress test (ADR 0027), 40 drags of Finder windows with posted events:** with the button check as fixed, both windows moved 40 times out of 40. With the fault put back for one run, both moved 11 times, only the held window 25 times, and nothing 4 times. So the test catches this fault, and the symptom is the one the owner reported.
 
-**Is the real partner out of sight during the drag?** Not answered yet.
+**Are the real windows out of sight during the drag?** Yes, by hand.
 
-**Verdict:** not given yet.
+**By hand, after the panel waits at the release:** the flash is gone.
+
+**Verdict:** moving as one window works well. It stays, and the other ways of following go (ADR 0028).

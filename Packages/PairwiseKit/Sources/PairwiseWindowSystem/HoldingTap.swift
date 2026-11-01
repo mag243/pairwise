@@ -3,7 +3,7 @@ import PairwiseCore
 import os
 
 /// An active event tap on the left mouse button, on the main run loop, that can withhold
-/// an event (ADR 0023, 0024). When this tap fails or is too slow, the system turns it off and
+/// an event (ADR 0024). When this tap fails or is too slow, the system turns it off and
 /// input passes.
 @MainActor
 final class HoldingTap {

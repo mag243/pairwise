@@ -2,22 +2,19 @@ import PairwiseCore
 import PairwiseUI
 import SwiftUI
 
-/// The spike's window: the permission, Start and Stop, and the last drag's numbers.
-struct FollowView: View {
+/// The app's window: the permissions, the partner app, Start and Stop, and the last drag's
+/// numbers.
+struct MainView: View {
     private static let minimumWidth: CGFloat = 360
     private static let minimumHeight: CGFloat = 420
     private static let millisecondsPerSecond = 1000.0
     private static let fractionDigits = 1
-    private static let lookAheadRange = 0...60
-    private static let lookAheadStep = 4
 
-    let model: FollowModel
-    let pairDrag: PairDragModel
+    let model: PairDragModel
 
     var body: some View {
         Form {
             controls
-            PairDragSection(model: pairDrag, isFollowing: model.isWatching)
             Section("Last drag") {
                 if let report = model.lastDrag {
                     measurements(of: report)
@@ -31,13 +28,12 @@ struct FollowView: View {
         .onReceive(
             NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)
         ) { _ in
-            model.refreshPermission()
+            model.refreshPermissions()
         }
         .onReceive(
             NotificationCenter.default.publisher(for: NSApplication.willTerminateNotification)
         ) { _ in
             model.stop()
-            pairDrag.stop()
         }
     }
 
@@ -54,7 +50,7 @@ struct FollowView: View {
             }
             if !model.isScreenRecordingGranted {
                 Button("Grant Screen Recording…") { model.requestScreenRecording() }
-                Text("Without it, the partner window itself follows.")
+                Text("Without it, windows move one at a time.")
                     .foregroundStyle(.secondary)
             }
             Picker("Partner app", selection: partnerApp) {
@@ -62,18 +58,11 @@ struct FollowView: View {
                     Text(verbatim: app.name).tag(app.bundleIdentifier)
                 }
             }
-            Stepper(
-                value: lookAheadMilliseconds, in: Self.lookAheadRange, step: Self.lookAheadStep
-            ) {
-                LabeledContent("Look ahead (ms)") {
-                    Text(lookAheadMilliseconds.wrappedValue, format: .number).monospacedDigit()
-                }
+            Button(model.isRunning ? "Stop" : "Start") {
+                if model.isRunning { model.stop() } else { model.start() }
             }
-            Button(model.isWatching ? "Stop" : "Start") {
-                if model.isWatching { model.stop() } else { model.start() }
-            }
-            .disabled(!model.isAccessibilityGranted || pairDrag.isRunning)
-            Text("Drag any window by its title bar: a window of the partner app follows beside it.")
+            .disabled(!model.isAccessibilityGranted || !model.isScreenRecordingGranted)
+            Text("Drag a window by its title bar: it and the partner move as one.")
                 .foregroundStyle(.secondary)
             if let problem = model.problem {
                 Text(problem.message).foregroundStyle(.red)
@@ -89,38 +78,13 @@ struct FollowView: View {
         }
     }
 
-    /// The value for what the next drag moves: the picture or the window itself.
-    private var lookAheadMilliseconds: Binding<Int> {
-        Binding {
-            let seconds =
-                model.isScreenRecordingGranted ? model.standInLookAhead : model.partnerLookAhead
-            return Int((seconds * Self.millisecondsPerSecond).rounded())
-        } set: { milliseconds in
-            let seconds = Double(milliseconds) / Self.millisecondsPerSecond
-            if model.isScreenRecordingGranted {
-                model.standInLookAhead = seconds
-            } else {
-                model.partnerLookAhead = seconds
-            }
-        }
-    }
-
-    @ViewBuilder private func measurements(of report: FollowReport) -> some View {
+    @ViewBuilder private func measurements(of report: DragReport) -> some View {
         LabeledContent("Moves") { Text(report.moves, format: .number) }
         row("Moves per second", report.movesPerSecond)
         row("Mean move (ms)", report.meanMove * Self.millisecondsPerSecond)
         row("95th percentile (ms)", report.percentile95Move * Self.millisecondsPerSecond)
         row("Longest move (ms)", report.longestMove * Self.millisecondsPerSecond)
-        row("Mean points behind", report.meanPointsBehind)
-        row("Most points behind", report.mostPointsBehind)
-        if let delay = report.standInDelay {
-            row("Stand-in appeared after (ms)", delay * Self.millisecondsPerSecond)
-        } else {
-            Text("No stand-in in this drag.")
-        }
-        if let slip = report.mostSlip {
-            row("Off from the real window (points)", slip)
-        }
+        row("Panel appeared after (ms)", report.panelDelay * Self.millisecondsPerSecond)
     }
 
     private func row(_ label: LocalizedStringKey, _ value: Double) -> some View {

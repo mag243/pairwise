@@ -6,7 +6,8 @@ import os
 /// Moves a window and its partner as one window of Pairwise's own (ADR 0024). A press on
 /// another app's title bar starts on a picture of both and holds the drag back; once the
 /// pointer has moved and the picture is there, a panel takes over from both windows, and
-/// the release puts them where the panel is.
+/// the release puts them where the panel is. Without the Screen Recording permission
+/// nothing is taken over, and macOS drags the one window (ADR 0028).
 @MainActor
 @Observable
 public final class PairDragModel {
@@ -19,17 +20,26 @@ public final class PairDragModel {
     private static let buttonReportTime: TimeInterval = 0.25
     private static let logger = Logger(subsystem: "me.m-domain.pairwise", category: "pair-drag")
 
+    /// The running apps a partner can come from; read again by `refreshPermissions`.
+    public private(set) var partnerApps: [PartnerApp]
+    /// The app the next drag takes its partner from.
+    public var partnerBundleIdentifier: String {
+        didSet { system.partnerBundleIdentifier = partnerBundleIdentifier }
+    }
+
+    public private(set) var isAccessibilityGranted: Bool
+    public private(set) var isScreenRecordingGranted: Bool
     public private(set) var isRunning = false
     /// Why the last start or drag did not work; cleared by the next one.
     public private(set) var problem: WindowSystemError?
     /// What became of the last press, in words for the log and the stress test.
     public private(set) var lastPressOutcome = ""
     /// The measurements of the last drag that moved the panel.
-    public private(set) var lastDrag: FollowReport?
+    public private(set) var lastDrag: DragReport?
 
     @ObservationIgnored private let system: any WindowSystemProviding
     @ObservationIgnored private var drag = PairDrag.none
-    @ObservationIgnored private var stats = FollowStats()
+    @ObservationIgnored private var stats = DragStats()
     @ObservationIgnored private var hasSeenButtonDown = false
     @ObservationIgnored private var pressTime: TimeInterval = 0
     /// Tells a picture that arrives late from the one this press asked for.
@@ -37,10 +47,32 @@ public final class PairDragModel {
 
     public init(system: any WindowSystemProviding) {
         self.system = system
+        partnerApps = system.partnerApps
+        partnerBundleIdentifier = system.partnerBundleIdentifier
+        isAccessibilityGranted = system.isAccessibilityGranted
+        isScreenRecordingGranted = system.isScreenRecordingGranted
+    }
+
+    /// Reads the permissions and the apps again; the user grants elsewhere, in System Settings.
+    public func refreshPermissions() {
+        partnerApps = system.partnerApps
+        isAccessibilityGranted = system.isAccessibilityGranted
+        isScreenRecordingGranted = system.isScreenRecordingGranted
+    }
+
+    /// Asks the system to show the user where to grant the Accessibility permission.
+    public func requestAccessibility() {
+        system.requestAccessibility()
+    }
+
+    /// Asks the system for the Screen Recording permission.
+    public func requestScreenRecording() {
+        system.requestScreenRecording()
     }
 
     /// Starts taking over drags; a failure lands in `problem`, and all input passes.
     public func start() {
+        refreshPermissions()
         guard system.isAccessibilityGranted else {
             problem = .accessibilityDenied
             return
@@ -146,7 +178,7 @@ public final class PairDragModel {
         case .moving(var moving):
             let before = system.uptime
             moving.standIn.move(to: moving.origin(forPointer: point))
-            stats.record(moveDuration: system.uptime - before, pointsBehind: 0)
+            stats.record(moveDuration: system.uptime - before)
             moving.lastPointer = point
             drag = .moving(moving)
             return true
@@ -169,9 +201,9 @@ public final class PairDragModel {
         let moving = PairDrag.Moving(
             window: pressed.window, partner: pressed.partner, standIn: standIn,
             frame: pressed.frame, pointer: pressed.pointer, startTime: now,
-            standInDelay: now - pressed.startTime, lastPointer: pressed.lastPointer)
+            panelDelay: now - pressed.startTime, lastPointer: pressed.lastPointer)
         standIn.show(at: moving.origin(forPointer: pressed.lastPointer))
-        stats = FollowStats()
+        stats = DragStats()
         drag = .moving(moving)
     }
 
@@ -242,7 +274,7 @@ public final class PairDragModel {
         report(moving)
         let placing = PairDrag.Placing(
             window: moving.window, partner: moving.partner, standIn: moving.standIn,
-            target: moving.origin(forPointer: point), width: moving.frame.size.width,
+            target: moving.origin(forPointer: point), size: moving.frame.size,
             deadline: system.uptime + Self.placingPatience)
         drag = .placing(placing)
         place(placing)
@@ -259,7 +291,7 @@ public final class PairDragModel {
             }
             let origin = (try? current.window.frame().origin) ?? current.target
             try current.partner.move(
-                to: ScreenPoint(x: origin.x + current.width, y: origin.y))
+                to: PartnerPlacement.origin(besideWindowAt: origin, size: current.size))
             // Raised last, the dragged window ends on top; a failure leaves it in place.
             try? current.partner.raise()
             try? current.window.raise()
@@ -284,11 +316,11 @@ extension PairDragModel {
             let origin = moving.origin(forPointer: moving.lastPointer)
             try? moving.window.move(to: origin)
             try? moving.partner.move(
-                to: ScreenPoint(x: origin.x + moving.frame.size.width, y: origin.y))
+                to: PartnerPlacement.origin(besideWindowAt: origin, size: moving.frame.size))
         case .placing(let placing):
             try? placing.window.move(to: placing.target)
             try? placing.partner.move(
-                to: ScreenPoint(x: placing.target.x + placing.width, y: placing.target.y))
+                to: PartnerPlacement.origin(besideWindowAt: placing.target, size: placing.size))
         default:
             break
         }
@@ -310,13 +342,13 @@ extension PairDragModel {
 
     private func report(_ moving: PairDrag.Moving) {
         lastDrag = stats.report(
-            elapsed: system.uptime - moving.startTime, standInDelay: moving.standInDelay)
+            elapsed: system.uptime - moving.startTime, panelDelay: moving.panelDelay)
         guard let lastDrag else { return }
         Self.logger.info(
             """
             drag: \(lastDrag.moves) moves, \(lastDrag.movesPerSecond) per second, \
             mean \(lastDrag.meanMove) s, longest \(lastDrag.longestMove) s, \
-            panel after \(moving.standInDelay) s
+            panel after \(moving.panelDelay) s
             """)
     }
 }

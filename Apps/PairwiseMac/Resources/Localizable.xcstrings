@@ -35,36 +35,19 @@
         }
       }
     },
-    "Drag a window by its title bar: it and the partner move as one picture." : {
+    "Drag a window by its title bar: it and the partner move as one." : {
       "comment" : "How to try moving as one",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ziehe ein Fenster an der Titelleiste: Es und der Partner bewegen sich als ein Bild."
+            "value" : "Ziehe ein Fenster an der Titelleiste: Es und der Partner bewegen sich als eines."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sleep een venster aan de titelbalk: het en de partner bewegen als één beeld."
-          }
-        }
-      }
-    },
-    "Drag any window by its title bar: a window of the partner app follows beside it." : {
-      "comment" : "How to try the spike",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ziehe ein beliebiges Fenster an der Titelleiste: Ein Fenster der Partner-App folgt daneben."
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sleep een willekeurig venster aan de titelbalk: een venster van de partner-app volgt ernaast."
+            "value" : "Sleep een venster aan de titelbalk: het en de partner bewegen als één."
           }
         }
       }
@@ -154,23 +137,6 @@
         }
       }
     },
-    "Look ahead (ms)" : {
-      "comment" : "Setting: how far ahead the picture of the partner looks with the pointer's movement",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vorausschauen (ms)"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vooruitkijken (ms)"
-          }
-        }
-      }
-    },
     "Mean move (ms)" : {
       "comment" : "Measurement: mean duration of one move",
       "localizations" : {
@@ -184,57 +150,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Gemiddelde verplaatsing (ms)"
-          }
-        }
-      }
-    },
-    "Mean points behind" : {
-      "comment" : "Measurement: how far the pointer travelled during a move",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Punkte im Rückstand, Mittel"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gemiddeld punten achter"
-          }
-        }
-      }
-    },
-    "Most points behind" : {
-      "comment" : "Measurement: how far the pointer travelled during a move, at most",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Punkte im Rückstand, höchstens"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Meeste punten achter"
-          }
-        }
-      }
-    },
-    "Move as one" : {
-      "comment" : "Section: moving a window and its partner as one window",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Als eines bewegen"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Als één bewegen"
           }
         }
       }
@@ -290,53 +205,36 @@
         }
       }
     },
-    "No picture of the partner: it follows by itself." : {
-      "comment" : "The picture of the partner failed",
+    "No picture of the windows: this drag moves one window." : {
+      "comment" : "The picture of the windows failed",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Kein Bild des Partners: Er folgt selbst."
+            "value" : "Kein Bild der Fenster: Dieses Ziehen bewegt ein Fenster."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Geen foto van de partner: die volgt zelf."
+            "value" : "Geen foto van de vensters: deze sleepbeweging verplaatst één venster."
           }
         }
       }
     },
-    "No stand-in in this drag." : {
-      "comment" : "Measurement: the drag had no picture of the partner",
+    "No window of the partner app: open one." : {
+      "comment" : "The partner app has no window",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Kein Platzhalter bei diesem Ziehen."
+            "value" : "Kein Fenster der Partner-App: Öffne eines."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Geen stand-in bij deze drag."
-          }
-        }
-      }
-    },
-    "No window of the partner app to follow: open one." : {
-      "comment" : "The partner app has no window to follow",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kein Fenster der Partner-App zum Folgen: Öffne eines."
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Geen venster van de partner-app om te volgen: open er een."
+            "value" : "Geen venster van de partner-app: open er een."
           }
         }
       }
@@ -354,23 +252,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Niet toegestaan"
-          }
-        }
-      }
-    },
-    "Off from the real window (points)" : {
-      "comment" : "Measurement: distance between the place worked out from the pointer and the dragged window's real place",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Abstand zum echten Fenster (Punkte)"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Afstand tot het echte venster (punten)"
           }
         }
       }
@@ -413,6 +294,23 @@
         }
       }
     },
+    "Panel appeared after (ms)" : {
+      "comment" : "Measurement: time from the press until the picture of both windows showed",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bereich erschien nach (ms)"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paneel verscheen na (ms)"
+          }
+        }
+      }
+    },
     "Partner app" : {
       "comment" : "Setting: the app that gives the window following the dragged one",
       "localizations" : {
@@ -447,23 +345,6 @@
         }
       }
     },
-    "Stand-in appeared after (ms)" : {
-      "comment" : "Measurement: time until the picture of the partner showed",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Platzhalter erschien nach (ms)"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Stand-in verscheen na (ms)"
-          }
-        }
-      }
-    },
     "Start" : {
       "comment" : "Button that starts following drags",
       "localizations" : {
@@ -481,23 +362,6 @@
         }
       }
     },
-    "Start moving as one" : {
-      "comment" : "Button: starts moving windows as one",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bewegen als eines starten"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Als één bewegen starten"
-          }
-        }
-      }
-    },
     "Stop" : {
       "comment" : "Button that stops following drags",
       "localizations" : {
@@ -511,23 +375,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Stop"
-          }
-        }
-      }
-    },
-    "Stop moving as one" : {
-      "comment" : "Button: stops moving windows as one",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bewegen als eines beenden"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Als één bewegen stoppen"
           }
         }
       }
@@ -600,19 +447,19 @@
         }
       }
     },
-    "Without it, the partner window itself follows." : {
+    "Without it, windows move one at a time." : {
       "comment" : "What happens without Screen Recording",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ohne diese Berechtigung folgt das Partnerfenster selbst."
+            "value" : "Ohne diese Berechtigung bewegen sich Fenster einzeln."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Zonder dit volgt het partnervenster zelf."
+            "value" : "Zonder dit bewegen vensters los van elkaar."
           }
         }
       }

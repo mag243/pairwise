@@ -1,6 +1,6 @@
 # 0013. How the spike follows the pointer
 
-- **Status:** Accepted
+- **Status:** Superseded by 0028
 - **Date:** 2026-11-01
 - **Milestone:** M1
 

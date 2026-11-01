@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Pairwise brings Snap Groups to the Mac: two windows of any app, brought together side by side, join, move together, share their seam and come apart again easily, through the Accessibility API and without anything from the apps.
 
-Milestone M0 (skeleton) holds the structure: the macOS app, the package with its four modules, the tools and the rules. M1, the spike, found that a Finder window following through the Accessibility API (ADR 0013) visibly lags, so M2 is under way: a stand-in while dragging (ADR 0014) that follows the window server's place of the dragged window (ADR 0018), and one window of Pairwise's own for both during a drag (ADR 0024), for the owner to compare. Joining, the shared seam and coming apart are M3.
+Milestone M0 (skeleton) holds the structure: the macOS app, the package with its four modules, the tools and the rules. M1, the spike, found that a window following through the Accessibility API visibly lags. M2 moves both windows as pictures in one window of Pairwise's own while dragging (ADR 0024, 0028). Joining, the shared seam and coming apart are M3.
 
 **Everything is written in English:** code, identifiers, comments, documentation (plans, ADRs, READMEs), commit messages, PR descriptions and test names. Chat with the owner may be in Dutch.
 
@@ -26,12 +26,13 @@ tools/setup.sh                        # verify Xcode, install tools, git hooks (
 tools/build.sh quick                  # check + package tests: gate for a step that leaves the app alone
 tools/build.sh verify                 # check + package tests + build the app: gate for an app change
 tools/build.sh ci                     # check + package tests + build the app + macOS app tests (default)
-tools/build.sh test DragGripTests     # one suite or test (swift test --filter)
+tools/build.sh test DragStatsTests     # one suite or test (swift test --filter)
 tools/build.sh apptest LaunchTests/testShowsWindow   # only these UI tests (comma-separated; takes the screen)
 tools/build.sh check                  # swift-format, SwiftLint, import rules (ADR 0001), shellcheck
 tools/build.sh format                 # the only command that rewrites code
 tools/build.sh coverage               # package tests with line coverage, per-module targets (PLAN.md, Test plan)
 tools/build.sh run                    # build and start the macOS app
+tools/build.sh run --drag-stress-test FILE   # the app tests dragging on its own windows; takes over the pointer (ADR 0027)
 ```
 
 - Run `quick` after a step that only touches the package and `verify` after any app change; both must be green. `ci` adds the XCUITest smoke tests, which take over the screen: run it only when the owner says so, and ask for it before the owner pushes and at the end of a plan (ADR 0011).

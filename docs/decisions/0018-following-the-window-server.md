@@ -1,6 +1,6 @@
 # 0018. Following the window server's place of the dragged window
 
-- **Status:** Accepted
+- **Status:** Superseded by 0028
 - **Date:** 2026-11-01
 - **Milestone:** M2
 

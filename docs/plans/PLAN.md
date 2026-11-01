@@ -1,6 +1,6 @@
 # Pairwise · plan
 
-**Status:** started 2026-11-01. The skeleton (M0) is in place; nothing functional is built. Progress per milestone is in `README.md` beside this file.
+**Status:** started 2026-11-01. The skeleton (M0) and the spike (M1) are in place, and M2 moves two windows as one while dragging. Progress per milestone is in `README.md` beside this file.
 **Subtitle:** *Snap groups for your Mac.*
 
 ## Why
@@ -22,7 +22,7 @@ an earlier project tried magnetic windows (in an earlier project) and dropped th
 A separate app cannot make another app's window a child window (`addChildWindow` works within one process only), so the window server cannot move the pair as one. Window Glue's lag comes from waiting for move notifications. Ways around it, in order:
 
 1. **Follow the pointer.** An event tap sees the drag start on a title bar; Pairwise keeps the grip offset and moves the partner 60–120 times a second from the pointer, through the Accessibility API (as an earlier project's guide did). The limit is how fast the other app handles a move.
-2. **A stand-in while dragging.** At the start of a drag, Pairwise takes a picture of the partner (ScreenCaptureKit), shows it in a window of its own that follows the pointer without lag, hides the real partner, and puts it in place on release. No visible lag; needs the screen recording permission as well.
+2. **One window while dragging.** Pairwise holds the drag back with an event tap, takes a picture of both windows (ScreenCaptureKit), shows them in one window of its own that it moves itself, parks the real windows, and puts them in place on release (ADR 0024, 0028). A picture of the partner alone beside a window macOS drags was tried first and could not keep step. No visible lag; needs the screen recording permission as well.
 3. **A Pairwise plug-in for apps** (an SDK apps embed), as an extra on top, never a requirement:
    - It does **not** remove the limit between two apps: the dragged window reports where it is, and the plug-in in the other app moves its own window; still a message between two processes, so a frame or two behind. Faster than the Accessibility API, not instant.
    - Two windows of the **same** app can be joined as child windows by the plug-in: smooth, as in an earlier project.
@@ -38,7 +38,7 @@ A separate app cannot make another app's window a child window (`addChildWindow`
 
 ## Order
 1. A spike: an app that follows the pointer and moves a Finder window beside the dragged one through the Accessibility API. Does it feel smooth enough?
-2. If not, the stand-in while dragging.
+2. If not, one window while dragging.
 3. Pairwise without plug-in: join, move together, the shared seam, coming apart, restoring.
 4. The plug-in, first in our own apps only; magnetic windows could come back to our own apps through Pairwise.
 5. Only if Pairwise has users: the plug-in public for other developers.
@@ -46,7 +46,7 @@ A separate app cannot make another app's window a child window (`addChildWindow`
 ## Milestones
 - **M0, skeleton & CI:** the structure below, with no function; `M0-skeleton-ci.md`.
 - **M1, spike:** step 1 of the order above. Its result, smooth enough or not, decides whether M2 is needed.
-- **M2, the stand-in while dragging:** step 2, only if M1 is not smooth enough.
+- **M2, moving together while dragging:** step 2, since M1 was not smooth enough.
 - **M3, Pairwise without plug-in:** step 3.
 - **M4, the plug-in in our own apps:** step 4.
 - **M5, the plug-in public:** step 5, only if Pairwise has users.

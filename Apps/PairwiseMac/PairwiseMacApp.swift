@@ -3,27 +3,25 @@ import PairwiseUI
 import PairwiseWindowSystem
 import SwiftUI
 
-/// The macOS app: for the spikes, one window to start following or moving as one and read
-/// the measurements (ADR 0013, 0024). With `--drag-stress-test <file>` it tests dragging
+/// The macOS app: for now one window to start moving windows as one and read the
+/// measurements (ADR 0024). With `--drag-stress-test <file>` it tests dragging
 /// itself and quits (ADR 0027).
 @main
 struct PairwiseMacApp: App {
     private static let stressTestFlag = "--drag-stress-test"
 
-    @State private var model: FollowModel
     @State private var pairDrag: PairDragModel
     private let system: AccessibilityWindowSystem
 
     init() {
         let system = AccessibilityWindowSystem()
         self.system = system
-        _model = State(initialValue: FollowModel(system: system))
         _pairDrag = State(initialValue: PairDragModel(system: system))
     }
 
     var body: some Scene {
         WindowGroup("Pairwise") {
-            FollowView(model: model, pairDrag: pairDrag)
+            MainView(model: pairDrag)
                 .task { await runStressTestIfAsked() }
         }
     }

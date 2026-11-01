@@ -1,6 +1,6 @@
 # 0020. Comparing the stand-in with the real window
 
-- **Status:** Accepted
+- **Status:** Superseded by 0028
 - **Date:** 2026-11-01
 - **Milestone:** M2
 

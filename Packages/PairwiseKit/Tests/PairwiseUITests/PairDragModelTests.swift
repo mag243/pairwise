@@ -283,6 +283,6 @@ import Testing
         _ = system.send(.released(Self.onTitleBar))
         let report = try #require(model.lastDrag)
         #expect(report.moves == 1)
-        #expect(report.standInDelay == 0.05)
+        #expect(report.panelDelay == 0.05)
     }
 }

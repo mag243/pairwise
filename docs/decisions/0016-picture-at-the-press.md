@@ -1,6 +1,6 @@
 # 0016. The picture at the press, and measuring the grip with a still pointer
 
-- **Status:** Accepted
+- **Status:** Superseded by 0028
 - **Date:** 2026-11-01
 - **Milestone:** M2
 

@@ -1,6 +1,6 @@
 # 0019. Looking ahead with the pointer's movement
 
-- **Status:** Accepted
+- **Status:** Superseded by 0028
 - **Date:** 2026-11-01
 - **Milestone:** M2
 

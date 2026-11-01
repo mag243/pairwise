@@ -33,7 +33,7 @@ enum PairDrag {
         let frame: WindowFrame
         let pointer: ScreenPoint
         let startTime: TimeInterval
-        let standInDelay: TimeInterval
+        let panelDelay: TimeInterval
         var lastPointer: ScreenPoint
         var isWindowParked = false
         var isPartnerParked = false
@@ -50,7 +50,7 @@ enum PairDrag {
         let partner: any MovableWindow
         let standIn: any WindowStandIn
         let target: ScreenPoint
-        let width: Double
+        let size: WindowSize
         let deadline: TimeInterval
         var isWindowPlaced = false
     }

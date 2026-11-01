@@ -1,6 +1,6 @@
 # 0015. Moving the stand-in on drag events, and raising the partner
 
-- **Status:** Accepted
+- **Status:** Superseded by 0028
 - **Date:** 2026-11-01
 - **Milestone:** M2
 

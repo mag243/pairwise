@@ -2,7 +2,7 @@ import AppKit
 import PairwiseCore
 
 /// Pictures of windows side by side, tops level, in one panel of Pairwise's own. It takes
-/// neither focus nor clicks, so the app being dragged keeps both (ADR 0014, 0024).
+/// neither focus nor clicks, so the app being dragged keeps both (ADR 0024).
 @MainActor
 final class StandInPanel: WindowStandIn {
     /// A picture and the size in points of the window it shows.

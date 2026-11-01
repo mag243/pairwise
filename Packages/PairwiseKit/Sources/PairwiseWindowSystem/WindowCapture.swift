@@ -1,7 +1,7 @@
 import PairwiseCore
 import ScreenCaptureKit
 
-/// Takes pictures of other apps' windows through ScreenCaptureKit (ADR 0014).
+/// Takes pictures of other apps' windows through ScreenCaptureKit (ADR 0024).
 @MainActor
 enum WindowCapture {
     /// The system's list of windows from the last call. Asking for it takes the longest,

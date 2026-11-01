@@ -3,8 +3,8 @@ import ApplicationServices
 import PairwiseCore
 import os
 
-/// The real window system: the Accessibility API, a listen-only event tap, display ticks and
-/// ScreenCaptureKit, all on the main actor (ADR 0013, 0014).
+/// The real window system: the Accessibility API, an event tap, display ticks and
+/// ScreenCaptureKit, all on the main actor (ADR 0024).
 @MainActor
 public final class AccessibilityWindowSystem: WindowSystemProviding {
     private static let logger = Logger(subsystem: "me.m-domain.pairwise", category: "windows")
@@ -13,7 +13,6 @@ public final class AccessibilityWindowSystem: WindowSystemProviding {
     /// The window `partner(for:)` gives whatever the app, for the stress test (ADR 0027).
     var pinnedPartner: AccessibilityWindow?
 
-    private var tap: PointerTap?
     private var holdingTap: HoldingTap?
     private var ticker: DisplayTicker?
     private var timer: Timer?
@@ -43,10 +42,6 @@ public final class AccessibilityWindowSystem: WindowSystemProviding {
         CGEventSource.buttonState(.combinedSessionState, button: .left)
     }
 
-    public var pointerLocation: ScreenPoint? {
-        CGEvent(source: nil).map { ScreenPoint($0.location) }
-    }
-
     public var uptime: TimeInterval { ProcessInfo.processInfo.systemUptime }
 
     public func requestAccessibility() {
@@ -56,19 +51,6 @@ public final class AccessibilityWindowSystem: WindowSystemProviding {
 
     public func requestScreenRecording() {
         CGRequestScreenCaptureAccess()
-    }
-
-    public func makeStandIn(
-        of window: any MovableWindow,
-        completion: @escaping @MainActor (Result<any WindowStandIn, WindowSystemError>) -> Void
-    ) {
-        Task { @MainActor in
-            guard let window = window as? AccessibilityWindow else {
-                completion(.failure(.captureFailed))
-                return
-            }
-            completion(await WindowCapture.standIn(of: [window]))
-        }
     }
 
     public func makePairStandIn(
@@ -130,20 +112,6 @@ public final class AccessibilityWindowSystem: WindowSystemProviding {
     private static func canFollow(_ window: AXUIElement) -> Bool {
         window.attribute(kAXSubroleAttribute) as? String == kAXStandardWindowSubrole
             && window.attribute(kAXMinimizedAttribute) as? Bool != true
-    }
-
-    public func startWatchingPointer(
-        _ handler: @escaping @MainActor (PointerButtonEvent) -> Void
-    ) throws(WindowSystemError) {
-        stopWatchingPointer()
-        let tap = PointerTap(handler: handler)
-        try tap.start()
-        self.tap = tap
-    }
-
-    public func stopWatchingPointer() {
-        tap?.stop()
-        tap = nil
     }
 
     public func startHoldingDrags(
