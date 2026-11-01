@@ -253,6 +253,7 @@ public final class PairDragModel {
     private func release(at point: ScreenPoint) {
         guard case .moving(let moving) = drag else {
             if case .pressed(let pressed) = drag {
+                if pressed.isDrag { moveWindowsAfterShortDrag(pressed, to: point) }
                 Self.logger.info(
                     "released with no panel, dragging \(pressed.isDrag), pictures \(pressed.standIn != nil)"
                 )
@@ -298,6 +299,17 @@ public final class PairDragModel {
 // MARK: - The end of a drag
 
 extension PairDragModel {
+    /// The drag was over before the pictures came, and its events were held back, so nothing
+    /// has moved yet. The windows go straight to where the drag ended.
+    private func moveWindowsAfterShortDrag(_ pressed: PairDrag.Pressed, to point: ScreenPoint) {
+        let origin = ScreenPoint(
+            x: pressed.frame.origin.x + point.x - pressed.pointer.x,
+            y: pressed.frame.origin.y + point.y - pressed.pointer.y)
+        try? pressed.window.move(to: origin)
+        try? pressed.partner.move(
+            to: PartnerPlacement.origin(besideWindowAt: origin, size: pressed.frame.size))
+    }
+
     /// One last try for parked windows, when something other than the release ends a drag.
     private func putWindowsBack() {
         switch drag {

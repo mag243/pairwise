@@ -11,7 +11,7 @@ The panel of ADR 0024 shows still pictures, so a video or animation stands still
 - While the panel shows, a ScreenCaptureKit stream of each window updates its picture. The still picture shows until a stream's first frame arrives.
 - The app's window sets the frame rate: still, 15, 30 or 60 frames a second. It starts at 30.
 - The streams stop when the panel comes down. A stream that fails leaves the last picture standing, and the drag goes on.
-- The report and log hold how many frames arrived per window. A stream only delivers a frame when the window has changed, so few frames from a moving window mean its app stopped drawing.
+- The report and log hold how many frames per window differed from the one before at the window's centre. The system also sends frames of a window that has not changed (a still Finder window got as many as an animated one), so counting frames says nothing. Few changes from a moving window mean its app stopped drawing.
 - The stress test (ADR 0027) gets a second part: it drags beside a helper window of its own that animates, and writes down the frames that arrived.
 
 ## Alternatives

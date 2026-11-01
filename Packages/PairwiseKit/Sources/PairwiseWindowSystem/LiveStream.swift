@@ -9,8 +9,10 @@ import ScreenCaptureKit
 final class LiveStream: NSObject {
     /// The layer that shows the frames.
     var layer: CALayer?
-    /// How many frames have arrived; a frame arrives only when the window has changed.
+    /// How many frames differed from the one before at the window's centre. The system also
+    /// sends frames of a window that has not changed, so counting all of them says nothing.
     private(set) var frames = 0
+    private var lastPixel: UInt32?
 
     private let filter: SCContentFilter
     private let configuration = SCStreamConfiguration()
@@ -43,8 +45,9 @@ final class LiveStream: NSObject {
         stream = nil
     }
 
-    fileprivate func show(_ surface: IOSurfaceRef) {
-        frames += 1
+    fileprivate func show(_ surface: IOSurfaceRef, centrePixel: UInt32?) {
+        if let lastPixel, centrePixel != lastPixel { frames += 1 }
+        lastPixel = centrePixel
         CATransaction.begin()
         CATransaction.setDisableActions(true)
         layer?.contents = surface
@@ -68,6 +71,18 @@ extension LiveStream: SCStreamOutput {
             let surface = CVPixelBufferGetIOSurface(buffer)?.takeUnretainedValue()
         else { return }
         nonisolated(unsafe) let frame = surface
-        MainActor.assumeIsolated { show(frame) }
+        let pixel = Self.centrePixel(of: buffer)
+        MainActor.assumeIsolated { show(frame, centrePixel: pixel) }
+    }
+
+    /// The pixel at the centre of a 32-bit frame.
+    private nonisolated static func centrePixel(of buffer: CVPixelBuffer) -> UInt32? {
+        CVPixelBufferLockBaseAddress(buffer, .readOnly)
+        defer { CVPixelBufferUnlockBaseAddress(buffer, .readOnly) }
+        guard let base = CVPixelBufferGetBaseAddress(buffer) else { return nil }
+        let row = CVPixelBufferGetHeight(buffer) / 2
+        let column = CVPixelBufferGetWidth(buffer) / 2
+        let offset = row * CVPixelBufferGetBytesPerRow(buffer) + column * MemoryLayout<UInt32>.size
+        return base.load(fromByteOffset: offset, as: UInt32.self)
     }
 }

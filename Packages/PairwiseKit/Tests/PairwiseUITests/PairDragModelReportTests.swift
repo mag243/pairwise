@@ -22,6 +22,21 @@ import Testing
         model.start()
     }
 
+    @Test func aDragShorterThanThePicturesStillMovesBoth() {
+        _ = system.send(.pressed(Self.onTitleBar))
+        _ = system.send(.dragged(Self.further))
+        _ = system.send(.released(Self.further))
+        #expect(window.moves.last == ScreenPoint(x: 140, y: 130))
+        #expect(partner.moves.last == ScreenPoint(x: 540, y: 130))
+    }
+
+    @Test func aClickBeforeThePicturesMovesNothing() {
+        _ = system.send(.pressed(Self.onTitleBar))
+        _ = system.send(.released(Self.onTitleBar))
+        #expect(window.moves.isEmpty)
+        #expect(partner.moves.isEmpty)
+    }
+
     @Test func theReportCarriesThePanelsDelay() throws {
         _ = system.send(.pressed(Self.onTitleBar))
         system.uptime = 0.05

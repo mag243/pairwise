@@ -11,6 +11,6 @@ public protocol WindowStandIn: AnyObject {
     /// Takes the stand-in off the screen for good.
     func dismiss()
 
-    /// How many live frames arrived so far, per window pictured.
+    /// How many live frames showed a change so far, per window pictured.
     var liveFrames: [Int] { get }
 }

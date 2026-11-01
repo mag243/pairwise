@@ -141,6 +141,8 @@ With the window list kept and the pictures taken together, over 13 drags: the pi
 
 **The stress test after the clean-up of ADR 0028:** both windows moved 40 times out of 40.
 
+**A drag shorter than the first pictures** (the stress test's first try) moved nothing, as its events were held back and no panel came. The windows now go straight to where such a drag ended.
+
 **Are the real windows out of sight during the drag?** Yes, by hand.
 
 **By hand, after the panel waits at the release:** the flash is gone.
