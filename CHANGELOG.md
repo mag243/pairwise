@@ -5,3 +5,6 @@ All notable changes to Pairwise are recorded here. The format follows
 [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
+
+### Added
+- A spike: a Finder window follows a dragged window through the Accessibility API, with the measurements of each drag.

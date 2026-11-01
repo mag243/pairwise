@@ -1,0 +1,82 @@
+import PairwiseCore
+import PairwiseUI
+import SwiftUI
+
+/// The spike's window: the permission, Start and Stop, and the last drag's numbers.
+struct FollowView: View {
+    private static let minimumWidth: CGFloat = 360
+    private static let minimumHeight: CGFloat = 420
+    private static let millisecondsPerSecond = 1000.0
+    private static let fractionDigits = 1
+
+    let model: FollowModel
+
+    var body: some View {
+        Form {
+            controls
+            Section("Last drag") {
+                if let report = model.lastDrag {
+                    measurements(of: report)
+                } else {
+                    Text("No drag measured yet.")
+                }
+            }
+        }
+        .formStyle(.grouped)
+        .frame(minWidth: Self.minimumWidth, minHeight: Self.minimumHeight)
+        .onReceive(
+            NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)
+        ) { _ in
+            model.refreshPermission()
+        }
+    }
+
+    @ViewBuilder private var controls: some View {
+        Section {
+            LabeledContent("Accessibility") {
+                Text(model.isAccessibilityGranted ? "Granted" : "Not granted")
+            }
+            if !model.isAccessibilityGranted {
+                Button("Grant Access…") { model.requestAccessibility() }
+            }
+            Button(model.isWatching ? "Stop" : "Start") {
+                if model.isWatching { model.stop() } else { model.start() }
+            }
+            .disabled(!model.isAccessibilityGranted)
+            Text("Drag any window by its title bar: a Finder window follows beside it.")
+                .foregroundStyle(.secondary)
+            if let problem = model.problem {
+                Text(Self.text(for: problem)).foregroundStyle(.red)
+            }
+        }
+    }
+
+    @ViewBuilder private func measurements(of report: FollowReport) -> some View {
+        LabeledContent("Moves") { Text(report.moves, format: .number) }
+        row("Moves per second", report.movesPerSecond)
+        row("Mean move (ms)", report.meanMove * Self.millisecondsPerSecond)
+        row("95th percentile (ms)", report.percentile95Move * Self.millisecondsPerSecond)
+        row("Longest move (ms)", report.longestMove * Self.millisecondsPerSecond)
+        row("Mean points behind", report.meanPointsBehind)
+        row("Most points behind", report.mostPointsBehind)
+    }
+
+    private func row(_ label: LocalizedStringKey, _ value: Double) -> some View {
+        LabeledContent(label) {
+            Text(value, format: .number.precision(.fractionLength(Self.fractionDigits)))
+                .monospacedDigit()
+        }
+    }
+
+    private static func text(for problem: WindowSystemError) -> LocalizedStringKey {
+        switch problem {
+        case .accessibilityDenied: "Pairwise has no Accessibility access."
+        case .eventTapUnavailable:
+            "The pointer cannot be watched. Quit and reopen Pairwise after granting access."
+        case .windowGone: "The window has gone."
+        case .windowRefused: "The window refuses to move."
+        case .windowBusy: "The window's app does not answer."
+        case .noPartner: "No Finder window to follow: open one."
+        }
+    }
+}

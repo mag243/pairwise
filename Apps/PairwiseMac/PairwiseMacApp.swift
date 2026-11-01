@@ -1,15 +1,16 @@
+import PairwiseUI
+import PairwiseWindowSystem
 import SwiftUI
 
-/// The macOS app: one empty window until the first milestone gives it content.
+/// The macOS app: for the spike of M1, one window to start following and read the
+/// measurements (ADR 0013).
 @main
 struct PairwiseMacApp: App {
-    private static let minimumWidth: CGFloat = 320
-    private static let minimumHeight: CGFloat = 200
+    @State private var model = FollowModel(system: AccessibilityWindowSystem())
 
     var body: some Scene {
         WindowGroup("Pairwise") {
-            Color.clear
-                .frame(minWidth: Self.minimumWidth, minHeight: Self.minimumHeight)
+            FollowView(model: model)
         }
     }
 }

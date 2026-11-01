@@ -6,7 +6,7 @@
 #   format      Rewrite Swift code with SwiftLint --fix and swift-format (the only
 #               command that changes code).
 #   test        Package tests (swift test). Followed by a filter, only matching tests:
-#               tools/build.sh test CoreModuleTests
+#               tools/build.sh test DragGripTests
 #   coverage    Package tests with code coverage; fails when a module is below its
 #               line-coverage target (Core 90 %, WindowSystem 75 %, UI 70 %; PLAN.md, Test plan).
 #   build       Build the macOS app with its tests (compiled, not run), Debug.

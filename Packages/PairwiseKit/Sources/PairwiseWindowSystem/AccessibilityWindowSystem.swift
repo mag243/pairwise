@@ -1,0 +1,97 @@
+import AppKit
+import ApplicationServices
+import PairwiseCore
+
+/// The real window system: the Accessibility API, a listen-only event tap and a timer,
+/// all on the main actor (ADR 0013).
+@MainActor
+public final class AccessibilityWindowSystem: WindowSystemProviding {
+    private static let partnerBundleIdentifier = "com.apple.finder"
+
+    private let systemWide = AXUIElementCreateSystemWide()
+    private var tap: PointerTap?
+    private var timer: Timer?
+
+    public init() {
+        systemWide.limitMessagingTime()
+    }
+
+    public var isAccessibilityGranted: Bool { AXIsProcessTrusted() }
+
+    public var pointerLocation: ScreenPoint? {
+        CGEvent(source: nil).map { ScreenPoint($0.location) }
+    }
+
+    public var uptime: TimeInterval { ProcessInfo.processInfo.systemUptime }
+
+    public func requestAccessibility() {
+        let options = ["AXTrustedCheckOptionPrompt": true] as CFDictionary
+        AXIsProcessTrustedWithOptions(options)
+    }
+
+    public func window(at point: ScreenPoint) -> (any MovableWindow)? {
+        var hit: AXUIElement?
+        let result = AXUIElementCopyElementAtPosition(
+            systemWide, Float(point.x), Float(point.y), &hit)
+        guard result == .success, let hit else { return nil }
+        // A call from Pairwise to itself would wait on the thread that has to answer it.
+        guard hit.processID != ProcessInfo.processInfo.processIdentifier else { return nil }
+        let isWindow = hit.attribute(kAXRoleAttribute) as? String == kAXWindowRole
+        let element = isWindow ? hit : hit.elementAttribute(kAXWindowAttribute)
+        return element.map(AccessibilityWindow.init(element:))
+    }
+
+    public func partner(
+        for window: any MovableWindow
+    ) throws(WindowSystemError) -> any MovableWindow {
+        let dragged = (window as? AccessibilityWindow)?.element
+        let apps = NSRunningApplication.runningApplications(
+            withBundleIdentifier: Self.partnerBundleIdentifier)
+        guard let app = apps.first else { throw .noPartner }
+        let appElement = AXUIElementCreateApplication(app.processIdentifier)
+        appElement.limitMessagingTime()
+        let windows = appElement.attribute(kAXWindowsAttribute) as? [AXUIElement] ?? []
+        let partner = windows.first { candidate in
+            Self.canFollow(candidate) && dragged.map { !CFEqual($0, candidate) } ?? true
+        }
+        guard let partner else { throw .noPartner }
+        return AccessibilityWindow(element: partner)
+    }
+
+    private static func canFollow(_ window: AXUIElement) -> Bool {
+        window.attribute(kAXSubroleAttribute) as? String == kAXStandardWindowSubrole
+            && window.attribute(kAXMinimizedAttribute) as? Bool != true
+    }
+
+    public func startWatchingPointer(
+        _ handler: @escaping @MainActor (PointerButtonEvent) -> Void
+    ) throws(WindowSystemError) {
+        stopWatchingPointer()
+        let tap = PointerTap(handler: handler)
+        try tap.start()
+        self.tap = tap
+    }
+
+    public func stopWatchingPointer() {
+        tap?.stop()
+        tap = nil
+    }
+
+    public func startTicking(
+        every interval: TimeInterval, _ handler: @escaping @MainActor () -> Void
+    ) {
+        stopTicking()
+        let timer = Timer(timeInterval: interval, repeats: true) { _ in
+            // The timer is on the main run loop, added below.
+            MainActor.assumeIsolated { handler() }
+        }
+        timer.tolerance = 0
+        RunLoop.main.add(timer, forMode: .common)
+        self.timer = timer
+    }
+
+    public func stopTicking() {
+        timer?.invalidate()
+        timer = nil
+    }
+}

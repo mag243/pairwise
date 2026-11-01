@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Pairwise brings Snap Groups to the Mac: two windows of any app, brought together side by side, join, move together, share their seam and come apart again easily, through the Accessibility API and without anything from the apps.
 
-Milestone M0 (skeleton) holds the structure: an empty macOS app, the package with its four modules, the tools and the rules. Nothing functional exists yet. Next is M1, the spike that decides whether following the pointer feels smooth enough.
+Milestone M0 (skeleton) holds the structure: the macOS app, the package with its four modules, the tools and the rules. M1 is the spike under way: a Finder window follows a dragged window through the Accessibility API (ADR 0013), with measurements, to decide whether this feels smooth enough or the stand-in of M2 is needed. Joining, the shared seam and coming apart are M3.
 
 **Everything is written in English:** code, identifiers, comments, documentation (plans, ADRs, READMEs), commit messages, PR descriptions and test names. Chat with the owner may be in Dutch.
 
@@ -26,7 +26,7 @@ tools/setup.sh                        # verify Xcode, install tools, git hooks (
 tools/build.sh quick                  # check + package tests: gate for a step that leaves the app alone
 tools/build.sh verify                 # check + package tests + build the app: gate for an app change
 tools/build.sh ci                     # check + package tests + build the app + macOS app tests (default)
-tools/build.sh test CoreModuleTests   # one suite or test (swift test --filter)
+tools/build.sh test DragGripTests     # one suite or test (swift test --filter)
 tools/build.sh apptest LaunchTests/testShowsWindow   # only these UI tests (comma-separated; takes the screen)
 tools/build.sh check                  # swift-format, SwiftLint, import rules (ADR 0001), shellcheck
 tools/build.sh format                 # the only command that rewrites code

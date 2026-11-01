@@ -1,0 +1,30 @@
+import PairwiseCore
+
+/// A window in memory, which records where it was moved.
+@MainActor
+public final class FakeWindow: MovableWindow {
+    public var currentFrame: WindowFrame
+    public private(set) var moves: [ScreenPoint] = []
+    /// When set, reading the frame throws this.
+    public var frameError: WindowSystemError?
+    /// When set, moving throws this and the window stays where it is.
+    public var moveError: WindowSystemError?
+    /// Runs during each move, to let a test advance time or the pointer.
+    public var duringMove: (() -> Void)?
+
+    public init(frame: WindowFrame) {
+        currentFrame = frame
+    }
+
+    public func frame() throws(WindowSystemError) -> WindowFrame {
+        if let frameError { throw frameError }
+        return currentFrame
+    }
+
+    public func move(to origin: ScreenPoint) throws(WindowSystemError) {
+        if let moveError { throw moveError }
+        moves.append(origin)
+        currentFrame.origin = origin
+        duringMove?()
+    }
+}

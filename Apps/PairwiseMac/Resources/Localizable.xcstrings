@@ -1,9 +1,383 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "95th percentile (ms)" : {
+      "comment" : "Measurement: duration 95 percent of moves stay within",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "95. Perzentil (ms)"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "95e percentiel (ms)"
+          }
+        }
+      }
+    },
+    "Accessibility" : {
+      "comment" : "The system permission Pairwise needs",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bedienungshilfen"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toegankelijkheid"
+          }
+        }
+      }
+    },
+    "Drag any window by its title bar: a Finder window follows beside it." : {
+      "comment" : "How to try the spike",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ziehe ein Fenster an seiner Titelleiste: Ein Finder-Fenster folgt daneben."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sleep een venster aan de titelbalk: een Finder-venster volgt ernaast."
+          }
+        }
+      }
+    },
+    "Grant Access…" : {
+      "comment" : "Button that opens the system's permission prompt",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zugriff erlauben…"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toegang geven…"
+          }
+        }
+      }
+    },
+    "Granted" : {
+      "comment" : "The Accessibility permission's status",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erlaubt"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toegestaan"
+          }
+        }
+      }
+    },
+    "Last drag" : {
+      "comment" : "Section with the measurements of the last drag",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Letztes Ziehen"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Laatste keer slepen"
+          }
+        }
+      }
+    },
+    "Longest move (ms)" : {
+      "comment" : "Measurement: longest duration of one move",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Längste Bewegung (ms)"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Langste verplaatsing (ms)"
+          }
+        }
+      }
+    },
+    "Mean move (ms)" : {
+      "comment" : "Measurement: mean duration of one move",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mittlere Bewegung (ms)"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gemiddelde verplaatsing (ms)"
+          }
+        }
+      }
+    },
+    "Mean points behind" : {
+      "comment" : "Measurement: how far the pointer travelled during a move",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Punkte im Rückstand, Mittel"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gemiddeld punten achter"
+          }
+        }
+      }
+    },
+    "Most points behind" : {
+      "comment" : "Measurement: how far the pointer travelled during a move, at most",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Punkte im Rückstand, höchstens"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Meeste punten achter"
+          }
+        }
+      }
+    },
+    "Moves" : {
+      "comment" : "Measurement: how often the partner window was moved",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bewegungen"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verplaatsingen"
+          }
+        }
+      }
+    },
+    "Moves per second" : {
+      "comment" : "Measurement",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bewegungen pro Sekunde"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verplaatsingen per seconde"
+          }
+        }
+      }
+    },
+    "No Finder window to follow: open one." : {
+      "comment" : "Problem message",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kein Finder-Fenster zum Folgen: Öffne eines."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geen Finder-venster om te volgen: open er een."
+          }
+        }
+      }
+    },
+    "No drag measured yet." : {
+      "comment" : "Shown before the first drag",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Noch kein Ziehen gemessen."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nog geen sleepbeweging gemeten."
+          }
+        }
+      }
+    },
+    "Not granted" : {
+      "comment" : "The Accessibility permission's status",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nicht erlaubt"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Niet toegestaan"
+          }
+        }
+      }
+    },
     "Pairwise" : {
       "comment" : "The app's name, the title of its window",
       "shouldTranslate" : false
+    },
+    "Pairwise has no Accessibility access." : {
+      "comment" : "Problem message",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pairwise hat keinen Zugriff über die Bedienungshilfen."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pairwise heeft geen toegang via Toegankelijkheid."
+          }
+        }
+      }
+    },
+    "Start" : {
+      "comment" : "Button that starts following drags",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Starten"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start"
+          }
+        }
+      }
+    },
+    "Stop" : {
+      "comment" : "Button that stops following drags",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stoppen"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stop"
+          }
+        }
+      }
+    },
+    "The pointer cannot be watched. Quit and reopen Pairwise after granting access." : {
+      "comment" : "Problem message",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Zeiger kann nicht beobachtet werden. Beende Pairwise und öffne es erneut, nachdem du den Zugriff erlaubt hast."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "De aanwijzer kan niet worden gevolgd. Stop Pairwise en open het opnieuw nadat je toegang hebt gegeven."
+          }
+        }
+      }
+    },
+    "The window has gone." : {
+      "comment" : "Problem message",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Fenster ist nicht mehr da."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Het venster is verdwenen."
+          }
+        }
+      }
+    },
+    "The window refuses to move." : {
+      "comment" : "Problem message",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Fenster lässt sich nicht bewegen."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Het venster laat zich niet verplaatsen."
+          }
+        }
+      }
+    },
+    "The window's app does not answer." : {
+      "comment" : "Problem message",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die App des Fensters antwortet nicht."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "De app van het venster reageert niet."
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

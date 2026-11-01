@@ -22,6 +22,7 @@ M1 answers one question: does a partner window moved through the Accessibility A
 - **A separate thread for the Accessibility calls:** would keep the window responsive, but needs an isolation design a spike does not justify.
 
 ## Consequences
+- `PairwiseCore` has its own small geometry types (`ScreenPoint`, `WindowSize`, `WindowFrame`): Foundation alone exposes `CGPoint` and `CGRect` without initializers or equality, which come from CoreGraphics, and Core imports only Foundation (ADR 0001). `PairwiseWindowSystem` converts.
 - The spike's own strings are few, so they are translated directly in the catalog; the translation tools of ADR 0010 come over with M3, which adds real text.
 - `PairwiseWindowSystem` is thin code around calls that need the permission and real windows, so plain tests do not reach it. Its 75 % coverage target is not met in M1, and `tools/build.sh coverage` says so; the target stands, and M3 meets it with a seam around the system calls.
 - No UI test drives a drag: it would need the permission and, by an earlier project's finding, would not move the window. Feel is judged by hand.
