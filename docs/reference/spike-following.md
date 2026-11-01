@@ -123,6 +123,8 @@ One window while dragging (ADR 0024). "Panel after" runs from the press, so it i
 
 **By hand, holding back a drag (ADR 0023):** while the test runs, windows cannot be dragged by their title bars, so withholding drag events stops a window drag. Clicks keep working.
 
+With the window list kept and the pictures taken together, over 13 drags: the pictures came after 41 to 83 ms, before the pointer had moved 3 points each time, and no drag passed without them. The panel came after 101 to 484 ms, with one each at 913 and 2155 ms, moves took 0.28 to 0.39 ms on average, and the longest took 6.09 ms.
+
 **By hand, moving as one:** when dragging starts straight after the press, only the held window moves. After a short wait the other window comes along, and then it looks very smooth.
 
 **Is the real partner out of sight during the drag?** Not answered yet.
