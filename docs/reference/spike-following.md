@@ -74,6 +74,20 @@ Comparing the two (ADR 0020), both looking ahead 8 ms:
 | Real window | 1281 | 97.4 | 2.39 | 4.63 | 12.36 | 42.8 |
 | Real window | 758 | 84.4 | 2.14 | 3.30 | 10.84 | 28.1 |
 
+In step with the display (ADR 0021), with and without prediction:
+
+| Look ahead (ms) | Predicting | Moves | Moves per second | Mean move (ms) | 95th percentile (ms) | Longest move (ms) | Stand-in after (ms) | Most slip (points) |
+|---|---|---|---|---|---|---|---|---|
+| 8 | Yes | 551 | 112.5 | 3.24 | 6.39 | 15.88 | 0.8 | 46.3 |
+| 8 | Yes | 1348 | 97.9 | 3.23 | 6.77 | 10.61 | 1.3 | 48.0 |
+| 8 | No | 356 | 102.8 | 3.39 | 6.38 | 11.97 | 0.6 | 29.7 |
+| 8 | No | 160 | 101.5 | 3.21 | 5.39 | 8.02 | 1.7 | 15.6 |
+| 24 | Yes | 623 | 88.7 | 3.84 | 7.21 | 9.74 | 0.5 | 57.5 |
+| 4 | Yes | 330 | 112.5 | 3.13 | 4.95 | 8.72 | 1.2 | 13.8 |
+| 60 | Yes | 328 | 100.0 | 3.74 | 7.35 | 13.85 | 0.4 | 20.0 |
+| 12 | Yes | 509 | 107.9 | 3.06 | 4.85 | 6.83 | 1.3 | 65.4 |
+| 12 | No | 242 | 107.1 | 3.72 | 7.27 | 7.48 | 2.1 | 49.5 |
+
 **By hand, first run:** a little lag remains, the Finder window sometimes stands a small distance from the dragged window, the swap is not seen, and after the release the Finder window is behind another window. ADR 0015 answers these.
 
 **By hand, second run, on drag events:** less lag, with a short delay at the start of a drag. While dragging, the stand-in sometimes stands a small distance from the dragged window and sometimes overlaps it; after the release the two are tight. ADR 0016 answers these.
