@@ -6,14 +6,14 @@
 Not in this milestone: joining, the shared seam, coming apart, choosing a partner, restoring. Those are M3.
 
 ## Tasks
-- [ ] `PairwiseCore`, test-first: which on-screen window matches a frame, where a partner is parked, the protocols and errors.
-- [ ] `PairwiseTestSupport`: a fake stand-in and a capture a test finishes by hand.
-- [ ] `PairwiseUI`, test-first: `FollowModel` swaps to the stand-in, parks the partner, puts it back at the release, and falls back to following.
-- [ ] `PairwiseWindowSystem`: the capture and the panel; ScreenCaptureKit confined there by `tools/check_dependencies.sh`.
-- [ ] The app: the Screen Recording status and button, the new measurement; `nl` and `de` in the catalog.
+- [x] `PairwiseCore`, test-first: which on-screen window matches a frame, where a partner is parked, the protocols and errors.
+- [x] `PairwiseTestSupport`: a fake stand-in and a capture a test finishes by hand.
+- [x] `PairwiseUI`, test-first: `FollowModel` swaps to the stand-in, parks the partner, puts it back at the release, and falls back to following.
+- [x] `PairwiseWindowSystem`: the capture and the panel; ScreenCaptureKit confined there by `tools/check_dependencies.sh`.
+- [x] The app: the Screen Recording status and button, the new measurement; `nl` and `de` in the catalog.
 
 ## Acceptance criteria
-- [ ] `tools/build.sh verify` is green.
+- [x] `tools/build.sh verify` is green.
 - [ ] By hand: the stand-in moves beside the dragged window without visible lag, and the owner's verdict is in `docs/reference/spike-following.md`.
 - [ ] By hand: the real partner is out of sight during the drag (the assumption of ADR 0014), and ends level beside the dragged window after the release.
 - [ ] By hand: without Screen Recording the partner follows as in M1.

@@ -6,6 +6,8 @@ import PairwiseCore
 @MainActor
 public final class FakeWindowSystem: WindowSystemProviding {
     public var isAccessibilityGranted = true
+    public var isScreenRecordingGranted = false
+    public var parkingOrigin: ScreenPoint? = ScreenPoint(x: 9999, y: 9999)
     public var pointerLocation: ScreenPoint?
     public var uptime: TimeInterval = 0
     /// The window `window(at:)` returns, wherever is asked.
@@ -15,9 +17,13 @@ public final class FakeWindowSystem: WindowSystemProviding {
     /// When set, `startWatchingPointer` throws this.
     public var watchError: WindowSystemError?
     public private(set) var accessibilityRequests = 0
+    public private(set) var screenRecordingRequests = 0
+    public private(set) var standInRequests = 0
 
     private var pointerHandler: (@MainActor (PointerButtonEvent) -> Void)?
     private var tickHandler: (@MainActor () -> Void)?
+    private var standInCompletion:
+        (@MainActor (Result<any WindowStandIn, WindowSystemError>) -> Void)?
 
     public init() {}
 
@@ -26,6 +32,18 @@ public final class FakeWindowSystem: WindowSystemProviding {
 
     public func requestAccessibility() {
         accessibilityRequests += 1
+    }
+
+    public func requestScreenRecording() {
+        screenRecordingRequests += 1
+    }
+
+    public func makeStandIn(
+        of window: any MovableWindow,
+        completion: @escaping @MainActor (Result<any WindowStandIn, WindowSystemError>) -> Void
+    ) {
+        standInRequests += 1
+        standInCompletion = completion
     }
 
     public func window(at point: ScreenPoint) -> (any MovableWindow)? {
@@ -70,6 +88,19 @@ public final class FakeWindowSystem: WindowSystemProviding {
     public func release(at point: ScreenPoint) {
         pointerLocation = point
         pointerHandler?(.released(point))
+    }
+
+    /// Gives the last requested stand-in, or the reason there is none.
+    public func finishStandIn(with result: Result<any WindowStandIn, WindowSystemError>) {
+        standInCompletion?(result)
+    }
+
+    /// Hands over the last completion, to call after a later request has been made.
+    public func takeStandInCompletion() -> (
+        @MainActor (Result<any WindowStandIn, WindowSystemError>) -> Void
+    )? {
+        defer { standInCompletion = nil }
+        return standInCompletion
     }
 
     /// Runs one tick, when ticking.

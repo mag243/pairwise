@@ -14,4 +14,7 @@ public struct WindowFrame: Equatable, Sendable {
 
     /// The x of the window's right edge.
     public var maxX: Double { origin.x + size.width }
+
+    /// The y of the window's bottom edge.
+    public var maxY: Double { origin.y + size.height }
 }

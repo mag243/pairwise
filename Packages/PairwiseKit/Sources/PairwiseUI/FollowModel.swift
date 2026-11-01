@@ -6,28 +6,18 @@ import os
 /// Moves a partner window beside a dragged one, from the pointer, and measures it
 /// (ADR 0013). A press notes the window under the pointer; the first tick that sees it
 /// moved starts the following; the release ends it, with the partner placed from the
-/// dragged window's real frame.
+/// dragged window's real frame. With the Screen Recording permission, a stand-in takes
+/// over from the partner as soon as its picture arrives (ADR 0014).
 @MainActor
 @Observable
 public final class FollowModel {
     private static let tickInterval: TimeInterval = 1.0 / 120
+    /// How long a busy partner gets to come back at the release, with the stand-in up.
+    private static let placingPatience: TimeInterval = 0.5
     private static let logger = Logger(subsystem: "me.m-domain.pairwise", category: "follow")
 
-    private enum Drag {
-        case none
-        case pressed(window: any MovableWindow, frame: WindowFrame, pointer: ScreenPoint)
-        case following(Following)
-    }
-
-    private struct Following {
-        let window: any MovableWindow
-        let partner: any MovableWindow
-        let size: WindowSize
-        let grip: DragGrip
-        let startTime: TimeInterval
-    }
-
     public private(set) var isAccessibilityGranted: Bool
+    public private(set) var isScreenRecordingGranted: Bool
     public private(set) var isWatching = false
     /// Why the last start or drag did not work; cleared by the next one.
     public private(set) var problem: WindowSystemError?
@@ -35,22 +25,31 @@ public final class FollowModel {
     public private(set) var lastDrag: FollowReport?
 
     @ObservationIgnored private let system: any WindowSystemProviding
-    @ObservationIgnored private var drag = Drag.none
+    @ObservationIgnored private var drag = FollowDrag.none
     @ObservationIgnored private var stats = FollowStats()
+    /// Tells a picture that arrives late from the one this drag asked for.
+    @ObservationIgnored private var standInRequest = 0
 
     public init(system: any WindowSystemProviding) {
         self.system = system
         isAccessibilityGranted = system.isAccessibilityGranted
+        isScreenRecordingGranted = system.isScreenRecordingGranted
     }
 
-    /// Reads the permission again; the user grants it elsewhere, in System Settings.
+    /// Reads the permissions again; the user grants them elsewhere, in System Settings.
     public func refreshPermission() {
         isAccessibilityGranted = system.isAccessibilityGranted
+        isScreenRecordingGranted = system.isScreenRecordingGranted
     }
 
     /// Asks the system to show the user where to grant the permission.
     public func requestAccessibility() {
         system.requestAccessibility()
+    }
+
+    /// Asks the system for the permission a stand-in needs.
+    public func requestScreenRecording() {
+        system.requestScreenRecording()
     }
 
     /// Starts watching for drags; a failure lands in `problem`.
@@ -69,8 +68,9 @@ public final class FollowModel {
         }
     }
 
-    /// Stops watching and lets go of any drag.
+    /// Stops watching and lets go of any drag, with a parked partner put back.
     public func stop() {
+        putPartnerBack()
         endDrag()
         system.stopWatchingPointer()
         isWatching = false
@@ -84,6 +84,7 @@ public final class FollowModel {
     }
 
     private func press(at point: ScreenPoint) {
+        putPartnerBack()
         endDrag()
         problem = nil
         guard let window = system.window(at: point) else { return }
@@ -103,6 +104,8 @@ public final class FollowModel {
                 try checkForMove(of: window, from: frame, pointer: pointer)
             case .following(let following):
                 try follow(following)
+            case .placing(let placing):
+                place(placing)
             }
         } catch {
             fail(error)
@@ -114,40 +117,137 @@ public final class FollowModel {
     ) throws(WindowSystemError) {
         guard WindowDragRule.isMove(from: start, to: try window.frame()) else { return }
         stats = FollowStats()
+        let partner = try system.partner(for: window)
         drag = .following(
-            Following(
+            FollowDrag.Following(
                 window: window,
-                partner: try system.partner(for: window),
+                partner: partner,
                 size: start.size,
                 grip: DragGrip(pointer: pointer, windowOrigin: start.origin),
                 startTime: system.uptime
             ))
+        requestStandIn(of: partner)
     }
 
-    private func follow(_ following: Following) throws(WindowSystemError) {
+    private func requestStandIn(of partner: any MovableWindow) {
+        guard system.isScreenRecordingGranted else { return }
+        let request = standInRequest
+        system.makeStandIn(of: partner) { [weak self] result in
+            guard let self, request == standInRequest else { return }
+            receive(result)
+        }
+    }
+
+    /// A failure leaves the partner following as itself.
+    private func receive(_ result: Result<any WindowStandIn, WindowSystemError>) {
+        guard case .following(var following) = drag else { return }
+        switch result {
+        case .failure(let error):
+            problem = error
+        case .success(let standIn):
+            guard let pointer = system.pointerLocation else { return }
+            // Showing it before the partner leaves keeps the place from flashing empty.
+            standIn.show(at: following.target(forPointer: pointer))
+            let now = system.uptime
+            following.standIn = standIn
+            following.standInDelay = now - following.startTime
+            following.startTime = now
+            stats = FollowStats()
+            drag = .following(following)
+        }
+    }
+
+    private func follow(_ following: FollowDrag.Following) throws(WindowSystemError) {
         guard let pointer = system.pointerLocation else { return }
-        let target = PartnerPlacement.origin(
-            besideWindowAt: following.grip.windowOrigin(forPointer: pointer),
-            size: following.size)
+        let target = following.target(forPointer: pointer)
         let before = system.uptime
-        try following.partner.move(to: target)
+        if let standIn = following.standIn {
+            standIn.move(to: target)
+        } else {
+            try following.partner.move(to: target)
+        }
         stats.record(
             moveDuration: system.uptime - before,
             pointsBehind: pointer.distance(to: system.pointerLocation ?? pointer))
+        if following.standIn != nil, !following.isParked {
+            try park(following)
+        }
     }
 
-    /// The button is up, so the drag ends whatever the apps answer here.
+    private func park(_ following: FollowDrag.Following) throws(WindowSystemError) {
+        if let origin = system.parkingOrigin {
+            try following.partner.move(to: origin)
+        }
+        var parked = following
+        parked.isParked = true
+        drag = .following(parked)
+    }
+
+    /// The button is up, so the drag ends whatever the apps answer here, except that a
+    /// stand-in stays up while a busy partner may still come back.
     private func release() {
-        defer { endDrag() }
-        guard case .following(let following) = drag else { return }
-        lastDrag = stats.report(elapsed: system.uptime - following.startTime)
-        logLastDrag()
+        guard case .following(let following) = drag else {
+            endDrag()
+            return
+        }
+        lastDrag = stats.report(
+            elapsed: system.uptime - following.startTime,
+            standInDelay: following.standInDelay)
+        lastDrag?.log(to: Self.logger)
+        let finalTarget: ScreenPoint
         do {
-            let frame = try following.window.frame()
-            try following.partner.move(
-                to: PartnerPlacement.origin(besideWindowAt: frame.origin, size: frame.size))
+            finalTarget = try following.placementFromRealFrame()
         } catch {
             problem = error
+            guard following.standIn != nil, let pointer = system.pointerLocation else {
+                endDrag()
+                return
+            }
+            finalTarget = following.target(forPointer: pointer)
+        }
+        guard let standIn = following.standIn else {
+            moveAtRelease(following.partner, to: finalTarget)
+            return
+        }
+        let placing = FollowDrag.Placing(
+            partner: following.partner, standIn: standIn, target: finalTarget,
+            deadline: system.uptime + Self.placingPatience)
+        drag = .placing(placing)
+        place(placing)
+    }
+
+    private func moveAtRelease(_ partner: any MovableWindow, to target: ScreenPoint) {
+        defer { endDrag() }
+        do {
+            try partner.move(to: target)
+        } catch {
+            problem = error
+        }
+    }
+
+    private func place(_ placing: FollowDrag.Placing) {
+        do {
+            try placing.partner.move(to: placing.target)
+            endDrag()
+        } catch {
+            if error == .windowBusy, system.uptime < placing.deadline { return }
+            problem = error
+            endDrag()
+        }
+    }
+
+    /// One last try for a partner that is parked or on its way back, when something other
+    /// than the release ends the drag.
+    private func putPartnerBack() {
+        switch drag {
+        case .following(let following) where following.standIn != nil:
+            if let target = try? following.placementFromRealFrame() {
+                try? following.partner.move(to: target)
+            }
+        case .placing(let placing):
+            try? placing.partner.move(to: placing.target)
+        default:
+            break
         }
     }
 
@@ -165,17 +265,9 @@ public final class FollowModel {
 
     private func endDrag() {
         system.stopTicking()
+        if case .following(let following) = drag { following.standIn?.dismiss() }
+        if case .placing(let placing) = drag { placing.standIn.dismiss() }
+        standInRequest += 1
         drag = .none
-    }
-
-    private func logLastDrag() {
-        guard let report = lastDrag else { return }
-        Self.logger.info(
-            """
-            drag: \(report.moves) moves, \(report.movesPerSecond) per second, \
-            mean \(report.meanMove) s, p95 \(report.percentile95Move) s, \
-            longest \(report.longestMove) s, \
-            behind mean \(report.meanPointsBehind), most \(report.mostPointsBehind)
-            """)
     }
 }

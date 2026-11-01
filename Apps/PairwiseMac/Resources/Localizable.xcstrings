@@ -69,6 +69,23 @@
         }
       }
     },
+    "Grant Screen Recording…" : {
+      "comment" : "Button that asks for the Screen Recording permission",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bildschirmaufnahme erlauben …"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schermopname toestaan…"
+          }
+        }
+      }
+    },
     "Granted" : {
       "comment" : "The Accessibility permission's status",
       "localizations" : {
@@ -205,6 +222,23 @@
         }
       }
     },
+    "No drag measured yet." : {
+      "comment" : "Shown before the first drag",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Noch kein Ziehen gemessen."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nog geen sleepbeweging gemeten."
+          }
+        }
+      }
+    },
     "No Finder window to follow: open one." : {
       "comment" : "Problem message",
       "localizations" : {
@@ -222,19 +256,36 @@
         }
       }
     },
-    "No drag measured yet." : {
-      "comment" : "Shown before the first drag",
+    "No picture of the Finder window: it follows by itself." : {
+      "comment" : "The picture of the partner failed",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Noch kein Ziehen gemessen."
+            "value" : "Kein Bild des Finder-Fensters: Es folgt selbst."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nog geen sleepbeweging gemeten."
+            "value" : "Geen afbeelding van het Finder-venster: het volgt zelf."
+          }
+        }
+      }
+    },
+    "No stand-in in this drag." : {
+      "comment" : "Measurement: the drag had no picture of the partner",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kein Platzhalter bei diesem Ziehen."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geen stand-in bij deze drag."
           }
         }
       }
@@ -273,6 +324,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pairwise heeft geen toegang via Toegankelijkheid."
+          }
+        }
+      }
+    },
+    "Screen Recording" : {
+      "comment" : "The system permission the stand-in needs",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bildschirmaufnahme"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schermopname"
+          }
+        }
+      }
+    },
+    "Stand-in appeared after (ms)" : {
+      "comment" : "Measurement: time until the picture of the partner showed",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Platzhalter erschien nach (ms)"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stand-in verscheen na (ms)"
           }
         }
       }
@@ -375,6 +460,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "De app van het venster reageert niet."
+          }
+        }
+      }
+    },
+    "Without it, the Finder window itself follows, with some lag." : {
+      "comment" : "What happens without Screen Recording",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ohne diese Berechtigung folgt das Finder-Fenster selbst, mit etwas Verzögerung."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zonder dit volgt het Finder-venster zelf, met wat vertraging."
           }
         }
       }

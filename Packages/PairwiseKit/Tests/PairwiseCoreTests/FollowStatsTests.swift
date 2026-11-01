@@ -34,3 +34,17 @@ import Testing
         #expect(report.percentile95Move == 0.095)
     }
 }
+
+@Suite struct FollowStatsStandInTests {
+    @Test func theReportCarriesTheStandInDelay() {
+        var stats = FollowStats()
+        stats.record(moveDuration: 0.001, pointsBehind: 1)
+        #expect(stats.report(elapsed: 1, standInDelay: 0.08)?.standInDelay == 0.08)
+    }
+
+    @Test func withoutAStandInThereIsNoDelay() {
+        var stats = FollowStats()
+        stats.record(moveDuration: 0.001, pointsBehind: 1)
+        #expect(stats.report(elapsed: 1)?.standInDelay == nil)
+    }
+}

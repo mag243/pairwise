@@ -2,8 +2,8 @@ import AppKit
 import ApplicationServices
 import PairwiseCore
 
-/// The real window system: the Accessibility API, a listen-only event tap and a timer,
-/// all on the main actor (ADR 0013).
+/// The real window system: the Accessibility API, a listen-only event tap, a timer and
+/// ScreenCaptureKit, all on the main actor (ADR 0013, 0014).
 @MainActor
 public final class AccessibilityWindowSystem: WindowSystemProviding {
     private static let partnerBundleIdentifier = "com.apple.finder"
@@ -18,6 +18,12 @@ public final class AccessibilityWindowSystem: WindowSystemProviding {
 
     public var isAccessibilityGranted: Bool { AXIsProcessTrusted() }
 
+    public var isScreenRecordingGranted: Bool { CGPreflightScreenCaptureAccess() }
+
+    public var parkingOrigin: ScreenPoint? {
+        PartnerPlacement.parkingOrigin(onDisplays: NSScreen.globalFrames)
+    }
+
     public var pointerLocation: ScreenPoint? {
         CGEvent(source: nil).map { ScreenPoint($0.location) }
     }
@@ -27,6 +33,23 @@ public final class AccessibilityWindowSystem: WindowSystemProviding {
     public func requestAccessibility() {
         let options = ["AXTrustedCheckOptionPrompt": true] as CFDictionary
         AXIsProcessTrustedWithOptions(options)
+    }
+
+    public func requestScreenRecording() {
+        CGRequestScreenCaptureAccess()
+    }
+
+    public func makeStandIn(
+        of window: any MovableWindow,
+        completion: @escaping @MainActor (Result<any WindowStandIn, WindowSystemError>) -> Void
+    ) {
+        Task { @MainActor in
+            guard let window = window as? AccessibilityWindow else {
+                completion(.failure(.captureFailed))
+                return
+            }
+            completion(await WindowCapture.standIn(of: window))
+        }
     }
 
     public func window(at point: ScreenPoint) -> (any MovableWindow)? {

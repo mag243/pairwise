@@ -22,3 +22,15 @@ Measured on 2026-11-01. The partner is a Finder window, and the dragged windows 
 **By hand:** the Finder window moves along with the dragged window, and it visibly lags behind.
 
 **Verdict:** not smooth enough. On to M2, the stand-in while dragging.
+
+## The stand-in (M2)
+
+Measured by hand with the stand-in of ADR 0014. "Stand-in after" is the time from seeing the drag to showing the picture.
+
+| Dragged window | Moves | Moves per second | Mean move (ms) | Longest move (ms) | Stand-in after (ms) |
+|---|---|---|---|---|---|
+| Not measured yet | | | | | |
+
+**Is the real partner out of sight during the drag?** Not tried yet.
+
+**Verdict:** not given yet.

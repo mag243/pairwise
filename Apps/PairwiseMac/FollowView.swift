@@ -29,6 +29,11 @@ struct FollowView: View {
         ) { _ in
             model.refreshPermission()
         }
+        .onReceive(
+            NotificationCenter.default.publisher(for: NSApplication.willTerminateNotification)
+        ) { _ in
+            model.stop()
+        }
     }
 
     @ViewBuilder private var controls: some View {
@@ -38,6 +43,14 @@ struct FollowView: View {
             }
             if !model.isAccessibilityGranted {
                 Button("Grant Access…") { model.requestAccessibility() }
+            }
+            LabeledContent("Screen Recording") {
+                Text(model.isScreenRecordingGranted ? "Granted" : "Not granted")
+            }
+            if !model.isScreenRecordingGranted {
+                Button("Grant Screen Recording…") { model.requestScreenRecording() }
+                Text("Without it, the Finder window itself follows, with some lag.")
+                    .foregroundStyle(.secondary)
             }
             Button(model.isWatching ? "Stop" : "Start") {
                 if model.isWatching { model.stop() } else { model.start() }
@@ -59,6 +72,11 @@ struct FollowView: View {
         row("Longest move (ms)", report.longestMove * Self.millisecondsPerSecond)
         row("Mean points behind", report.meanPointsBehind)
         row("Most points behind", report.mostPointsBehind)
+        if let delay = report.standInDelay {
+            row("Stand-in appeared after (ms)", delay * Self.millisecondsPerSecond)
+        } else {
+            Text("No stand-in in this drag.")
+        }
     }
 
     private func row(_ label: LocalizedStringKey, _ value: Double) -> some View {
@@ -73,6 +91,7 @@ struct FollowView: View {
         case .accessibilityDenied: "Pairwise has no Accessibility access."
         case .eventTapUnavailable:
             "The pointer cannot be watched. Quit and reopen Pairwise after granting access."
+        case .captureFailed: "No picture of the Finder window: it follows by itself."
         case .windowGone: "The window has gone."
         case .windowRefused: "The window refuses to move."
         case .windowBusy: "The window's app does not answer."

@@ -16,4 +16,7 @@ public struct FollowReport: Equatable, Sendable {
     public let meanPointsBehind: Double
     /// How far the pointer travelled during a move, at most, in points.
     public let mostPointsBehind: Double
+    /// How long the stand-in took to appear after the drag was seen, or `nil` when the
+    /// drag had none. With a stand-in, the moves above are the stand-in's.
+    public let standInDelay: TimeInterval?
 }
