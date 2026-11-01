@@ -1,0 +1,10 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Pairwise" : {
+      "comment" : "The app's name, the title of its window",
+      "shouldTranslate" : false
+    }
+  },
+  "version" : "1.0"
+}

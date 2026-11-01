@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  },
+
+  "sandbox": {
+    "enabled": true,
+    "failIfUnavailable": false,
+    "allowUnsandboxedCommands": false,
+    "filesystem": {
+      "denyRead": ["~/"],
+      "allowRead": [
+        ".",
+        "~/.gitconfig",
+        "~/.config/git",
+        "~/.claude/projects",
+        "~/.swiftpm",
+        "~/Library/org.swift.swiftpm",
+        "~/Library/Caches/org.swift.swiftpm",
+        "~/Library/Developer/Xcode",
+        "/opt/homebrew",
+        "/usr/lib",
+        "/usr/include",
+        "/usr/local/lib",
+        "/usr/local/include",
+        "/Library/Developer/CommandLineTools"
+      ],
+      "allowWrite": [
+        "./",
+        "~/.swiftpm",
+        "~/Library/org.swift.swiftpm",
+        "~/Library/Caches/org.swift.swiftpm",
+        "~/Library/Developer/Xcode/DerivedData",
+        "/tmp"
+      ]
+    },
+
+    "network": {
+      "allowedDomains": [
+        "github.com",
+        "raw.githubusercontent.com",
+        "objects.githubusercontent.com",
+        "codeload.github.com",
+        "swift.org",
+        "download.swift.org",
+        "developer.apple.com"
+      ]
+    }
+  }
+}
