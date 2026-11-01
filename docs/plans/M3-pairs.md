@@ -13,10 +13,9 @@ Not in this milestone: the plug-in (M4), distribution, top and bottom pairs, mor
 
 Done first because everything below adds code to this module.
 
-### 2. Tell a title bar from a control
-- [ ] ADR: how a press is taken over. The fixed band of 52 points goes.
-- [ ] Ask what is under the pointer through the Accessibility API. On a button, tab, text field or other control, nothing is taken over and the drag passes.
-- [ ] A rule table in `PairwiseCore` from role to "drag" or "leave alone", test-first. An unknown role passes.
+### 2. Tell a window drag from everything else
+- [x] ADR 0032: a press and its drag events pass until the window has really moved, and only then is the drag taken over. This replaces the proposed table of roles, and the fixed band of 52 points goes.
+- [x] `PairwiseCore`, test-first: what counts as a move and as a resize.
 - [ ] Check by hand: dragging a tab in Safari works, clicks work, a toolbar's empty space moves the pair. Check Terminal, Finder, Safari and one Electron app.
 
 ### 3. Pairs as a model
@@ -76,6 +75,5 @@ Done first because everything below adds code to this module.
 
 ## Risks
 - **The seam** may lag in the way following did, and a picture does not help as easily while the content itself changes size. Step 6 starts with a spike for this reason.
-- **Roles under the pointer differ per app,** so step 2 may need several rounds, particularly with Electron apps. An unknown role passes, so the failure is one window moving alone, not a blocked click.
 - **Finding windows after a restart** is guesswork for apps with changing titles. Step 9 prefers dropping a pair to moving the wrong window.
-- **The event tap now holds up every press** for the time of a window list and an Accessibility call. Step 3 should shorten this by leaving windows without a pair alone early. If an app is slow to answer, step 2's call must not hold input for long.
+- **The event tap now holds up every press** for the time of a window list and an Accessibility call. Step 3 should shorten this by leaving windows without a pair alone early.

@@ -4,27 +4,21 @@ import Testing
 @Suite struct DragHoldRuleTests {
     private static let frame = WindowFrame(x: 100, y: 100, width: 400, height: 300)
 
-    @Test(arguments: [
-        (ScreenPoint(x: 150, y: 110), true),
-        (ScreenPoint(x: 100, y: 100), true),
-        (ScreenPoint(x: 500, y: 152), true),
-        (ScreenPoint(x: 150, y: 153), false),
-        (ScreenPoint(x: 99, y: 110), false),
-        (ScreenPoint(x: 501, y: 110), false),
-        (ScreenPoint(x: 150, y: 99), false),
-    ])
-    func onlyTheTopBandCounts(point: ScreenPoint, expected: Bool) {
-        #expect(DragHoldRule.isInTitleBand(point, of: Self.frame) == expected)
+    @Test func theSameFrameIsNeitherMoveNorResize() {
+        #expect(!DragHoldRule.isMove(from: Self.frame, to: Self.frame))
+        #expect(!DragHoldRule.isResize(from: Self.frame, to: Self.frame))
     }
 
-    @Test func aSmallMoveIsNotADrag() {
-        let press = ScreenPoint(x: 10, y: 10)
-        #expect(!DragHoldRule.isDrag(from: press, to: ScreenPoint(x: 12, y: 10)))
+    @Test func aNewOriginWithTheSameSizeIsAMove() {
+        let moved = WindowFrame(x: 101, y: 100, width: 400, height: 300)
+        #expect(DragHoldRule.isMove(from: Self.frame, to: moved))
+        #expect(!DragHoldRule.isResize(from: Self.frame, to: moved))
     }
 
-    @Test func aMoveOfThreePointsIsADrag() {
-        let press = ScreenPoint(x: 10, y: 10)
-        #expect(DragHoldRule.isDrag(from: press, to: ScreenPoint(x: 13, y: 10)))
+    @Test func aNewSizeIsAResizeEvenWithANewOrigin() {
+        let resized = WindowFrame(x: 90, y: 100, width: 410, height: 300)
+        #expect(!DragHoldRule.isMove(from: Self.frame, to: resized))
+        #expect(DragHoldRule.isResize(from: Self.frame, to: resized))
     }
 
     @Test func picturesMayTakeAShortTime() {

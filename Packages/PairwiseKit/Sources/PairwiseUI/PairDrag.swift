@@ -17,11 +17,13 @@ enum PairDrag {
     struct Pressed {
         let window: any MovableWindow
         let partner: any MovableWindow
-        let frame: WindowFrame
-        let pointer: ScreenPoint
         let startTime: TimeInterval
+        /// The window's frame at the press, and once it has moved, at that moment.
+        var frame: WindowFrame
+        /// The pointer's place at the moment of `frame`.
+        var pointer: ScreenPoint
         var standIn: (any WindowStandIn)?
-        var isDrag = false
+        var hasWindowMoved = false
         var lastPointer: ScreenPoint
     }
 

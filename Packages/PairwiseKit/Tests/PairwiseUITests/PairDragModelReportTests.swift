@@ -22,11 +22,12 @@ import Testing
         model.start()
     }
 
-    @Test func aDragShorterThanThePicturesStillMovesBoth() {
+    @Test func aDragShorterThanThePanelPutsThePartnerBesideTheWindow() {
         _ = system.send(.pressed(Self.onTitleBar))
         _ = system.send(.dragged(Self.further))
+        window.currentFrame.origin = ScreenPoint(x: 140, y: 130)
         _ = system.send(.released(Self.further))
-        #expect(window.moves.last == ScreenPoint(x: 140, y: 130))
+        #expect(window.moves.isEmpty)
         #expect(partner.moves.last == ScreenPoint(x: 540, y: 130))
     }
 
@@ -42,6 +43,8 @@ import Testing
         system.uptime = 0.05
         system.finishStandIn(with: .success(panel))
         _ = system.send(.dragged(Self.further))
+        window.currentFrame.origin = ScreenPoint(x: 140, y: 130)
+        system.tick()
         _ = system.send(.dragged(Self.onTitleBar))
         system.uptime = 1.05
         _ = system.send(.released(Self.onTitleBar))
@@ -54,6 +57,8 @@ import Testing
         _ = system.send(.pressed(Self.onTitleBar))
         system.finishStandIn(with: .success(panel))
         _ = system.send(.dragged(Self.further))
+        window.currentFrame.origin = ScreenPoint(x: 140, y: 130)
+        system.tick()
         _ = system.send(.dragged(Self.onTitleBar))
         panel.liveFrames = [7, 9]
         system.uptime = 1

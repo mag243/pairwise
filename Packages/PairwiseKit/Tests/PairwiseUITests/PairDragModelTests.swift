@@ -9,6 +9,7 @@ import Testing
     private static let onTitleBar = ScreenPoint(x: 150, y: 110)
     private static let inContent = ScreenPoint(x: 150, y: 300)
     private static let further = ScreenPoint(x: 190, y: 140)
+    private static let moved = ScreenPoint(x: 140, y: 130)
     private static let parked = ScreenPoint(x: 9999, y: 9999)
 
     private let system = FakeWindowSystem()
@@ -25,11 +26,18 @@ import Testing
         model.start()
     }
 
-    /// Presses on the title bar, lets the picture arrive, and drags so the panel takes over.
+    /// What macOS does with a window drag: the drag event passes, and the window moves.
+    private func dragAsMacOS() {
+        _ = system.send(.dragged(Self.further))
+        window.currentFrame.origin = Self.moved
+        system.tick()
+    }
+
+    /// Presses, lets the picture arrive, and drags so the panel takes over.
     private func startDrag() {
         _ = system.send(.pressed(Self.onTitleBar))
         system.finishStandIn(with: .success(panel))
-        _ = system.send(.dragged(Self.further))
+        dragAsMacOS()
     }
 
     /// Lets the time pass that the panel stays over placed windows.
@@ -74,12 +82,6 @@ import Testing
         #expect(system.send(.released(Self.onTitleBar)))
     }
 
-    @Test func aDragFromTheContentPasses() {
-        _ = system.send(.pressed(Self.inContent))
-        #expect(system.send(.dragged(Self.further)))
-        #expect(system.standInRequests == 0)
-    }
-
     @Test func aPressWithoutAPartnerLetsTheDragPass() {
         system.partnerWindow = nil
         _ = system.send(.pressed(Self.onTitleBar))
@@ -95,22 +97,8 @@ import Testing
         #expect(!system.isTicking)
     }
 
-    @Test func aSmallMoveIsHeldButShowsNoPanel() {
-        _ = system.send(.pressed(Self.onTitleBar))
-        system.finishStandIn(with: .success(panel))
-        #expect(!system.send(.dragged(ScreenPoint(x: 151, y: 110))))
-        #expect(panel.shownAt == nil)
-    }
-
     @Test func thePanelShowsWhereThePointerTookTheWindow() {
         startDrag()
-        #expect(panel.shownAt == ScreenPoint(x: 140, y: 130))
-    }
-
-    @Test func aDragBeforeThePictureIsHeldAndThePanelComesLater() {
-        _ = system.send(.pressed(Self.onTitleBar))
-        #expect(!system.send(.dragged(Self.further)))
-        system.finishStandIn(with: .success(panel))
         #expect(panel.shownAt == ScreenPoint(x: 140, y: 130))
     }
 
@@ -207,42 +195,10 @@ import Testing
         #expect(system.send(.dragged(Self.further)))
     }
 
-    @Test func aPictureThatTakesTooLongLetsTheDragPass() {
-        _ = system.send(.pressed(Self.onTitleBar))
-        system.uptime = 1
-        #expect(system.send(.dragged(Self.further)))
-        #expect(model.problem == .captureFailed)
-        system.finishStandIn(with: .success(panel))
-        #expect(panel.shownAt == nil)
-    }
-
     @Test func aPictureThatArrivedKeepsHoldingALongDrag() {
         startDrag()
         system.uptime = 60
         #expect(!system.send(.dragged(Self.onTitleBar)))
-    }
-
-    @Test func aButtonNotYetSeenDownDoesNotEndThePress() {
-        system.isPrimaryButtonDown = false
-        _ = system.send(.pressed(Self.onTitleBar))
-        system.tick()
-        #expect(!system.send(.dragged(Self.further)))
-    }
-
-    @Test func aButtonSeenDownAndThenUpEndsThePress() {
-        _ = system.send(.pressed(Self.onTitleBar))
-        system.tick()
-        system.isPrimaryButtonDown = false
-        system.tick()
-        #expect(system.send(.dragged(Self.further)))
-    }
-
-    @Test func aButtonNeverSeenDownEndsThePressInTheEnd() {
-        system.isPrimaryButtonDown = false
-        _ = system.send(.pressed(Self.onTitleBar))
-        system.uptime = 0.3
-        system.tick()
-        #expect(system.send(.dragged(Self.further)))
     }
 
     @Test func aLostReleaseIsSeenOnATick() {
