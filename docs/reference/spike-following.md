@@ -147,7 +147,9 @@ With the window list kept and the pictures taken together, over 13 drags: the pi
 
 **By hand, live pictures with a YouTube video in Safari:** very smooth, and 30 frames a second is fine. At the release the Safari window flies in from the corner where it was parked. ADR 0030 answers this.
 
-**Are the real windows out of sight during the drag?** Yes, by hand.
+**By hand, after ADR 0030:** the Safari window no longer flies in.
+
+& Yes, by hand.
 
 **By hand, after the panel waits at the release:** the flash is gone.
 

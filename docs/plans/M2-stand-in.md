@@ -22,8 +22,8 @@ Not in this milestone: joining, the shared seam, coming apart, choosing a partne
 - [x] By hand: the real windows are out of sight during the drag (the assumption of ADR 0014), and end level and tight after the release.
 - [x] Measured and written down: how long the panel takes to appear, and how its moves hold up.
 - [x] The stress test moves both windows every time (ADR 0027).
-- [ ] By hand or measured: an animated window stays alive in its picture during a drag (ADR 0029).
-- [ ] `tools/build.sh ci` is green (when the owner says so, ADR 0011).
+- [x] By hand or measured: an animated window stays alive in its picture during a drag (ADR 0029).
+- [x] `tools/build.sh ci` is green (when the owner says so, ADR 0011).
 
 ## Trying it
 `tools/build.sh run`, allow Accessibility and Screen Recording, quit and run again, press Start, open a window of the partner app, and drag a window of another app by its title bar. `tools/build.sh run --drag-stress-test <file>` makes the app test itself; it takes over the pointer while it runs.

@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Pairwise brings Snap Groups to the Mac: two windows of any app, brought together side by side, join, move together, share their seam and come apart again easily, through the Accessibility API and without anything from the apps.
 
-Milestone M0 (skeleton) holds the structure: the macOS app, the package with its four modules, the tools and the rules. M1, the spike, found that a window following through the Accessibility API visibly lags. M2 moves both windows as pictures in one window of Pairwise's own while dragging (ADR 0024, 0028). Joining, the shared seam and coming apart are M3.
+Milestone M0 (skeleton) holds the structure: the macOS app, the package with its four modules, the tools and the rules. M1, the spike, found that a window following through the Accessibility API visibly lags. M2 moves both windows as pictures in one window of Pairwise's own while dragging, live at a chosen frame rate (ADR 0024, 0028, 0029). Joining, the shared seam and coming apart are M3.
 
 **Everything is written in English:** code, identifiers, comments, documentation (plans, ADRs, READMEs), commit messages, PR descriptions and test names. Chat with the owner may be in Dutch.
 

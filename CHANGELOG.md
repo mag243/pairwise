@@ -8,5 +8,6 @@ All notable changes to Pairwise are recorded here. The format follows
 
 ### Added
 - Moving a window and its partner together while dragging, as pictures in one window of Pairwise's own.
+- Live pictures while dragging, at a chosen frame rate.
 - A stress test of dragging that the app runs on itself.
 - The app icon.
