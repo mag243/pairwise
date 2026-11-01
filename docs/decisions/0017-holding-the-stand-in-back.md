@@ -1,6 +1,6 @@
 # 0017. Holding the stand-in back
 
-- **Status:** Accepted
+- **Status:** Superseded by 0018
 - **Date:** 2026-11-01
 - **Milestone:** M2
 

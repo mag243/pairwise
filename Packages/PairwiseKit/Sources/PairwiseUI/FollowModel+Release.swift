@@ -21,8 +21,8 @@ extension FollowModel {
         lastDrag = stats.report(
             elapsed: system.uptime - following.startTime,
             standInDelay: following.standInDelay,
-            gripOffset: gripOffset)
-        lastDrag?.log(to: Self.logger, standInHoldBack: standInHoldBack)
+            mostSlip: mostSlip)
+        lastDrag?.log(to: Self.logger)
         guard let finalTarget = placement else {
             endDrag()
             return

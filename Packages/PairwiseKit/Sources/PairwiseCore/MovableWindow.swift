@@ -5,6 +5,10 @@ public protocol MovableWindow: AnyObject {
     /// The window's current frame, asked of its app.
     func frame() throws(WindowSystemError) -> WindowFrame
 
+    /// The window's current frame as the window server has it, without asking its app, or
+    /// `nil` when the window server does not tell.
+    func serverFrame() -> WindowFrame?
+
     /// Moves the window's top left corner to `origin`.
     func move(to origin: ScreenPoint) throws(WindowSystemError)
 

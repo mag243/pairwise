@@ -6,6 +6,9 @@ import PairwiseCore
 @MainActor
 final class AccessibilityWindow: MovableWindow {
     let element: AXUIElement
+    /// The window server's number for this window, found on first use (ADR 0018).
+    private var serverWindowNumber: CGWindowID?
+    private var hasLookedUpWindowNumber = false
 
     /// Precondition: `element` is a window.
     init(element: AXUIElement) {
@@ -17,6 +20,17 @@ final class AccessibilityWindow: MovableWindow {
         let origin = try read(kAXPositionAttribute, as: .cgPoint, initial: CGPoint.zero)
         let size = try read(kAXSizeAttribute, as: .cgSize, initial: CGSize.zero)
         return WindowFrame(origin: origin, size: size)
+    }
+
+    func serverFrame() -> WindowFrame? {
+        if !hasLookedUpWindowNumber {
+            hasLookedUpWindowNumber = true
+            if let processID = element.processID, let frame = try? frame() {
+                serverWindowNumber = WindowServer.windowNumber(
+                    ofProcess: processID, matching: frame)
+            }
+        }
+        return serverWindowNumber.flatMap(WindowServer.frame(ofWindow:))
     }
 
     func move(to origin: ScreenPoint) throws(WindowSystemError) {

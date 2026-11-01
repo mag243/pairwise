@@ -18,7 +18,7 @@ public struct FollowStats: Sendable {
     /// The report for a drag that lasted `elapsed` seconds, or `nil` when there is
     /// nothing to report: no moves, or no time.
     public func report(
-        elapsed: TimeInterval, standInDelay: TimeInterval? = nil, gripOffset: Double? = nil
+        elapsed: TimeInterval, standInDelay: TimeInterval? = nil, mostSlip: Double? = nil
     ) -> FollowReport? {
         guard !durations.isEmpty, elapsed > 0 else { return nil }
         let sorted = durations.sorted()
@@ -33,7 +33,7 @@ public struct FollowStats: Sendable {
             meanPointsBehind: pointsBehind.reduce(0, +) / count,
             mostPointsBehind: pointsBehind.max() ?? 0,
             standInDelay: standInDelay,
-            gripOffset: gripOffset
+            mostSlip: mostSlip
         )
     }
 }

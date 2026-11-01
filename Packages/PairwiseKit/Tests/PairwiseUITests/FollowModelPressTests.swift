@@ -7,7 +7,6 @@ import Testing
 @Suite struct FollowModelPressTests {
     private static let start = WindowFrame(x: 100, y: 100, width: 400, height: 300)
     private static let grab = ScreenPoint(x: 150, y: 110)
-    private static let pointer = ScreenPoint(x: 250, y: 60)
 
     private let system = FakeWindowSystem()
     private let dragged = FakeWindow(frame: Self.start)
@@ -20,7 +19,6 @@ import Testing
         system.windowUnderPointer = dragged
         system.partnerWindow = partner
         model = FollowModel(system: system)
-        model.standInHoldBack = 0
     }
 
     @Test func aPressAsksForTheStandInBeforeTheDragIsSeen() {
@@ -75,33 +73,5 @@ import Testing
         system.press(at: Self.grab)
         #expect(model.problem == nil)
         #expect(system.standInRequests == 0)
-    }
-
-    @Test func theStandInGoesWhereThePointerWasALittleAgo() {
-        model.standInHoldBack = 0.016
-        model.start()
-        system.press(at: Self.grab)
-        system.finishStandIn(with: .success(standIn))
-        dragged.currentFrame.origin = ScreenPoint(x: 101, y: 100)
-        system.tick()
-        system.uptime = 0.1
-        system.drag(to: ScreenPoint(x: 160, y: 110))
-        system.uptime = 0.11
-        system.drag(to: ScreenPoint(x: 170, y: 110))
-        system.uptime = 0.12
-        system.drag(to: ScreenPoint(x: 180, y: 110))
-        #expect(standIn.moves.last == ScreenPoint(x: 510, y: 100))
-    }
-
-    @Test func thePartnerAsItselfIsNotHeldBack() {
-        system.isScreenRecordingGranted = false
-        model.standInHoldBack = 0.016
-        model.start()
-        system.press(at: Self.grab)
-        dragged.currentFrame.origin = ScreenPoint(x: 101, y: 100)
-        system.tick()
-        system.pointerLocation = Self.pointer
-        system.tick()
-        #expect(partner.moves == [ScreenPoint(x: 600, y: 50)])
     }
 }

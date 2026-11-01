@@ -22,4 +22,5 @@ Use `0000-template.md` as the basis.
 | 0014 | A stand-in while dragging | Accepted |
 | 0015 | Moving the stand-in on drag events, and raising the partner | Accepted |
 | 0016 | The picture at the press, and measuring the grip with a still pointer | Accepted |
-| 0017 | Holding the stand-in back | Accepted |
+| 0017 | Holding the stand-in back | Superseded by 0018 |
+| 0018 | Following the window server's place of the dragged window | Accepted |

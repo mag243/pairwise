@@ -37,7 +37,7 @@ public protocol WindowSystemProviding: AnyObject {
     /// A window to follow `window`, not `window` itself.
     func partner(for window: any MovableWindow) throws(WindowSystemError) -> any MovableWindow
 
-    /// Calls `handler` for each press, drag and release of the left mouse button, without
+    /// Calls `handler` for each press and release of the left mouse button, without
     /// holding up or changing the input.
     /// Postcondition: an earlier watch has ended.
     func startWatchingPointer(

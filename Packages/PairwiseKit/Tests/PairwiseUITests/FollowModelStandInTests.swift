@@ -22,7 +22,6 @@ import Testing
         system.windowUnderPointer = dragged
         system.partnerWindow = partner
         model = FollowModel(system: system)
-        model.standInHoldBack = 0
     }
 
     /// Starts watching, presses on the window, and moves it so the drag is seen.
@@ -210,31 +209,6 @@ import Testing
         system.uptime = 1
         system.release(at: Self.pointer)
         #expect(try #require(model.lastDrag).standInDelay == nil)
-    }
-
-    @Test func aDragEventMovesTheStandInWithoutWaitingForATick() {
-        startDragWithStandIn()
-        system.drag(to: ScreenPoint(x: 260, y: 60))
-        #expect(standIn.moves == [ScreenPoint(x: 610, y: 50)])
-    }
-
-    @Test func aDragEventParksThePartner() {
-        startDragWithStandIn()
-        system.drag(to: Self.pointer)
-        #expect(partner.moves == [Self.parked])
-    }
-
-    @Test func aDragEventBeforeTheStandInDoesNotMoveThePartner() {
-        startDrag()
-        system.drag(to: Self.pointer)
-        #expect(partner.moves.isEmpty)
-    }
-
-    @Test func aDragEventWithoutADragDoesNothing() {
-        model.start()
-        system.drag(to: Self.pointer)
-        #expect(partner.moves.isEmpty)
-        #expect(!system.isTicking)
     }
 
     @Test func requestingScreenRecordingGoesToTheSystem() {

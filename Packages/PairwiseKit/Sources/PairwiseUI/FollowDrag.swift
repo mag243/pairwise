@@ -22,6 +22,17 @@ enum FollowDrag {
         var standIn: (any WindowStandIn)?
         var standInDelay: TimeInterval?
         var isParked = false
+        /// Where the partner or its stand-in was last sent.
+        var lastTarget: ScreenPoint?
+
+        /// Where the partner belongs: beside the window server's place of the dragged
+        /// window, or from the pointer and the grip when the window server does not tell.
+        func target(serverFrame: WindowFrame?, pointer: ScreenPoint?) -> ScreenPoint? {
+            if let serverFrame {
+                return PartnerPlacement.origin(besideWindowAt: serverFrame.origin, size: size)
+            }
+            return pointer.map(target(forPointer:))
+        }
 
         /// Where the partner belongs for a pointer at `pointer`, without asking any app.
         func target(forPointer pointer: ScreenPoint) -> ScreenPoint {
@@ -31,7 +42,7 @@ enum FollowDrag {
 
         /// Where the partner belongs beside the dragged window's real frame.
         func placementFromRealFrame() throws(WindowSystemError) -> ScreenPoint {
-            let frame = try window.frame()
+            let frame = try window.liveFrame()
             return PartnerPlacement.origin(besideWindowAt: frame.origin, size: frame.size)
         }
     }
@@ -46,17 +57,25 @@ enum FollowDrag {
     }
 }
 
+extension MovableWindow {
+    /// The window's frame from the window server, or from its app when the window server
+    /// does not tell.
+    func liveFrame() throws(WindowSystemError) -> WindowFrame {
+        if let serverFrame = serverFrame() { return serverFrame }
+        return try frame()
+    }
+}
+
 extension FollowReport {
     /// Writes the measurements to `logger`; a negative number means it is not known.
-    func log(to logger: Logger, standInHoldBack: TimeInterval) {
+    func log(to logger: Logger) {
         logger.info(
             """
             drag: \(moves) moves, \(movesPerSecond) per second, \
             mean \(meanMove) s, p95 \(percentile95Move) s, \
             longest \(longestMove) s, \
             behind mean \(meanPointsBehind), most \(mostPointsBehind), \
-            stand-in after \(standInDelay ?? -1) s, grip offset \(gripOffset ?? -1), \
-            held back \(standInHoldBack) s
+            stand-in after \(standInDelay ?? -1) s, slip \(mostSlip ?? -1)
             """)
     }
 }

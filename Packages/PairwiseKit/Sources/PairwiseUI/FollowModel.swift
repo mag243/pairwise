@@ -3,11 +3,12 @@ import Observation
 import PairwiseCore
 import os
 
-/// Moves a partner window beside a dragged one, from the pointer, and measures it
-/// (ADR 0013). A press notes the window under the pointer; the first tick that sees it
-/// moved starts the following; the release ends it, with the partner placed from the
-/// dragged window's real frame. With the Screen Recording permission, a stand-in takes
-/// over from the partner as soon as its picture arrives (ADR 0014).
+/// Moves a partner window beside a dragged one and measures it. A press notes the window
+/// under the pointer and starts on a picture of the partner; the first tick that sees the
+/// window moved starts the following; the release ends it, with the partner placed beside
+/// the dragged window. The place comes from the window server, or from the pointer and
+/// the grip when it does not tell (ADR 0013, 0018). With the Screen Recording permission,
+/// a stand-in takes over from the partner as soon as its picture is there (ADR 0014).
 @MainActor
 @Observable
 public final class FollowModel {
@@ -15,9 +16,6 @@ public final class FollowModel {
     /// How long a busy partner gets to come back at the release, with the stand-in up.
     static let placingPatience: TimeInterval = 0.5
     static let logger = Logger(subsystem: "me.m-domain.pairwise", category: "follow")
-
-    /// How long a stand-in stays behind the pointer, in seconds (ADR 0017).
-    public var standInHoldBack: TimeInterval = 1.0 / 60
 
     public private(set) var isAccessibilityGranted: Bool
     public private(set) var isScreenRecordingGranted: Bool
@@ -34,9 +32,7 @@ public final class FollowModel {
     @ObservationIgnored var pressPartner: (any MovableWindow)?
     /// A picture that arrived before the press turned out to be a drag.
     @ObservationIgnored var earlyPicture: Result<any WindowStandIn, WindowSystemError>?
-    @ObservationIgnored var stillPointer = StillPointer()
-    @ObservationIgnored var pointerDelay = PointerDelay()
-    @ObservationIgnored var gripOffset: Double?
+    @ObservationIgnored var mostSlip: Double?
     /// Tells a picture that arrives late from the one this drag asked for.
     @ObservationIgnored var standInRequest = 0
 
@@ -89,7 +85,6 @@ public final class FollowModel {
     private func handle(_ event: PointerButtonEvent) {
         switch event {
         case .pressed(let point): press(at: point)
-        case .dragged(let point): moveStandIn(toward: point)
         case .released: release()
         }
     }
@@ -100,7 +95,7 @@ public final class FollowModel {
         problem = nil
         guard let window = system.window(at: point) else { return }
         do {
-            drag = .pressed(window: window, frame: try window.frame(), pointer: point)
+            drag = .pressed(window: window, frame: try window.liveFrame(), pointer: point)
             system.startTicking(every: Self.tickInterval) { [weak self] in self?.tick() }
             prepareStandIn(for: window)
         } catch {
@@ -115,10 +110,7 @@ public final class FollowModel {
             case .pressed(let window, let frame, let pointer):
                 try checkForMove(of: window, from: frame, pointer: pointer)
             case .following(let following):
-                if let pointer = system.pointerLocation {
-                    try follow(following, pointer: pointer)
-                    measureGrip(of: following, pointer: pointer)
-                }
+                try follow(following)
             case .placing(let placing):
                 place(placing)
             }
@@ -130,11 +122,9 @@ public final class FollowModel {
     private func checkForMove(
         of window: any MovableWindow, from start: WindowFrame, pointer: ScreenPoint
     ) throws(WindowSystemError) {
-        guard WindowDragRule.isMove(from: start, to: try window.frame()) else { return }
+        guard WindowDragRule.isMove(from: start, to: try window.liveFrame()) else { return }
         stats = FollowStats()
-        stillPointer = StillPointer()
-        pointerDelay = PointerDelay()
-        gripOffset = nil
+        mostSlip = nil
         let partner: any MovableWindow
         if let pressPartner {
             partner = pressPartner
@@ -155,23 +145,40 @@ public final class FollowModel {
         }
     }
 
-    func follow(
-        _ following: FollowDrag.Following, pointer: ScreenPoint
-    ) throws(WindowSystemError) {
+    /// Moves only when the dragged window's place has changed, so the moves measured are
+    /// how often it changed (ADR 0018).
+    func follow(_ following: FollowDrag.Following) throws(WindowSystemError) {
         let before = system.uptime
-        if let standIn = following.standIn {
-            let heldBack = pointerDelay.place(
-                of: pointer, at: before, holdingBack: standInHoldBack)
-            standIn.move(to: following.target(forPointer: heldBack))
-        } else {
-            try following.partner.move(to: following.target(forPointer: pointer))
+        let pointer = system.pointerLocation
+        let serverFrame = following.window.serverFrame()
+        noteSlip(of: following, serverFrame: serverFrame, pointer: pointer)
+        guard let target = following.target(serverFrame: serverFrame, pointer: pointer) else {
+            return
         }
-        stats.record(
-            moveDuration: system.uptime - before,
-            pointsBehind: pointer.distance(to: system.pointerLocation ?? pointer))
-        if following.standIn != nil, !following.isParked {
-            try park(following)
+        var current = following
+        if target != current.lastTarget {
+            if let standIn = current.standIn {
+                standIn.move(to: target)
+            } else {
+                try current.partner.move(to: target)
+            }
+            let pointerNow = system.pointerLocation
+            let behind = pointer.flatMap { start in pointerNow.map(start.distance(to:)) }
+            stats.record(moveDuration: system.uptime - before, pointsBehind: behind ?? 0)
+            current.lastTarget = target
+            drag = .following(current)
         }
+        if current.standIn != nil, !current.isParked {
+            try park(current)
+        }
+    }
+
+    private func noteSlip(
+        of following: FollowDrag.Following, serverFrame: WindowFrame?, pointer: ScreenPoint?
+    ) {
+        guard let serverFrame, let pointer else { return }
+        let slip = following.grip.windowOrigin(forPointer: pointer).distance(to: serverFrame.origin)
+        mostSlip = max(mostSlip ?? 0, slip)
     }
 
     /// A busy app may answer on the next tick; anything else ends the drag.

@@ -4,6 +4,8 @@ import PairwiseCore
 @MainActor
 public final class FakeWindow: MovableWindow {
     public var currentFrame: WindowFrame
+    /// What `serverFrame()` gives; without one the window server does not tell.
+    public var currentServerFrame: WindowFrame?
     public private(set) var moves: [ScreenPoint] = []
     /// When set, reading the frame throws this.
     public var frameError: WindowSystemError?
@@ -24,6 +26,10 @@ public final class FakeWindow: MovableWindow {
     public func frame() throws(WindowSystemError) -> WindowFrame {
         if let frameError { throw frameError }
         return currentFrame
+    }
+
+    public func serverFrame() -> WindowFrame? {
+        currentServerFrame
     }
 
     public func move(to origin: ScreenPoint) throws(WindowSystemError) {

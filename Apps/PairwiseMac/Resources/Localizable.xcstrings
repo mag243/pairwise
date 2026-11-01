@@ -103,23 +103,6 @@
         }
       }
     },
-    "Hold the picture back (ms)" : {
-      "comment" : "Setting: how long the picture of the partner stays behind the pointer",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bild zurückhalten (ms)"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Foto inhouden (ms)"
-          }
-        }
-      }
-    },
     "Last drag" : {
       "comment" : "Section with the measurements of the last drag",
       "localizations" : {
