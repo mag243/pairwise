@@ -50,6 +50,22 @@ Following the window server's place (ADR 0018), moves per second is how often th
 | Not noted | 153 | 60.4 | 1.77 | 5.27 | 11.38 | 4.4 | 35.7 |
 | Not noted | 305 | 56.0 | 2.43 | 6.32 | 12.33 | 1.8 | 22.6 |
 
+Looking ahead (ADR 0019), with the place's changes and the pointer's together in moves per second:
+
+| Look ahead (ms) | Moves | Moves per second | Mean move (ms) | 95th percentile (ms) | Longest move (ms) | Stand-in after (ms) | Most slip (points) |
+|---|---|---|---|---|---|---|---|
+| 16 | 896 | 90.5 | 3.27 | 5.32 | 15.17 | 1.2 | 37.1 |
+| 56 | 442 | 99.7 | 1.64 | 7.35 | 8.62 | 1.6 | 41.6 |
+| 4 | 501 | 98.6 | 2.16 | 7.46 | 9.91 | 1.5 | 57.3 |
+| 60 | 377 | 104.6 | 2.22 | 4.09 | 13.57 | 1.4 | 36.5 |
+| 8 | 669 | 102.7 | 3.00 | 5.39 | 11.35 | 6.3 | 81.4 |
+| 0 | 281 | 79.0 | 1.27 | 2.24 | 8.49 | 1.3 | 46.6 |
+| 8 | 352 | 97.4 | 1.39 | 2.98 | 13.81 | 1.9 | 27.7 |
+| 4 | 418 | 90.3 | 1.81 | 5.02 | 10.25 | 1.3 | 19.5 |
+| 12 | 241 | 94.3 | 2.11 | 3.71 | 9.25 | 1.4 | 14.6 |
+| 8 | 319 | 93.1 | 1.97 | 3.37 | 12.20 | 1.5 | 21.9 |
+| 8 | 184 | 85.6 | 1.33 | 2.15 | 11.21 | 0.5 | 34.7 |
+
 **By hand, first run:** a little lag remains, the Finder window sometimes stands a small distance from the dragged window, the swap is not seen, and after the release the Finder window is behind another window. ADR 0015 answers these.
 
 **By hand, second run, on drag events:** less lag, with a short delay at the start of a drag. While dragging, the stand-in sometimes stands a small distance from the dragged window and sometimes overlaps it; after the release the two are tight. ADR 0016 answers these.
