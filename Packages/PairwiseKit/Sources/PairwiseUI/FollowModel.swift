@@ -136,20 +136,18 @@ public final class FollowModel {
             pointsBehind: pointer.distance(to: system.pointerLocation ?? pointer))
     }
 
+    /// The button is up, so the drag ends whatever the apps answer here.
     private func release() {
-        guard case .following(let following) = drag else {
-            endDrag()
-            return
-        }
+        defer { endDrag() }
+        guard case .following(let following) = drag else { return }
         lastDrag = stats.report(elapsed: system.uptime - following.startTime)
         logLastDrag()
         do {
             let frame = try following.window.frame()
             try following.partner.move(
                 to: PartnerPlacement.origin(besideWindowAt: frame.origin, size: frame.size))
-            endDrag()
         } catch {
-            fail(error)
+            problem = error
         }
     }
 

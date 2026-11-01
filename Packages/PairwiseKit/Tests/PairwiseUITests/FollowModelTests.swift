@@ -147,6 +147,14 @@ import Testing
         #expect(partner.moves.count == 1)
     }
 
+    @Test func aBusyAppAtTheReleaseStillEndsTheDrag() {
+        startDrag()
+        partner.moveError = .windowBusy
+        system.release(at: Self.grab)
+        #expect(!system.isTicking)
+        #expect(model.problem == .windowBusy)
+    }
+
     @Test func aNewPressClearsTheLastProblem() {
         system.partnerWindow = nil
         startDrag()
