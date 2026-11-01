@@ -35,3 +35,4 @@ Use `0000-template.md` as the basis.
 | 0027 | A stress test of dragging, run by the agent | Accepted |
 | 0028 | One window while dragging is the way; the rest goes | Accepted |
 | 0029 | Live pictures while dragging | Accepted |
+| 0030 | Moving a window without its animation | Accepted |

@@ -1,7 +1,7 @@
 # M2 · Moving together while dragging
 
 **Goal:** the two windows move together without visible lag, as pictures in one window of Pairwise's own.
-**ADRs:** 0024, 0025, 0026, 0027, 0028, 0029, with 0014 for the picture and parking
+**ADRs:** 0024, 0025, 0026, 0027, 0028, 0029, 0030, with 0014 for the picture and parking
 
 Not in this milestone: joining, the shared seam, coming apart, choosing a partner, restoring. Those are M3.
 

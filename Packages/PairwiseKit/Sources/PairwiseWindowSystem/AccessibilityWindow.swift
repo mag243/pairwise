@@ -5,6 +5,8 @@ import PairwiseCore
 /// app and waits for its answer, up to the messaging timeout.
 @MainActor
 final class AccessibilityWindow: MovableWindow {
+    private static let enhancedInterfaceAttribute = "AXEnhancedUserInterface"
+
     let element: AXUIElement
     /// The window server's number for this window, found on first use (ADR 0018).
     private var serverWindowNumber: CGWindowID?
@@ -42,11 +44,25 @@ final class AccessibilityWindow: MovableWindow {
     }
 
     func move(to origin: ScreenPoint) throws(WindowSystemError) {
+        let restoreAnimation = turnOffMoveAnimation()
+        defer { restoreAnimation() }
         var point = origin.cgPoint
         guard let value = AXValueCreate(.cgPoint, &point) else { throw .windowRefused }
         let result = AXUIElementSetAttributeValue(
             element, kAXPositionAttribute as CFString, value)
         guard result == .success else { throw WindowSystemError(result) }
+    }
+
+    /// An app with this attribute on animates a move, and a parked window would fly across
+    /// the screen (ADR 0030). Returns what puts the attribute back.
+    private func turnOffMoveAnimation() -> () -> Void {
+        guard let processID = element.processID else { return {} }
+        let app = AXUIElementCreateApplication(processID)
+        app.limitMessagingTime()
+        let name = Self.enhancedInterfaceAttribute as CFString
+        guard app.attribute(Self.enhancedInterfaceAttribute) as? Bool == true else { return {} }
+        AXUIElementSetAttributeValue(app, name, kCFBooleanFalse)
+        return { AXUIElementSetAttributeValue(app, name, kCFBooleanTrue) }
     }
 
     func raise() throws(WindowSystemError) {
