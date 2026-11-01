@@ -6,7 +6,7 @@ import PairwiseCore
 /// ScreenCaptureKit, all on the main actor (ADR 0013, 0014).
 @MainActor
 public final class AccessibilityWindowSystem: WindowSystemProviding {
-    private static let partnerBundleIdentifier = "com.apple.finder"
+    public var partnerBundleIdentifier = "com.apple.finder"
 
     private let systemWide = AXUIElementCreateSystemWide()
     private var tap: PointerTap?
@@ -22,6 +22,17 @@ public final class AccessibilityWindowSystem: WindowSystemProviding {
 
     public var parkingOrigin: ScreenPoint? {
         PartnerPlacement.parkingOrigin(onDisplays: NSScreen.globalFrames)
+    }
+
+    public var partnerApps: [PartnerApp] {
+        NSWorkspace.shared.runningApplications
+            .filter { $0.activationPolicy == .regular && $0 != .current }
+            .compactMap { app in
+                guard let identifier = app.bundleIdentifier else { return nil }
+                return PartnerApp(
+                    bundleIdentifier: identifier, name: app.localizedName ?? identifier)
+            }
+            .sorted { $0.name.localizedStandardCompare($1.name) == .orderedAscending }
     }
 
     public var pointerLocation: ScreenPoint? {
@@ -69,7 +80,7 @@ public final class AccessibilityWindowSystem: WindowSystemProviding {
     ) throws(WindowSystemError) -> any MovableWindow {
         let dragged = (window as? AccessibilityWindow)?.element
         let apps = NSRunningApplication.runningApplications(
-            withBundleIdentifier: Self.partnerBundleIdentifier)
+            withBundleIdentifier: partnerBundleIdentifier)
         guard let app = apps.first else { throw .noPartner }
         let appElement = AXUIElementCreateApplication(app.processIdentifier)
         appElement.limitMessagingTime()

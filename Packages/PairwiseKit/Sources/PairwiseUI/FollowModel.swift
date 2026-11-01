@@ -24,6 +24,13 @@ public final class FollowModel {
     /// How far ahead a partner moving as itself looks, in seconds (ADR 0020).
     public var partnerLookAhead: TimeInterval = 0.016
 
+    /// The running apps a partner can come from; read again by `refreshPermission`.
+    public private(set) var partnerApps: [PartnerApp]
+    /// The app the next drag takes its partner from.
+    public var partnerBundleIdentifier: String {
+        didSet { system.partnerBundleIdentifier = partnerBundleIdentifier }
+    }
+
     public private(set) var isAccessibilityGranted: Bool
     public private(set) var isScreenRecordingGranted: Bool
     public private(set) var isWatching = false
@@ -48,12 +55,15 @@ public final class FollowModel {
         self.system = system
         isAccessibilityGranted = system.isAccessibilityGranted
         isScreenRecordingGranted = system.isScreenRecordingGranted
+        partnerApps = system.partnerApps
+        partnerBundleIdentifier = system.partnerBundleIdentifier
     }
 
     /// Reads the permissions again; the user grants them elsewhere, in System Settings.
     public func refreshPermission() {
         isAccessibilityGranted = system.isAccessibilityGranted
         isScreenRecordingGranted = system.isScreenRecordingGranted
+        partnerApps = system.partnerApps
     }
 
     /// Asks the system to show the user where to grant the permission.

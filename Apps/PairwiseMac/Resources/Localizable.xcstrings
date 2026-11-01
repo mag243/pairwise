@@ -35,19 +35,19 @@
         }
       }
     },
-    "Drag any window by its title bar: a Finder window follows beside it." : {
+    "Drag any window by its title bar: a window of the partner app follows beside it." : {
       "comment" : "How to try the spike",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ziehe ein Fenster an seiner Titelleiste: Ein Finder-Fenster folgt daneben."
+            "value" : "Ziehe ein beliebiges Fenster an der Titelleiste: Ein Fenster der Partner-App folgt daneben."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sleep een venster aan de titelbalk: een Finder-venster volgt ernaast."
+            "value" : "Sleep een willekeurig venster aan de titelbalk: een venster van de partner-app volgt ernaast."
           }
         }
       }
@@ -256,36 +256,19 @@
         }
       }
     },
-    "No Finder window to follow: open one." : {
-      "comment" : "Problem message",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kein Finder-Fenster zum Folgen: Öffne eines."
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Geen Finder-venster om te volgen: open er een."
-          }
-        }
-      }
-    },
-    "No picture of the Finder window: it follows by itself." : {
+    "No picture of the partner: it follows by itself." : {
       "comment" : "The picture of the partner failed",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Kein Bild des Finder-Fensters: Es folgt selbst."
+            "value" : "Kein Bild des Partners: Er folgt selbst."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Geen afbeelding van het Finder-venster: het volgt zelf."
+            "value" : "Geen foto van de partner: die volgt zelf."
           }
         }
       }
@@ -303,6 +286,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Geen stand-in bij deze drag."
+          }
+        }
+      }
+    },
+    "No window of the partner app to follow: open one." : {
+      "comment" : "The partner app has no window to follow",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kein Fenster der Partner-App zum Folgen: Öffne eines."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geen venster van de partner-app om te volgen: open er een."
           }
         }
       }
@@ -358,6 +358,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pairwise heeft geen toegang via Toegankelijkheid."
+          }
+        }
+      }
+    },
+    "Partner app" : {
+      "comment" : "Setting: the app that gives the window following the dragged one",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Partner-App"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Partner-app"
           }
         }
       }
@@ -515,19 +532,19 @@
         }
       }
     },
-    "Without it, the Finder window itself follows, with some lag." : {
+    "Without it, the partner window itself follows." : {
       "comment" : "What happens without Screen Recording",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ohne diese Berechtigung folgt das Finder-Fenster selbst, mit etwas Verzögerung."
+            "value" : "Ohne diese Berechtigung folgt das Partnerfenster selbst."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Zonder dit volgt het Finder-venster zelf, met wat vertraging."
+            "value" : "Zonder dit volgt het partnervenster zelf."
           }
         }
       }

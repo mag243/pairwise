@@ -51,8 +51,13 @@ struct FollowView: View {
             }
             if !model.isScreenRecordingGranted {
                 Button("Grant Screen Recording…") { model.requestScreenRecording() }
-                Text("Without it, the Finder window itself follows, with some lag.")
+                Text("Without it, the partner window itself follows.")
                     .foregroundStyle(.secondary)
+            }
+            Picker("Partner app", selection: partnerApp) {
+                ForEach(model.partnerApps) { app in
+                    Text(verbatim: app.name).tag(app.bundleIdentifier)
+                }
             }
             if model.isScreenRecordingGranted {
                 Toggle("Use a picture of the partner", isOn: usesPicture)
@@ -68,11 +73,19 @@ struct FollowView: View {
                 if model.isWatching { model.stop() } else { model.start() }
             }
             .disabled(!model.isAccessibilityGranted)
-            Text("Drag any window by its title bar: a Finder window follows beside it.")
+            Text("Drag any window by its title bar: a window of the partner app follows beside it.")
                 .foregroundStyle(.secondary)
             if let problem = model.problem {
                 Text(Self.text(for: problem)).foregroundStyle(.red)
             }
+        }
+    }
+
+    private var partnerApp: Binding<String> {
+        Binding {
+            model.partnerBundleIdentifier
+        } set: {
+            model.partnerBundleIdentifier = $0
         }
     }
 
@@ -131,11 +144,11 @@ struct FollowView: View {
         case .accessibilityDenied: "Pairwise has no Accessibility access."
         case .eventTapUnavailable:
             "The pointer cannot be watched. Quit and reopen Pairwise after granting access."
-        case .captureFailed: "No picture of the Finder window: it follows by itself."
+        case .captureFailed: "No picture of the partner: it follows by itself."
         case .windowGone: "The window has gone."
         case .windowRefused: "The window refuses to move."
         case .windowBusy: "The window's app does not answer."
-        case .noPartner: "No Finder window to follow: open one."
+        case .noPartner: "No window of the partner app to follow: open one."
         }
     }
 }

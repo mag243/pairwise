@@ -19,4 +19,5 @@ The owner questions what the stand-in gives: it knows the dragged window's place
 ## Consequences
 - Positive: the choice rests on a like-for-like comparison.
 - Negative / risks: Finder may answer faster than other apps, so a good result for the real window needs that check. Both settings are for the spike.
-- Changes now: `FollowModel`, the app's window and its strings.
+- For the check with a slower app, the app's window chooses which running app gives the partner (this changes the simple partner of ADR 0013). Finder stays the first choice.
+- Changes now: `FollowModel`, the window system protocol, the app's window and its strings.

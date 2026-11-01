@@ -12,6 +12,12 @@ public protocol WindowSystemProviding: AnyObject {
     /// Where a partner waits out of sight, or `nil` when the system names no displays.
     var parkingOrigin: ScreenPoint? { get }
 
+    /// The running apps a partner can come from.
+    var partnerApps: [PartnerApp] { get }
+
+    /// The bundle identifier of the app that `partner(for:)` takes a window from.
+    var partnerBundleIdentifier: String { get set }
+
     /// The pointer's location now, or `nil` when the system does not tell.
     var pointerLocation: ScreenPoint? { get }
 

@@ -75,3 +75,27 @@ import Testing
         #expect(system.standInRequests == 0)
     }
 }
+
+@MainActor
+@Suite struct FollowModelPartnerAppTests {
+    private let system = FakeWindowSystem()
+
+    @Test func theSystemsPartnerAppIsTheFirstChoice() {
+        system.partnerBundleIdentifier = "com.example.first"
+        #expect(FollowModel(system: system).partnerBundleIdentifier == "com.example.first")
+    }
+
+    @Test func choosingAPartnerAppGoesToTheSystem() {
+        let model = FollowModel(system: system)
+        model.partnerBundleIdentifier = "com.example.slow"
+        #expect(system.partnerBundleIdentifier == "com.example.slow")
+    }
+
+    @Test func newlyRunningAppsAreSeenOnRefresh() {
+        let model = FollowModel(system: system)
+        let app = PartnerApp(bundleIdentifier: "com.example.slow", name: "Slow")
+        system.partnerApps = [app]
+        model.refreshPermission()
+        #expect(model.partnerApps == [app])
+    }
+}

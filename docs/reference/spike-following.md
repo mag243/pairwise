@@ -88,6 +88,8 @@ Comparing the two (ADR 0020), both looking ahead 8 ms:
 
 **The owner asks what the stand-in adds,** since it knows the window's place as late as a real partner. ADR 0020 compares the two.
 
+**By hand, comparing with Finder as the partner:** the difference is very small. The picture may be a little smoother, and that is very hard to see. What remains is the check with a slower app than Finder (ADR 0020).
+
 **Is the real partner out of sight during the drag?** Not answered yet.
 
 **Verdict:** not given yet.

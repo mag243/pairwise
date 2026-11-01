@@ -16,6 +16,8 @@ public final class FakeWindowSystem: WindowSystemProviding {
     public var partnerWindow: FakeWindow?
     /// When set, `startWatchingPointer` throws this.
     public var watchError: WindowSystemError?
+    public var partnerApps: [PartnerApp] = []
+    public var partnerBundleIdentifier = "com.apple.finder"
     public private(set) var accessibilityRequests = 0
     public private(set) var screenRecordingRequests = 0
     public private(set) var standInRequests = 0
