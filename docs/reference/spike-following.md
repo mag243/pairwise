@@ -35,6 +35,12 @@ Measured by hand on 2026-11-01 with the stand-in of ADR 0014, with a Finder wind
 | Not noted, on drag events | 2399 | 202.7 | 0.17 | 6.81 | 61.9 |
 | Not noted, on drag events | 458 | 211.4 | 0.17 | 0.65 | 74.3 |
 | Not noted, on drag events | 319 | 204.8 | 0.15 | 0.57 | 54.2 |
+| Not noted, picture at the press, held back 16.7 ms | 266 | 154.4 | 0.17 | 0.54 | 4.5 |
+| Not noted, picture at the press, held back 16.7 ms | 1855 | 185.9 | 0.16 | 12.32 | 1.7 |
+| Not noted, picture at the press, held back 16.7 ms | 1144 | 208.7 | 0.17 | 0.53 | 0.9 |
+| Not noted, picture at the press, not held back | 1696 | 222.8 | 0.19 | 4.82 | 1.5 |
+
+The largest grip offset with a still pointer, in the same order for these last four drags: 84.0, 52.8, 33.5 and 82.6 points. It does not follow the hold-back.
 
 **By hand, first run:** a little lag remains, the Finder window sometimes stands a small distance from the dragged window, the swap is not seen, and after the release the Finder window is behind another window. ADR 0015 answers these.
 
