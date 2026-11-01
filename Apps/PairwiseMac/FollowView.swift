@@ -77,6 +77,9 @@ struct FollowView: View {
         } else {
             Text("No stand-in in this drag.")
         }
+        if let offset = report.gripOffset {
+            row("Off from the real window (points)", offset)
+        }
     }
 
     private func row(_ label: LocalizedStringKey, _ value: Double) -> some View {

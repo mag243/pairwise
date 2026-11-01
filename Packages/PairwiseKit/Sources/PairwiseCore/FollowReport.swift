@@ -19,4 +19,7 @@ public struct FollowReport: Equatable, Sendable {
     /// How long the stand-in took to appear after the drag was seen, or `nil` when the
     /// drag had none. With a stand-in, the moves above are the stand-in's.
     public let standInDelay: TimeInterval?
+    /// How far the place worked out from the grip was from the dragged window's real
+    /// place at the release, in points, or `nil` when the window did not tell.
+    public let gripOffset: Double?
 }

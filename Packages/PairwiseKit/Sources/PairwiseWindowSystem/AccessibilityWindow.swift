@@ -27,6 +27,11 @@ final class AccessibilityWindow: MovableWindow {
         guard result == .success else { throw WindowSystemError(result) }
     }
 
+    func raise() throws(WindowSystemError) {
+        let result = AXUIElementPerformAction(element, kAXRaiseAction as CFString)
+        guard result == .success else { throw WindowSystemError(result) }
+    }
+
     private func read<Value: BitwiseCopyable>(
         _ attribute: String, as type: AXValueType, initial: Value
     ) throws(WindowSystemError) -> Value {

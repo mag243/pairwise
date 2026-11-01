@@ -9,6 +9,11 @@ public final class FakeWindow: MovableWindow {
     public var frameError: WindowSystemError?
     /// When set, moving throws this and the window stays where it is.
     public var moveError: WindowSystemError?
+    public private(set) var raises = 0
+    /// When set, raising throws this.
+    public var raiseError: WindowSystemError?
+    /// Runs during each raise, to let a test see what stands at that moment.
+    public var duringRaise: (() -> Void)?
     /// Runs during each move, to let a test advance time or the pointer.
     public var duringMove: (() -> Void)?
 
@@ -26,5 +31,11 @@ public final class FakeWindow: MovableWindow {
         moves.append(origin)
         currentFrame.origin = origin
         duringMove?()
+    }
+
+    public func raise() throws(WindowSystemError) {
+        if let raiseError { throw raiseError }
+        raises += 1
+        duringRaise?()
     }
 }

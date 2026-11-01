@@ -1,7 +1,7 @@
 import CoreGraphics
 import PairwiseCore
 
-/// A listen-only event tap on the left mouse button, on the main run loop. Being
+/// A listen-only event tap on the left mouse button and its drags, on the main run loop. Being
 /// listen-only, it cannot hold up or change input, whatever happens in here.
 @MainActor
 final class PointerTap {
@@ -14,10 +14,11 @@ final class PointerTap {
     }
 
     /// Installs the tap.
-    /// Postcondition: until `stop`, each press and release reaches the handler.
+    /// Postcondition: until `stop`, each press, drag and release reaches the handler.
     func start() throws(WindowSystemError) {
         let events =
             CGEventMask(1 << CGEventType.leftMouseDown.rawValue)
+            | CGEventMask(1 << CGEventType.leftMouseDragged.rawValue)
             | CGEventMask(1 << CGEventType.leftMouseUp.rawValue)
         guard
             let port = CGEvent.tapCreate(
@@ -45,6 +46,7 @@ final class PointerTap {
     fileprivate func receive(_ type: CGEventType, at location: CGPoint) {
         switch type {
         case .leftMouseDown: handler(.pressed(ScreenPoint(location)))
+        case .leftMouseDragged: handler(.dragged(ScreenPoint(location)))
         case .leftMouseUp: handler(.released(ScreenPoint(location)))
         case .tapDisabledByTimeout, .tapDisabledByUserInput:
             // The system turns off a tap it finds slow; without this the release is lost.

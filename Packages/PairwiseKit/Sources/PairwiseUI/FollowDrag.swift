@@ -47,7 +47,7 @@ enum FollowDrag {
 }
 
 extension FollowReport {
-    /// Writes the measurements to `logger`; a negative delay means no stand-in.
+    /// Writes the measurements to `logger`; a negative number means it is not known.
     func log(to logger: Logger) {
         logger.info(
             """
@@ -55,7 +55,7 @@ extension FollowReport {
             mean \(meanMove) s, p95 \(percentile95Move) s, \
             longest \(longestMove) s, \
             behind mean \(meanPointsBehind), most \(mostPointsBehind), \
-            stand-in after \(standInDelay ?? -1) s
+            stand-in after \(standInDelay ?? -1) s, grip offset \(gripOffset ?? -1)
             """)
     }
 }

@@ -79,6 +79,7 @@ public final class FollowModel {
     private func handle(_ event: PointerButtonEvent) {
         switch event {
         case .pressed(let point): press(at: point)
+        case .dragged(let point): moveStandIn(toward: point)
         case .released: release()
         }
     }
@@ -103,7 +104,9 @@ public final class FollowModel {
             case .pressed(let window, let frame, let pointer):
                 try checkForMove(of: window, from: frame, pointer: pointer)
             case .following(let following):
-                try follow(following)
+                if let pointer = system.pointerLocation {
+                    try follow(following, pointer: pointer)
+                }
             case .placing(let placing):
                 place(placing)
             }
@@ -157,8 +160,20 @@ public final class FollowModel {
         }
     }
 
-    private func follow(_ following: FollowDrag.Following) throws(WindowSystemError) {
-        guard let pointer = system.pointerLocation else { return }
+    /// A stand-in's move calls no other app, so it need not wait for the next tick. A
+    /// partner moving as itself stays on the ticks, or slow calls would queue up.
+    private func moveStandIn(toward pointer: ScreenPoint) {
+        guard case .following(let following) = drag, following.standIn != nil else { return }
+        do {
+            try follow(following, pointer: pointer)
+        } catch {
+            fail(error)
+        }
+    }
+
+    private func follow(
+        _ following: FollowDrag.Following, pointer: ScreenPoint
+    ) throws(WindowSystemError) {
         let target = following.target(forPointer: pointer)
         let before = system.uptime
         if let standIn = following.standIn {
@@ -190,20 +205,27 @@ public final class FollowModel {
             endDrag()
             return
         }
-        lastDrag = stats.report(
-            elapsed: system.uptime - following.startTime,
-            standInDelay: following.standInDelay)
-        lastDrag?.log(to: Self.logger)
-        let finalTarget: ScreenPoint
+        let pointer = system.pointerLocation
+        var placement: ScreenPoint?
+        var gripOffset: Double?
         do {
-            finalTarget = try following.placementFromRealFrame()
+            let frame = try following.window.frame()
+            placement = PartnerPlacement.origin(besideWindowAt: frame.origin, size: frame.size)
+            gripOffset = pointer.map {
+                following.grip.windowOrigin(forPointer: $0).distance(to: frame.origin)
+            }
         } catch {
             problem = error
-            guard following.standIn != nil, let pointer = system.pointerLocation else {
-                endDrag()
-                return
-            }
-            finalTarget = following.target(forPointer: pointer)
+            placement = pointer.map(following.target(forPointer:))
+        }
+        lastDrag = stats.report(
+            elapsed: system.uptime - following.startTime,
+            standInDelay: following.standInDelay,
+            gripOffset: gripOffset)
+        lastDrag?.log(to: Self.logger)
+        guard let finalTarget = placement else {
+            endDrag()
+            return
         }
         guard let standIn = following.standIn else {
             moveAtRelease(following.partner, to: finalTarget)
@@ -220,6 +242,7 @@ public final class FollowModel {
         defer { endDrag() }
         do {
             try partner.move(to: target)
+            try? partner.raise()
         } catch {
             problem = error
         }
@@ -228,6 +251,8 @@ public final class FollowModel {
     private func place(_ placing: FollowDrag.Placing) {
         do {
             try placing.partner.move(to: placing.target)
+            // It stays in front as the stand-in was; it is in its place either way.
+            try? placing.partner.raise()
             endDrag()
         } catch {
             if error == .windowBusy, system.uptime < placing.deadline { return }

@@ -307,6 +307,23 @@
         }
       }
     },
+    "Off from the real window (points)" : {
+      "comment" : "Measurement: distance between the place worked out from the pointer and the dragged window's real place",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abstand zum echten Fenster (Punkte)"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afstand tot het echte venster (punten)"
+          }
+        }
+      }
+    },
     "Pairwise" : {
       "comment" : "The app's name, the title of its window",
       "shouldTranslate" : false

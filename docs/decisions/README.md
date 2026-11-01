@@ -20,3 +20,4 @@ Use `0000-template.md` as the basis.
 | 0012 | Signing debug builds with Apple Development | Accepted |
 | 0013 | How the spike follows the pointer | Accepted |
 | 0014 | A stand-in while dragging | Accepted |
+| 0015 | Moving the stand-in on drag events, and raising the partner | Accepted |

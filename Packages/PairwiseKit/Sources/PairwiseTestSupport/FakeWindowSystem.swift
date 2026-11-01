@@ -84,6 +84,12 @@ public final class FakeWindowSystem: WindowSystemProviding {
         pointerHandler?(.pressed(point))
     }
 
+    /// Reports the pointer dragged to `point`, with the pointer there.
+    public func drag(to point: ScreenPoint) {
+        pointerLocation = point
+        pointerHandler?(.dragged(point))
+    }
+
     /// Releases the button at `point`, with the pointer there.
     public func release(at point: ScreenPoint) {
         pointerLocation = point

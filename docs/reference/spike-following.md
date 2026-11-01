@@ -32,6 +32,8 @@ Measured by hand on 2026-11-01 with the stand-in of ADR 0014, with a Finder wind
 | Not noted | 660 | 120.1 | 0.18 | 2.11 | 107.8 |
 | Not noted | 2021 | 120.0 | 0.15 | 1.79 | 47.9 |
 
-**Is the real partner out of sight during the drag?** Not tried yet.
+**By hand, first run:** a little lag remains, the Finder window sometimes stands a small distance from the dragged window, the swap is not seen, and after the release the Finder window is behind another window. ADR 0015 answers these.
+
+**Is the real partner out of sight during the drag?** Not answered yet.
 
 **Verdict:** not given yet.
