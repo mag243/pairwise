@@ -47,6 +47,9 @@ DERIVED_DATA="$BUILD_DIR/DerivedData"
 LOG_DIR="$BUILD_DIR/logs"
 REPORT_DIR="$BUILD_DIR/reports"
 MAC_DESTINATION="platform=macOS,arch=$(uname -m)"
+# CI has no certificate and nothing there needs the Accessibility permission (ADR 0012).
+CI_SIGNING=()
+[[ "${CI:-}" == true ]] && CI_SIGNING=(CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual DEVELOPMENT_TEAM=)
 COMMANDS=" check format test coverage build apptest run quick verify ci clean help "
 declare -a SUMMARY=()
 
@@ -92,10 +95,10 @@ xcode() {
   mkdir -p "$LOG_DIR"
   local rc=0
   if has xcbeautify; then
-    (cd "$ROOT_DIR" && xcodebuild -project "$XCODE_PROJECT" -derivedDataPath "$DERIVED_DATA" "$@" 2>&1) |
+    (cd "$ROOT_DIR" && xcodebuild -project "$XCODE_PROJECT" -derivedDataPath "$DERIVED_DATA" "${CI_SIGNING[@]}" "$@" 2>&1) |
       tee "$log" | xcbeautify --quiet || rc=${PIPESTATUS[0]}
   else
-    (cd "$ROOT_DIR" && xcodebuild -project "$XCODE_PROJECT" -derivedDataPath "$DERIVED_DATA" "$@" >"$log" 2>&1) \
+    (cd "$ROOT_DIR" && xcodebuild -project "$XCODE_PROJECT" -derivedDataPath "$DERIVED_DATA" "${CI_SIGNING[@]}" "$@" >"$log" 2>&1) \
       || rc=$?
   fi
   ((rc == 0)) || { tail -n 30 "$log" >&2; fail "xcodebuild failed; log: ${log#"$ROOT_DIR"/}"; }

@@ -17,3 +17,5 @@ Use `0000-template.md` as the basis.
 | 0009 | Semantic version plus a date-and-time build number | Accepted |
 | 0010 | English, Dutch and German | Accepted |
 | 0011 | UI tests only when the owner says so | Accepted |
+| 0012 | Signing debug builds with Apple Development | Accepted |
+| 0013 | How the spike follows the pointer | Accepted |

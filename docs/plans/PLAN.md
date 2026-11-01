@@ -80,7 +80,7 @@ tools/                            setup, build, hooks, pinned versions
 - **Feel:** whether following is smooth cannot be tested automatically; it is judged by hand, with the measured rate and delay noted in `docs/reference/`.
 
 ## Open decisions
-1. **Keeping the Accessibility permission while developing.** macOS ties the grant to the app's code signature, and debug builds are signed ad hoc, so a rebuild may lose it. Settle before M1: sign debug builds with a development certificate, or another way.
+1. **Keeping the Accessibility permission while developing:** settled in ADR 0012.
 2. **Menu bar app or windowed app.** M0 shows a window only to have something to launch. Decide in M1 or M3.
 3. **Distribution:** Developer ID or the Mac App Store, and whether the App Store allows what Pairwise needs. an earlier project's route (signed, notarized, disk image, Sparkle, tap) is the default; its tools come over when Pairwise is ready to ship.
 4. **The name and the domain,** see What exists already; before the first release.

@@ -5,7 +5,7 @@ One plan per milestone, numbered in order, worked through one by one, directly o
 | Plan | Milestone | Status |
 |---|---|---|
 | [M0](M0-skeleton-ci.md) | Skeleton & CI | In progress |
-| M1 | Spike: following the pointer | Todo |
+| [M1](M1-spike-following.md) | Spike: following the pointer | In progress |
 | M2 | The stand-in while dragging, only if M1 is not smooth enough | Todo |
 | M3 | Pairwise without plug-in | Todo |
 | M4 | The plug-in, first in our own apps only | Todo |
