@@ -17,6 +17,9 @@ public final class FollowModel {
     static let placingPatience: TimeInterval = 0.5
     static let logger = Logger(subsystem: "me.m-domain.pairwise", category: "follow")
 
+    /// How far ahead a stand-in looks with the pointer's movement, in seconds (ADR 0019).
+    public var standInLookAhead: TimeInterval = 1.0 / 60
+
     public private(set) var isAccessibilityGranted: Bool
     public private(set) var isScreenRecordingGranted: Bool
     public private(set) var isWatching = false
@@ -33,6 +36,7 @@ public final class FollowModel {
     /// A picture that arrived before the press turned out to be a drag.
     @ObservationIgnored var earlyPicture: Result<any WindowStandIn, WindowSystemError>?
     @ObservationIgnored var mostSlip: Double?
+    @ObservationIgnored var pointerLead = PointerLead()
     /// Tells a picture that arrives late from the one this drag asked for.
     @ObservationIgnored var standInRequest = 0
 
@@ -125,6 +129,7 @@ public final class FollowModel {
         guard WindowDragRule.isMove(from: start, to: try window.liveFrame()) else { return }
         stats = FollowStats()
         mostSlip = nil
+        pointerLead = PointerLead()
         let partner: any MovableWindow
         if let pressPartner {
             partner = pressPartner
@@ -152,9 +157,10 @@ public final class FollowModel {
         let pointer = system.pointerLocation
         let serverFrame = following.window.serverFrame()
         noteSlip(of: following, serverFrame: serverFrame, pointer: pointer)
-        guard let target = following.target(serverFrame: serverFrame, pointer: pointer) else {
-            return
-        }
+        guard
+            let place = following.target(serverFrame: serverFrame, pointer: pointer)
+        else { return }
+        let target = lookingAhead(from: place, for: following, serverFrame, pointer, at: before)
         var current = following
         if target != current.lastTarget {
             if let standIn = current.standIn {
@@ -171,6 +177,18 @@ public final class FollowModel {
         if current.standIn != nil, !current.isParked {
             try park(current)
         }
+    }
+
+    /// Notes the pointer on every tick, so its movement is known when the stand-in comes.
+    /// Without the window server's place the pointer is already in `place`.
+    private func lookingAhead(
+        from place: ScreenPoint, for following: FollowDrag.Following, _ serverFrame: WindowFrame?,
+        _ pointer: ScreenPoint?, at time: TimeInterval
+    ) -> ScreenPoint {
+        guard serverFrame != nil, let pointer else { return place }
+        let ahead = pointerLead.ahead(
+            of: place, pointer: pointer, at: time, lookingAhead: standInLookAhead)
+        return following.standIn == nil ? place : ahead
     }
 
     private func noteSlip(

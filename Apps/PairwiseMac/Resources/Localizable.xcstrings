@@ -137,6 +137,23 @@
         }
       }
     },
+    "Look ahead (ms)" : {
+      "comment" : "Setting: how far ahead the picture of the partner looks with the pointer's movement",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vorausschauen (ms)"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vooruitkijken (ms)"
+          }
+        }
+      }
+    },
     "Mean move (ms)" : {
       "comment" : "Measurement: mean duration of one move",
       "localizations" : {

@@ -24,3 +24,4 @@ Use `0000-template.md` as the basis.
 | 0016 | The picture at the press, and measuring the grip with a still pointer | Accepted |
 | 0017 | Holding the stand-in back | Superseded by 0018 |
 | 0018 | Following the window server's place of the dragged window | Accepted |
+| 0019 | Looking ahead with the pointer's movement | Accepted |

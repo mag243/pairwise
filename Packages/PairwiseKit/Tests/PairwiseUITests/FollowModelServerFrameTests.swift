@@ -20,6 +20,7 @@ import Testing
         system.partnerWindow = partner
         dragged.currentServerFrame = Self.start
         model = FollowModel(system: system)
+        model.standInLookAhead = 0
     }
 
     private func moveWindow(toX x: Double, y: Double = 100) {
@@ -51,6 +52,52 @@ import Testing
         moveWindow(toX: 120)
         system.tick()
         #expect(standIn.moves.last == ScreenPoint(x: 520, y: 100))
+    }
+
+    @Test func theStandInLooksAheadByThePointersMovement() {
+        model.standInLookAhead = 0.016
+        startDragWithStandIn()
+        system.uptime = 0.1
+        system.pointerLocation = ScreenPoint(x: 170, y: 110)
+        system.tick()
+        system.uptime = 0.11
+        system.pointerLocation = ScreenPoint(x: 180, y: 110)
+        system.tick()
+        system.uptime = 0.12
+        system.pointerLocation = ScreenPoint(x: 190, y: 110)
+        moveWindow(toX: 110)
+        system.tick()
+        #expect(standIn.moves.last == ScreenPoint(x: 530, y: 100))
+    }
+
+    @Test func theStandInRestsExactlyBesideTheWindow() {
+        model.standInLookAhead = 0.016
+        startDragWithStandIn()
+        system.uptime = 0.1
+        system.pointerLocation = ScreenPoint(x: 170, y: 110)
+        system.tick()
+        moveWindow(toX: 120)
+        system.uptime = 0.5
+        system.tick()
+        system.uptime = 0.6
+        system.tick()
+        #expect(standIn.moves.last == ScreenPoint(x: 520, y: 100))
+    }
+
+    @Test func thePartnerAsItselfDoesNotLookAhead() {
+        system.isScreenRecordingGranted = false
+        model.standInLookAhead = 0.016
+        model.start()
+        system.press(at: Self.grab)
+        moveWindow(toX: 101)
+        system.tick()
+        system.pointerLocation = ScreenPoint(x: 170, y: 110)
+        system.tick()
+        system.uptime = 0.1
+        system.pointerLocation = ScreenPoint(x: 190, y: 110)
+        moveWindow(toX: 130)
+        system.tick()
+        #expect(partner.moves.last == ScreenPoint(x: 530, y: 100))
     }
 
     @Test func aWindowThatHangsHoldsTheStandInStill() {

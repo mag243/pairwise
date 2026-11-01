@@ -58,6 +58,8 @@ Following the window server's place (ADR 0018), moves per second is how often th
 
 **By hand, third run:** while the gap or overlap grows, the pointer and the stand-in move and the dragged window stands still until it jumps along. Without Pairwise running, the pointer also sometimes shifts against the place where a Terminal window was held. So the place worked out from the pointer and the grip is not always where the window is, which ADR 0013 assumes.
 
+**By hand, following the window server:** the stand-in and the window move together, with a small delay. The owner saw that the pointer moves first and the window follows shortly after. ADR 0019 answers this.
+
 **Is the real partner out of sight during the drag?** Not answered yet.
 
 **Verdict:** not given yet.
