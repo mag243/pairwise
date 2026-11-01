@@ -13,7 +13,6 @@ extension WindowSystemError {
         case .windowGone: "The window has gone."
         case .windowRefused: "The window refuses to move."
         case .windowBusy: "The window's app does not answer."
-        case .noPartner: "No window of the partner app: open one."
         }
     }
 }

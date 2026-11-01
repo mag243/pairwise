@@ -13,7 +13,7 @@ extension PairDragModel {
                 current.isWindowParked = true
             }
             if !current.isPartnerParked {
-                try current.partner.move(to: origin)
+                try current.partner.window.move(to: origin)
                 current.isPartnerParked = true
             }
             drag = .moving(current)
@@ -56,10 +56,10 @@ extension PairDragModel {
                 current.isWindowPlaced = true
             }
             let origin = (try? current.window.frame().origin) ?? current.target
-            try current.partner.move(
-                to: PartnerPlacement.origin(besideWindowAt: origin, size: current.size))
+            try current.partner.window.move(
+                to: place(of: current.partner, beside: origin, current.size))
             // Raised last, the dragged window ends on top; a failure leaves it in place.
-            try? current.partner.raise()
+            try? current.partner.window.raise()
             try? current.window.raise()
             drag = .settling(standIn: current.standIn, until: system.uptime + Self.settleTime)
         } catch {
@@ -77,9 +77,9 @@ extension PairDragModel {
             let now = pressed.window.serverFrame() ?? (try? pressed.window.frame()),
             pressed.hasWindowMoved || DragHoldRule.isMove(from: pressed.frame, to: now)
         else { return }
-        try? pressed.partner.move(
-            to: PartnerPlacement.origin(besideWindowAt: now.origin, size: now.size))
-        try? pressed.partner.raise()
+        try? pressed.partner.window.move(
+            to: place(of: pressed.partner, beside: now.origin, now.size))
+        try? pressed.partner.window.raise()
         try? pressed.window.raise()
     }
 
@@ -89,15 +89,22 @@ extension PairDragModel {
         case .moving(let moving):
             let origin = moving.origin(forPointer: moving.lastPointer)
             try? moving.window.move(to: origin)
-            try? moving.partner.move(
-                to: PartnerPlacement.origin(besideWindowAt: origin, size: moving.frame.size))
+            try? moving.partner.window.move(
+                to: place(of: moving.partner, beside: origin, moving.frame.size))
         case .placing(let placing):
             try? placing.window.move(to: placing.target)
-            try? placing.partner.move(
-                to: PartnerPlacement.origin(besideWindowAt: placing.target, size: placing.size))
+            try? placing.partner.window.move(
+                to: place(of: placing.partner, beside: placing.target, placing.size))
         default:
             break
         }
+    }
+
+    private func place(
+        of partner: PairDrag.Partner, beside origin: ScreenPoint, _ size: WindowSize
+    ) -> ScreenPoint {
+        PartnerPlacement.origin(
+            besideWindowAt: origin, size: size, partnerSize: partner.size, on: partner.side)
     }
 
     func letDragPass() {

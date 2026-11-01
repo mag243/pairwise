@@ -12,12 +12,6 @@ public protocol WindowSystemProviding: AnyObject {
     /// Where a partner waits out of sight, or `nil` when the system names no displays.
     var parkingOrigin: ScreenPoint? { get }
 
-    /// The running apps a partner can come from.
-    var partnerApps: [PartnerApp] { get }
-
-    /// The bundle identifier of the app that `partner(for:)` takes a window from.
-    var partnerBundleIdentifier: String { get set }
-
     /// How many live frames a second a new stand-in asks for per window; 0 keeps it still.
     var liveFramesPerSecond: Int { get set }
 
@@ -40,11 +34,12 @@ public protocol WindowSystemProviding: AnyObject {
         completion: @escaping @MainActor (Result<any WindowStandIn, WindowSystemError>) -> Void
     )
 
+    /// The number of the normal window on top at `point`, or `nil` when there is none or it
+    /// is one of Pairwise's own. Asks no app.
+    func windowNumber(at point: ScreenPoint) -> UInt32?
+
     /// The window under `point`, or `nil` when there is none Pairwise may follow.
     func window(at point: ScreenPoint) -> (any MovableWindow)?
-
-    /// A window to follow `window`, not `window` itself.
-    func partner(for window: any MovableWindow) throws(WindowSystemError) -> any MovableWindow
 
     /// Asks `decide` about each press, drag and release of the left mouse button; an event
     /// it answers `false` for does not reach any app. Input passes when this fails.

@@ -52,23 +52,6 @@
         }
       }
     },
-    "Drag a window by its title bar: it and the partner move as one." : {
-      "comment" : "How to try moving as one",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ziehe ein Fenster an der Titelleiste: Es und der Partner bewegen sich als eines."
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sleep een venster aan de titelbalk: het en de partner bewegen als één."
-          }
-        }
-      }
-    },
     "Grant Access…" : {
       "comment" : "Button that opens the system's permission prompt",
       "localizations" : {
@@ -273,23 +256,6 @@
         }
       }
     },
-    "No window of the partner app: open one." : {
-      "comment" : "The partner app has no window",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kein Fenster der Partner-App: Öffne eines."
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Geen venster van de partner-app: open er een."
-          }
-        }
-      }
-    },
     "Not granted" : {
       "comment" : "The Accessibility permission's status",
       "localizations" : {
@@ -358,23 +324,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Paneel verscheen na (ms)"
-          }
-        }
-      }
-    },
-    "Partner app" : {
-      "comment" : "Setting: the app that gives the window following the dragged one",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Partner-App"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Partner-app"
           }
         }
       }
@@ -511,6 +460,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "De app van het venster reageert niet."
+          }
+        }
+      }
+    },
+    "Windows in a pair move as one when you drag them." : {
+      "comment" : "What the app does",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fenster in einem Paar bewegen sich beim Ziehen als eines."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vensters in een paar bewegen als één als je ze sleept."
           }
         }
       }

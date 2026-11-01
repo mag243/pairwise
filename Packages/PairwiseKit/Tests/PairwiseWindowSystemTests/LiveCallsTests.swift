@@ -41,13 +41,8 @@ import Testing
         #expect(element.setAttribute("PairwiseNoSuchAttribute", to: kCFBooleanTrue) != .success)
     }
 
-    @Test func noAppHasThisBundleIdentifier() {
-        #expect(access.processes(bundleIdentifier: "me.m-domain.no-such-app").isEmpty)
-    }
-
     @Test func theWindowListsRun() {
         _ = access.onScreenWindows()
-        _ = access.regularApps()
         _ = access.displays()
         #expect(access.windowDescription(CGWindowID.max) == nil)
     }
@@ -66,7 +61,6 @@ import Testing
         _ = system.isAccessibilityGranted
         _ = system.isScreenRecordingGranted
         _ = system.isPrimaryButtonDown
-        _ = system.partnerApps
         _ = system.parkingOrigin
         #expect(system.uptime > 0)
     }

@@ -20,13 +20,6 @@ public final class PairDragModel {
     private static let buttonReportTime: TimeInterval = 0.25
     static let logger = Logger(subsystem: "me.m-domain.pairwise", category: "pair-drag")
 
-    /// The running apps a partner can come from; read again by `refreshPermissions`.
-    public internal(set) var partnerApps: [PartnerApp]
-    /// The app the next drag takes its partner from.
-    public var partnerBundleIdentifier: String {
-        didSet { system.partnerBundleIdentifier = partnerBundleIdentifier }
-    }
-
     /// How many live frames a second the pictures show during a drag; 0 keeps them still.
     public var liveFramesPerSecond: Int {
         didSet { system.liveFramesPerSecond = liveFramesPerSecond }
@@ -43,6 +36,9 @@ public final class PairDragModel {
     public internal(set) var lastDrag: DragReport?
 
     @ObservationIgnored let system: any WindowSystemProviding
+    @ObservationIgnored var book = PairBook()
+    /// The windows in `book`, by number.
+    @ObservationIgnored var pairedWindows: [UInt32: any MovableWindow] = [:]
     @ObservationIgnored var drag = PairDrag.none
     @ObservationIgnored var stats = DragStats()
     @ObservationIgnored private var hasSeenButtonDown = false
@@ -52,8 +48,6 @@ public final class PairDragModel {
 
     public init(system: any WindowSystemProviding) {
         self.system = system
-        partnerApps = system.partnerApps
-        partnerBundleIdentifier = system.partnerBundleIdentifier
         liveFramesPerSecond = system.liveFramesPerSecond
         isAccessibilityGranted = system.isAccessibilityGranted
         isScreenRecordingGranted = system.isScreenRecordingGranted
@@ -114,20 +108,36 @@ public final class PairDragModel {
         Self.logger.info("press: \(outcome, privacy: .public), deciding took \(elapsed) s")
     }
 
-    /// Says what became of the press, for the log.
+    /// Says what became of the press, for the log. A window in no pair costs only the window
+    /// number, as most presses are on such windows (ADR 0033).
     private func takeOverPress(at point: ScreenPoint) -> String {
-        guard let window = system.window(at: point) else { return "no window under the pointer" }
-        guard let frame = window.serverFrame() ?? (try? window.frame()) else {
-            return "the window gave no frame"
+        guard let number = system.windowNumber(at: point) else {
+            return "no window under the pointer"
         }
-        guard let partner = try? system.partner(for: window) else { return "no partner" }
+        guard
+            let partnerEntry = book.partner(of: number),
+            let window = pairedWindows[number],
+            let partnerWindow = pairedWindows[partnerEntry.window]
+        else { return "not in a pair" }
+        guard
+            window.isAvailable, partnerWindow.isAvailable,
+            let partnerFrame = partnerWindow.serverFrame() ?? (try? partnerWindow.frame()),
+            let frame = window.serverFrame() ?? (try? window.frame())
+        else {
+            endPair(of: number)
+            return "the pair ended: a window is gone, minimized or full screen"
+        }
+        let partner = PairDrag.Partner(
+            window: partnerWindow, size: partnerFrame.size, side: partnerEntry.side)
         drag = .pressed(
             PairDrag.Pressed(
                 window: window, partner: partner, startTime: system.uptime, frame: frame,
                 pointer: point, lastPointer: point))
         system.startTicking(every: Self.tickInterval) { [weak self] in self?.tick() }
         let current = request
-        system.makePairStandIn(of: window, beside: partner) { [weak self] result in
+        let first = partner.side == .right ? window : partnerWindow
+        let second = partner.side == .right ? partnerWindow : window
+        system.makePairStandIn(of: first, beside: second) { [weak self] result in
             guard let self, current == request else { return }
             receive(result)
         }
@@ -169,7 +179,7 @@ public final class PairDragModel {
             return true
         case .moving(var moving):
             let before = system.uptime
-            moving.standIn.move(to: moving.origin(forPointer: point))
+            moving.standIn.move(to: moving.panelOrigin(forPointer: point))
             stats.record(moveDuration: system.uptime - before)
             moving.lastPointer = point
             drag = .moving(moving)
@@ -201,7 +211,7 @@ public final class PairDragModel {
             window: pressed.window, partner: pressed.partner, standIn: standIn,
             frame: pressed.frame, pointer: pressed.pointer, startTime: now,
             panelDelay: now - pressed.startTime, lastPointer: pressed.lastPointer)
-        standIn.show(at: moving.origin(forPointer: pressed.lastPointer))
+        standIn.show(at: moving.panelOrigin(forPointer: pressed.lastPointer))
         stats = DragStats()
         drag = .moving(moving)
     }

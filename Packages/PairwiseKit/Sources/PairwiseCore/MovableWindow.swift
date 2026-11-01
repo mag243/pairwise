@@ -2,6 +2,13 @@
 /// the top left of the main display, the coordinates pointer locations come in.
 @MainActor
 public protocol MovableWindow: AnyObject {
+    /// The window server's number for this window, or `nil` when it does not know it.
+    var windowNumber: UInt32? { get }
+
+    /// Whether the window is on screen as a normal window: not closed, minimized or full
+    /// screen. Asked of its app.
+    var isAvailable: Bool { get }
+
     /// The window's current frame, asked of its app.
     func frame() throws(WindowSystemError) -> WindowFrame
 

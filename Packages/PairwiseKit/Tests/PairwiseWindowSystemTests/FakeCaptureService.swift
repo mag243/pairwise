@@ -13,6 +13,9 @@ struct FakeCapturable: CapturableWindow {
 /// A window of neither the real system nor a capture list.
 @MainActor
 final class FakePlainWindow: MovableWindow {
+    var windowNumber: UInt32? { nil }
+    var isAvailable: Bool { true }
+
     func frame() throws(WindowSystemError) -> WindowFrame {
         WindowFrame(x: 0, y: 0, width: 1, height: 1)
     }

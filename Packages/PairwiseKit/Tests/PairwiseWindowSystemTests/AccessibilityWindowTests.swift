@@ -117,4 +117,30 @@ import Testing
         ]
         #expect(window.serverFrame() == nil)
     }
+
+    @Test func aWindowKnowsItsNumber() {
+        access.windows = [
+            FakeSystemAccess.description(number: 7, process: 1, frame: Self.rect)
+        ]
+        #expect(makeWindow().windowNumber == 7)
+    }
+
+    @Test func aNormalWindowIsAvailable() {
+        #expect(makeWindow().isAvailable)
+    }
+
+    @Test func aMinimizedWindowIsNotAvailable() {
+        element.attributes[kAXMinimizedAttribute] = kCFBooleanTrue
+        #expect(!makeWindow().isAvailable)
+    }
+
+    @Test func aFullScreenWindowIsNotAvailable() {
+        element.attributes["AXFullScreen"] = kCFBooleanTrue
+        #expect(!makeWindow().isAvailable)
+    }
+
+    @Test func aClosedWindowIsNotAvailable() {
+        element.errors[kAXPositionAttribute] = .invalidUIElement
+        #expect(!makeWindow().isAvailable)
+    }
 }

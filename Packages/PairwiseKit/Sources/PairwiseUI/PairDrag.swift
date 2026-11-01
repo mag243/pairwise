@@ -16,7 +16,7 @@ enum PairDrag {
     @MainActor
     struct Pressed {
         let window: any MovableWindow
-        let partner: any MovableWindow
+        let partner: PairDrag.Partner
         let startTime: TimeInterval
         /// The window's frame at the press. macOS keeps a window at this distance from the
         /// pointer, so this and `pointer` tell where it belongs, also while it lags behind.
@@ -28,10 +28,18 @@ enum PairDrag {
         var lastPointer: ScreenPoint
     }
 
+    /// The other window of a pair.
+    @MainActor
+    struct Partner {
+        let window: any MovableWindow
+        let size: WindowSize
+        let side: PairSide
+    }
+
     @MainActor
     struct Moving {
         let window: any MovableWindow
-        let partner: any MovableWindow
+        let partner: PairDrag.Partner
         let standIn: any WindowStandIn
         let frame: WindowFrame
         let pointer: ScreenPoint
@@ -41,16 +49,24 @@ enum PairDrag {
         var isWindowParked = false
         var isPartnerParked = false
 
+        /// Where the dragged window belongs for a pointer at `point`.
         func origin(forPointer point: ScreenPoint) -> ScreenPoint {
             ScreenPoint(
                 x: frame.origin.x + point.x - pointer.x, y: frame.origin.y + point.y - pointer.y)
+        }
+
+        /// Where the panel goes: its origin is that of the pair's left window.
+        func panelOrigin(forPointer point: ScreenPoint) -> ScreenPoint {
+            let origin = origin(forPointer: point)
+            return partner.side == .left
+                ? ScreenPoint(x: origin.x - partner.size.width, y: origin.y) : origin
         }
     }
 
     @MainActor
     struct Placing {
         let window: any MovableWindow
-        let partner: any MovableWindow
+        let partner: PairDrag.Partner
         let standIn: any WindowStandIn
         let target: ScreenPoint
         let size: WindowSize

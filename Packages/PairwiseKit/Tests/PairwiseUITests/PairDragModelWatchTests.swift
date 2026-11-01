@@ -11,17 +11,19 @@ import Testing
     private static let moved = ScreenPoint(x: 140, y: 130)
 
     private let system = FakeWindowSystem()
-    private let window = FakeWindow(frame: WindowFrame(x: 100, y: 100, width: 400, height: 300))
-    private let partner = FakeWindow(frame: WindowFrame(x: 0, y: 500, width: 200, height: 200))
+    private let window = FakeWindow(
+        frame: WindowFrame(x: 100, y: 100, width: 400, height: 300), number: 1)
+    private let partner = FakeWindow(
+        frame: WindowFrame(x: 0, y: 500, width: 200, height: 200), number: 2)
     private let panel = FakeStandIn()
     private let model: PairDragModel
 
     init() {
         system.isScreenRecordingGranted = true
         system.windowUnderPointer = window
-        system.partnerWindow = partner
         model = PairDragModel(system: system)
         model.start()
+        try? model.join(window, to: partner, on: .left)
     }
 
     /// What macOS does with a window drag: the drag event passes, and the window moves.

@@ -4,7 +4,6 @@ import PairwiseCore
 extension PairDragModel {
     /// Reads the permissions and the apps again; the user grants elsewhere, in System Settings.
     public func refreshPermissions() {
-        partnerApps = system.partnerApps
         isAccessibilityGranted = system.isAccessibilityGranted
         isScreenRecordingGranted = system.isScreenRecordingGranted
     }

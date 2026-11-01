@@ -48,16 +48,6 @@ import Testing
         #expect(!model.isRunning)
     }
 
-    @Test func theSystemsPartnerAppIsTheFirstChoice() {
-        system.partnerBundleIdentifier = "com.example.first"
-        #expect(PairDragModel(system: system).partnerBundleIdentifier == "com.example.first")
-    }
-
-    @Test func choosingAPartnerAppGoesToTheSystem() {
-        model.partnerBundleIdentifier = "com.example.slow"
-        #expect(system.partnerBundleIdentifier == "com.example.slow")
-    }
-
     @Test func theSystemsFrameRateIsTheFirstChoice() {
         system.liveFramesPerSecond = 15
         #expect(PairDragModel(system: system).liveFramesPerSecond == 15)
@@ -66,12 +56,5 @@ import Testing
     @Test func choosingAFrameRateGoesToTheSystem() {
         model.liveFramesPerSecond = 60
         #expect(system.liveFramesPerSecond == 60)
-    }
-
-    @Test func newlyRunningAppsAreSeenOnRefresh() {
-        let app = PartnerApp(bundleIdentifier: "com.example.slow", name: "Slow")
-        system.partnerApps = [app]
-        model.refreshPermissions()
-        #expect(model.partnerApps == [app])
     }
 }

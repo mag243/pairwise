@@ -19,10 +19,10 @@ Done first because everything below adds code to this module.
 - [ ] Check by hand: dragging a tab in Safari works, clicks work, a toolbar's empty space moves the pair. Check Terminal, Finder, Safari and one Electron app.
 
 ### 3. Pairs as a model
-- [ ] `PairwiseCore`, test-first: a pair, which side each window is on, the rules (not a window with itself, a window in one pair only).
-- [ ] A window is known by its window number. What happens when one closes, minimizes or goes full screen: the pair ends and the other window stays where it is.
-- [ ] Only a press on a window in a pair is taken over. All others pass untouched, and no picture is taken. This also removes the picture on every click.
-- [ ] The panel holds the pair in its own order, with the partner on either side.
+- [x] `PairwiseCore`, test-first: a pair, which side each window is on, the rules (not a window with itself, a window in one pair only).
+- [x] A window is known by its window number. What happens when one closes, minimizes or goes full screen: the pair ends and the other window stays where it is.
+- [x] Only a press on a window in a pair is taken over. All others pass untouched, and no picture is taken. This also removes the picture on every click.
+- [x] The panel holds the pair in its own order, with the partner on either side.
 
 ### 4. Joining
 - [ ] ADR: the gesture (owner's choice 1).
@@ -55,7 +55,7 @@ Done first because everything below adds code to this module.
 
 ### 10. The app itself
 - [ ] ADR: menu bar app or window (open decision 2 in `PLAN.md`, owner's choice 4).
-- [ ] The measurements, the frame rate and the choice of partner app leave the main interface. The permissions stay, explained plainly. The stress test stays.
+- [ ] The measurements and the frame rate leave the main interface. The permissions stay, explained plainly. The stress test stays.
 - [ ] Complete `nl` and `de`, with the translation tools of ADR 0010 brought over.
 
 ## Acceptance criteria

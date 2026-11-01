@@ -38,10 +38,6 @@ protocol SystemAccess {
     func onScreenWindows() -> [[String: Any]]
     /// The window server's description of one window, or `nil` when it has gone.
     func windowDescription(_ number: CGWindowID) -> [String: Any]?
-    /// The processes of the app with this bundle identifier.
-    func processes(bundleIdentifier: String) -> [pid_t]
-    /// The running apps with a place in the Dock, other than this one.
-    func regularApps() -> [PartnerApp]
     /// All displays in global screen coordinates.
     func displays() -> [WindowFrame]
     /// This app's own process.

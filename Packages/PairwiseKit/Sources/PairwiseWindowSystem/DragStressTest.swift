@@ -30,23 +30,28 @@ public final class DragStressTest {
     private static let windowWait: UInt64 = 100
     private static let windowLookups = 50
 
-    private let system: AccessibilityWindowSystem
     private let outputPath: String
     private let pressOutcome: () -> String
     private let lastLiveFrames: () -> [Int]
+    private let join: (any MovableWindow, any MovableWindow) -> Void
+    private let leave: (any MovableWindow) -> Void
     private var lines: [String] = []
     private var folders: [URL] = []
 
     /// `pressOutcome` says what became of the last press, and `lastLiveFrames` how many
-    /// live frames per window the last drag got.
+    /// live frames per window the last drag got. `join` makes a pair of two windows, with the
+    /// first on the left, and `leave` ends a window's pair.
     public init(
-        system: AccessibilityWindowSystem, outputPath: String,
-        pressOutcome: @escaping () -> String, lastLiveFrames: @escaping () -> [Int]
+        outputPath: String, pressOutcome: @escaping () -> String,
+        lastLiveFrames: @escaping () -> [Int],
+        join: @escaping (any MovableWindow, any MovableWindow) -> Void,
+        leave: @escaping (any MovableWindow) -> Void
     ) {
-        self.system = system
         self.outputPath = outputPath
         self.pressOutcome = pressOutcome
         self.lastLiveFrames = lastLiveFrames
+        self.join = join
+        self.leave = leave
     }
 
     /// Runs all tries and writes the file; a failure to set up is written there too.
@@ -62,13 +67,14 @@ public final class DragStressTest {
             lines.append("could not open the test windows")
             return
         }
-        system.pinnedPartner = partner
+        await place(dragged, at: Self.origin)
+        join(dragged, partner)
         var counts: [String: Int] = [:]
         for index in 0..<Self.tries {
             let result = await oneTry(index, dragged: dragged, partner: partner)
             counts[result, default: 0] += 1
         }
-        system.pinnedPartner = nil
+        leave(dragged)
         lines.append("summary: \(counts.sorted { $0.key < $1.key })")
         await liveTries(dragged: dragged)
         close(dragged)
@@ -115,7 +121,7 @@ public final class DragStressTest {
             return
         }
         defer { process.terminate() }
-        system.pinnedPartner = helper
+        join(dragged, helper)
         for index in 0..<Self.liveTries {
             await place(dragged, at: Self.origin)
             await place(helper, at: ScreenPoint(x: Self.partnerX, y: Self.origin.y))
@@ -126,7 +132,7 @@ public final class DragStressTest {
             await wait(Self.settleWait)
             lines.append("live try \(index): frames per window \(lastLiveFrames())")
         }
-        system.pinnedPartner = nil
+        leave(dragged)
     }
 
     private func longDrag() async {

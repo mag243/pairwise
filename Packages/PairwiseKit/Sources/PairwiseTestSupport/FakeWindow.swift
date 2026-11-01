@@ -4,6 +4,8 @@ import PairwiseCore
 @MainActor
 public final class FakeWindow: MovableWindow {
     public var currentFrame: WindowFrame
+    public var windowNumber: UInt32?
+    public var isAvailable = true
     /// What `serverFrame()` gives; without one the window server does not tell.
     public var currentServerFrame: WindowFrame?
     public private(set) var moves: [ScreenPoint] = []
@@ -19,8 +21,9 @@ public final class FakeWindow: MovableWindow {
     /// Runs during each move, to let a test advance time or the pointer.
     public var duringMove: (() -> Void)?
 
-    public init(frame: WindowFrame) {
+    public init(frame: WindowFrame, number: UInt32? = nil) {
         currentFrame = frame
+        windowNumber = number
     }
 
     public func frame() throws(WindowSystemError) -> WindowFrame {

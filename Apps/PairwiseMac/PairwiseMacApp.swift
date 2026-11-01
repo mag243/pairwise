@@ -11,11 +11,9 @@ struct PairwiseMacApp: App {
     private static let stressTestFlag = "--drag-stress-test"
 
     @State private var pairDrag: PairDragModel
-    private let system: AccessibilityWindowSystem
 
     init() {
         let system = AccessibilityWindowSystem()
-        self.system = system
         _pairDrag = State(initialValue: PairDragModel(system: system))
     }
 
@@ -39,9 +37,11 @@ struct PairwiseMacApp: App {
         pairDrag.start()
         let model = pairDrag
         let test = DragStressTest(
-            system: system, outputPath: arguments[flag + 1],
+            outputPath: arguments[flag + 1],
             pressOutcome: { model.lastPressOutcome },
-            lastLiveFrames: { model.lastDrag?.liveFrames ?? [] })
+            lastLiveFrames: { model.lastDrag?.liveFrames ?? [] },
+            join: { first, second in try? model.join(first, to: second, on: .left) },
+            leave: { model.leavePair(of: $0) })
         await test.run()
         pairDrag.stop()
         NSApplication.shared.terminate(nil)

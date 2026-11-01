@@ -11,17 +11,14 @@ public final class FakeWindowSystem: WindowSystemProviding {
     public var uptime: TimeInterval = 0
     /// The window `window(at:)` returns, wherever is asked.
     public var windowUnderPointer: FakeWindow?
-    /// The window `partner(for:)` returns; without one it throws `noPartner`.
-    public var partnerWindow: FakeWindow?
     /// When set, `startHoldingDrags` throws this.
     public var watchError: WindowSystemError?
-    public var partnerApps: [PartnerApp] = []
     public var isPrimaryButtonDown = true
     public var liveFramesPerSecond = 0
-    public var partnerBundleIdentifier = "com.apple.finder"
     public private(set) var accessibilityRequests = 0
     public private(set) var screenRecordingRequests = 0
     public private(set) var standInRequests = 0
+    public private(set) var windowNumberRequests = 0
 
     private var holdDecision: (@MainActor (PointerButtonEvent) -> Bool)?
     private var tickHandler: (@MainActor () -> Void)?
@@ -48,15 +45,13 @@ public final class FakeWindowSystem: WindowSystemProviding {
         standInCompletion = completion
     }
 
-    public func window(at point: ScreenPoint) -> (any MovableWindow)? {
-        windowUnderPointer
+    public func windowNumber(at point: ScreenPoint) -> UInt32? {
+        windowNumberRequests += 1
+        return windowUnderPointer?.windowNumber
     }
 
-    public func partner(
-        for window: any MovableWindow
-    ) throws(WindowSystemError) -> any MovableWindow {
-        guard let partnerWindow else { throw .noPartner }
-        return partnerWindow
+    public func window(at point: ScreenPoint) -> (any MovableWindow)? {
+        windowUnderPointer
     }
 
     public func startHoldingDrags(

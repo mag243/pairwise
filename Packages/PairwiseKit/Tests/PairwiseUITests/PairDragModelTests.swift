@@ -13,17 +13,18 @@ import Testing
     private static let parked = ScreenPoint(x: 9999, y: 9999)
 
     private let system = FakeWindowSystem()
-    private let window = FakeWindow(frame: Self.frame)
-    private let partner = FakeWindow(frame: WindowFrame(x: 0, y: 500, width: 200, height: 200))
+    private let window = FakeWindow(frame: Self.frame, number: 1)
+    private let partner = FakeWindow(
+        frame: WindowFrame(x: 0, y: 500, width: 200, height: 200), number: 2)
     private let panel = FakeStandIn()
     private let model: PairDragModel
 
     init() {
         system.isScreenRecordingGranted = true
         system.windowUnderPointer = window
-        system.partnerWindow = partner
         model = PairDragModel(system: system)
         model.start()
+        try? model.join(window, to: partner, on: .left)
     }
 
     /// What macOS does with a window drag: the drag event passes, and the window moves.
@@ -80,12 +81,6 @@ import Testing
     @Test func aPressAndReleaseAlwaysPass() {
         #expect(system.send(.pressed(Self.onTitleBar)))
         #expect(system.send(.released(Self.onTitleBar)))
-    }
-
-    @Test func aPressWithoutAPartnerLetsTheDragPass() {
-        system.partnerWindow = nil
-        _ = system.send(.pressed(Self.onTitleBar))
-        #expect(system.send(.dragged(Self.further)))
     }
 
     @Test func aClickShowsNoPanelAndMovesNothing() {

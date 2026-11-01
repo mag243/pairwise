@@ -15,6 +15,4 @@ public enum WindowSystemError: Error, Equatable, Sendable {
     case screenRecordingDenied
     /// The system gave no picture of the window.
     case captureFailed
-    /// There is no window to follow the dragged one.
-    case noPartner
 }

@@ -9,7 +9,6 @@ import Testing
 @Suite struct AccessibilityWindowSystemTests {
     private static let rect = CGRect(x: 100, y: 100, width: 300, height: 200)
     private static let onWindow = ScreenPoint(x: 150, y: 110)
-    private static let finder = "com.apple.finder"
     private static let windowFrame = WindowFrame(x: 100, y: 100, width: 300, height: 200)
 
     private let access = FakeSystemAccess()
@@ -60,50 +59,6 @@ import Testing
         #expect(window.serverFrame() == WindowFrame(x: 100, y: 100, width: 300, height: 200))
     }
 
-    @Test func thePartnerIsAWindowOfTheChosenApp() throws {
-        let element = addWindow()
-        access.bundleProcesses[Self.finder] = [5]
-        let dragged = FakeElement.window(frame: Self.rect)
-        let window = AccessibilityWindow(element: dragged, access: access)
-        let partner = try #require(try system.partner(for: window) as? AccessibilityWindow)
-        #expect(partner.element.isSame(as: element))
-    }
-
-    @Test func thePartnerIsNotTheDraggedWindow() {
-        let element = addWindow()
-        access.bundleProcesses[Self.finder] = [5]
-        let window = AccessibilityWindow(element: element, access: access)
-        #expect(throws: WindowSystemError.noPartner) { try system.partner(for: window) }
-    }
-
-    @Test func aMinimizedWindowIsNoPartner() {
-        let element = addWindow()
-        element.attributes[kAXMinimizedAttribute] = kCFBooleanTrue
-        access.bundleProcesses[Self.finder] = [5]
-        let window = AccessibilityWindow(element: FakeElement(), access: access)
-        #expect(throws: WindowSystemError.noPartner) { try system.partner(for: window) }
-    }
-
-    @Test func anAppThatIsNotRunningGivesNoPartner() {
-        let window = AccessibilityWindow(element: FakeElement(), access: access)
-        #expect(throws: WindowSystemError.noPartner) { try system.partner(for: window) }
-    }
-
-    @Test func aPinnedPartnerGoesFirst() throws {
-        let pinned = AccessibilityWindow(element: FakeElement(), access: access)
-        system.pinnedPartner = pinned
-        let window = AccessibilityWindow(element: FakeElement(), access: access)
-        #expect(try system.partner(for: window) === pinned)
-    }
-
-    @Test func thePartnerAppsAreInOrderOfName() {
-        access.runningApps = [
-            PartnerApp(bundleIdentifier: "b", name: "Zed"),
-            PartnerApp(bundleIdentifier: "a", name: "Arc"),
-        ]
-        #expect(system.partnerApps.map(\.name) == ["Arc", "Zed"])
-    }
-
     @Test func ticksCanStartAndStop() {
         system.startTicking(every: 1) {}
         system.stopTicking()
@@ -145,6 +100,16 @@ import Testing
             }
         }
         #expect(failed)
+    }
+
+    @Test func theNumberAtAPointAsksNoApp() {
+        addWindow()
+        access.apps[5] = nil
+        #expect(system.windowNumber(at: Self.onWindow) == 7)
+    }
+
+    @Test func nothingAtAPointHasNoNumber() {
+        #expect(system.windowNumber(at: Self.onWindow) == nil)
     }
 
     @Test func parkingIsPastAllDisplays() {

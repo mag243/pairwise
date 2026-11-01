@@ -38,3 +38,4 @@ Use `0000-template.md` as the basis.
 | 0030 | Moving a window without its animation | Accepted |
 | 0031 | A seam around the system calls | Accepted |
 | 0032 | Taking over once the window has moved | Accepted |
+| 0033 | Pairs as a model | Accepted |

@@ -54,11 +54,6 @@ struct MainView: View {
                 Text("Without it, windows move one at a time.")
                     .foregroundStyle(.secondary)
             }
-            Picker("Partner app", selection: partnerApp) {
-                ForEach(model.partnerApps) { app in
-                    Text(verbatim: app.name).tag(app.bundleIdentifier)
-                }
-            }
             Picker("Live pictures", selection: liveFrames) {
                 Text("Still").tag(0)
                 ForEach(Self.frameRates, id: \.self) { rate in
@@ -69,7 +64,7 @@ struct MainView: View {
                 if model.isRunning { model.stop() } else { model.start() }
             }
             .disabled(!model.isAccessibilityGranted || !model.isScreenRecordingGranted)
-            Text("Drag a window by its title bar: it and the partner move as one.")
+            Text("Windows in a pair move as one when you drag them.")
                 .foregroundStyle(.secondary)
             if let problem = model.problem {
                 Text(problem.message).foregroundStyle(.red)
@@ -82,14 +77,6 @@ struct MainView: View {
             model.liveFramesPerSecond
         } set: {
             model.liveFramesPerSecond = $0
-        }
-    }
-
-    private var partnerApp: Binding<String> {
-        Binding {
-            model.partnerBundleIdentifier
-        } set: {
-            model.partnerBundleIdentifier = $0
         }
     }
 

@@ -10,11 +10,7 @@ public final class AccessibilityWindowSystem: WindowSystemProviding {
     private static let logger = Logger(subsystem: "me.m-domain.pairwise", category: "windows")
     private static let defaultLiveFramesPerSecond = 30
 
-    public var partnerBundleIdentifier = "com.apple.finder"
     public var liveFramesPerSecond = AccessibilityWindowSystem.defaultLiveFramesPerSecond
-    /// The window `partner(for:)` gives whatever the app, for the stress test (ADR 0027).
-    var pinnedPartner: AccessibilityWindow?
-
     private let access: any SystemAccess
     private let capture: WindowCapture
     private var holdingTap: HoldingTap?
@@ -36,11 +32,6 @@ public final class AccessibilityWindowSystem: WindowSystemProviding {
 
     public var parkingOrigin: ScreenPoint? {
         PartnerPlacement.parkingOrigin(onDisplays: access.displays())
-    }
-
-    public var partnerApps: [PartnerApp] {
-        access.regularApps()
-            .sorted { $0.name.localizedStandardCompare($1.name) == .orderedAscending }
     }
 
     public var isPrimaryButtonDown: Bool {
@@ -76,6 +67,12 @@ public final class AccessibilityWindowSystem: WindowSystemProviding {
         }
     }
 
+    public func windowNumber(at point: ScreenPoint) -> UInt32? {
+        WindowServer.topWindow(
+            at: point, excludingProcess: access.ownProcess, in: access.onScreenWindows()
+        )?.number
+    }
+
     public func window(at point: ScreenPoint) -> (any MovableWindow)? {
         guard
             let top = WindowServer.topWindow(
@@ -97,27 +94,6 @@ public final class AccessibilityWindowSystem: WindowSystemProviding {
         }
         return AccessibilityWindow(
             element: elements[index], serverWindowNumber: top.number, access: access)
-    }
-
-    public func partner(
-        for window: any MovableWindow
-    ) throws(WindowSystemError) -> any MovableWindow {
-        if let pinnedPartner { return pinnedPartner }
-        let dragged = (window as? AccessibilityWindow)?.element
-        guard let process = access.processes(bundleIdentifier: partnerBundleIdentifier).first
-        else { throw .noPartner }
-        let app = access.application(process)
-        app.limitMessagingTime()
-        let partner = app.elements(of: kAXWindowsAttribute).first { candidate in
-            Self.canFollow(candidate) && dragged.map { !$0.isSame(as: candidate) } ?? true
-        }
-        guard let partner else { throw .noPartner }
-        return AccessibilityWindow(element: partner, access: access)
-    }
-
-    private static func canFollow(_ window: any AccessibilityElement) -> Bool {
-        window.attribute(kAXSubroleAttribute) as? String == kAXStandardWindowSubrole
-            && window.attribute(kAXMinimizedAttribute) as? Bool != true
     }
 
     public func startHoldingDrags(

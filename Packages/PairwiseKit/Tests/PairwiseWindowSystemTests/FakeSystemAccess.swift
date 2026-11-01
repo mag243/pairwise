@@ -74,8 +74,6 @@ final class FakeElement: AccessibilityElement {
 final class FakeSystemAccess: SystemAccess {
     var apps: [pid_t: FakeElement] = [:]
     var windows: [[String: Any]] = []
-    var bundleProcesses: [String: [pid_t]] = [:]
-    var runningApps: [PartnerApp] = []
     var displayFrames: [WindowFrame] = []
     var ownProcess: pid_t = 99
 
@@ -92,14 +90,6 @@ final class FakeSystemAccess: SystemAccess {
 
     func windowDescription(_ number: CGWindowID) -> [String: Any]? {
         windows.first { $0[kCGWindowNumber as String] as? CGWindowID == number }
-    }
-
-    func processes(bundleIdentifier: String) -> [pid_t] {
-        bundleProcesses[bundleIdentifier] ?? []
-    }
-
-    func regularApps() -> [PartnerApp] {
-        runningApps
     }
 
     func displays() -> [WindowFrame] {

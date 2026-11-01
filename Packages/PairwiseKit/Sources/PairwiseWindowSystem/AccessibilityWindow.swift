@@ -6,6 +6,7 @@ import PairwiseCore
 @MainActor
 final class AccessibilityWindow: MovableWindow {
     private static let enhancedInterfaceAttribute = "AXEnhancedUserInterface"
+    private static let fullScreenAttribute = "AXFullScreen"
 
     let element: any AccessibilityElement
     private let access: any SystemAccess
@@ -71,6 +72,17 @@ final class AccessibilityWindow: MovableWindow {
         guard app.attribute(name) as? Bool == true else { return {} }
         _ = app.setAttribute(name, to: kCFBooleanFalse)
         return { _ = app.setAttribute(name, to: kCFBooleanTrue) }
+    }
+
+    var windowNumber: UInt32? {
+        _ = serverFrame()
+        return serverWindowNumber
+    }
+
+    var isAvailable: Bool {
+        guard (try? frame()) != nil else { return false }
+        return element.attribute(kAXMinimizedAttribute) as? Bool != true
+            && element.attribute(Self.fullScreenAttribute) as? Bool != true
     }
 
     func raise() throws(WindowSystemError) {

@@ -18,21 +18,6 @@ struct LiveSystemAccess: SystemAccess {
         return list?.first
     }
 
-    func processes(bundleIdentifier: String) -> [pid_t] {
-        NSRunningApplication.runningApplications(withBundleIdentifier: bundleIdentifier)
-            .map(\.processIdentifier)
-    }
-
-    func regularApps() -> [PartnerApp] {
-        NSWorkspace.shared.runningApplications
-            .filter { $0.activationPolicy == .regular && $0 != .current }
-            .compactMap { app in
-                guard let identifier = app.bundleIdentifier else { return nil }
-                return PartnerApp(
-                    bundleIdentifier: identifier, name: app.localizedName ?? identifier)
-            }
-    }
-
     func displays() -> [WindowFrame] {
         NSScreen.globalFrames(of: NSScreen.screens.map(\.frame))
     }
