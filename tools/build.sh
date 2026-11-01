@@ -232,9 +232,14 @@ cmd_run() {
   local app
   app="$(find "$DERIVED_DATA/Build/Products/Debug" -maxdepth 1 -name "$APP_NAME.app" -print -quit 2>/dev/null)"
   [[ -n "$app" ]] || fail "No $APP_NAME.app in build/DerivedData/Build/Products/Debug"
-  local exe; exe="$app/Contents/MacOS/$(defaults read "$app/Contents/Info" CFBundleExecutable)"
+  # open only brings a running copy forward, which would hide the build just made.
+  if pgrep -x "$APP_NAME" >/dev/null; then
+    fail "$APP_NAME is already running. Quit it, then run this again."
+  fi
   info "Starting ${app#"$ROOT_DIR"/}"
-  "$exe" "$@"
+  # Launch Services makes the app responsible for itself. Started from the shell,
+  # macOS asks for permissions on behalf of the terminal instead (ADR 0012).
+  open -W "$app" --args "$@"
 }
 
 cmd_clean() {
