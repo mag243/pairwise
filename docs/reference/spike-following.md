@@ -19,4 +19,6 @@ Measured on 2026-11-01. The partner is a Finder window, and the dragged windows 
 
 **Does the permission survive a rebuild?** Not settled.
 
-**Verdict:** not given yet.
+**By hand:** the Finder window moves along with the dragged window, and it visibly lags behind.
+
+**Verdict:** not smooth enough. On to M2, the stand-in while dragging.
