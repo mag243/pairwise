@@ -60,6 +60,8 @@ Following the window server's place (ADR 0018), moves per second is how often th
 
 **By hand, following the window server:** the stand-in and the window move together, with a small delay. The owner saw that the pointer moves first and the window follows shortly after. ADR 0019 answers this.
 
+**By hand, looking ahead:** 4 to 8 ms looks best, and a visible effect remains.
+
 **Is the real partner out of sight during the drag?** Not answered yet.
 
 **Verdict:** not given yet.

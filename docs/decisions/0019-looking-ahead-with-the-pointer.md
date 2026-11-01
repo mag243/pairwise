@@ -12,7 +12,7 @@ Following the pointer's place itself failed: when the window slips from the poin
 ## Decision
 The stand-in goes to the window server's place of the dragged window, plus how far the pointer moved in the last moments. When the pointer rests, this adds nothing, so the stand-in comes to rest exactly beside the window. When the window hangs while the pointer moves, the stand-in is ahead by at most the pointer's movement in that short time, and it does not run away.
 
-In the spike the time looked ahead is set in the app's window, in steps of 4 ms, so the owner can find the right value by eye; it starts at one frame at 60 Hz, 16 ms. The log holds the value of each drag. Only a stand-in looks ahead: a partner moving as itself lags far more, for another reason (ADR 0013).
+In the spike the time looked ahead is set in the app's window, in steps of 4 ms, so the owner can find the right value by eye. By hand, 4 to 8 ms looks best, so it starts at 8 ms. The log holds the value of each drag. Only a stand-in looks ahead: a partner moving as itself lags far more, for another reason (ADR 0013).
 
 ## Alternatives
 - **Extending the window's own recent movement:** needs no pointer, but reacts later, and overshoots when the window stops.

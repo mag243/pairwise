@@ -18,7 +18,7 @@ public final class FollowModel {
     static let logger = Logger(subsystem: "me.m-domain.pairwise", category: "follow")
 
     /// How far ahead a stand-in looks with the pointer's movement, in seconds (ADR 0019).
-    public var standInLookAhead: TimeInterval = 1.0 / 60
+    public var standInLookAhead: TimeInterval = 0.008
 
     public private(set) var isAccessibilityGranted: Bool
     public private(set) var isScreenRecordingGranted: Bool
