@@ -108,7 +108,7 @@ In step with the display (ADR 0021), with and without prediction:
 
 **By hand, predicting:** no positive effect, at any look-ahead tried. ADR 0022 drops it.
 
-**By hand, holding back a drag (ADR 0023):** while the test runs, windows cannot be dragged by their title bars, so withholding drag events stops a window drag. Clicks and the numbers are still to be confirmed.
+**By hand, holding back a drag (ADR 0023):** while the test runs, windows cannot be dragged by their title bars, so withholding drag events stops a window drag. Clicks keep working.
 
 **Is the real partner out of sight during the drag?** Not answered yet.
 

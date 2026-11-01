@@ -17,11 +17,21 @@ import Testing
         #expect(DragHoldRule.isInTitleBand(point, of: Self.frame) == expected)
     }
 
-    @Test func aDragMayBeHeldForAShortTime() {
-        #expect(DragHoldRule.mayHold(after: 4.9))
+    @Test func aSmallMoveIsNotADrag() {
+        let press = ScreenPoint(x: 10, y: 10)
+        #expect(!DragHoldRule.isDrag(from: press, to: ScreenPoint(x: 12, y: 10)))
     }
 
-    @Test func aLongDragIsLetGo() {
-        #expect(!DragHoldRule.mayHold(after: 5))
+    @Test func aMoveOfThreePointsIsADrag() {
+        let press = ScreenPoint(x: 10, y: 10)
+        #expect(DragHoldRule.isDrag(from: press, to: ScreenPoint(x: 13, y: 10)))
+    }
+
+    @Test func picturesMayTakeAShortTime() {
+        #expect(DragHoldRule.mayWaitForPictures(after: 0.9))
+    }
+
+    @Test func picturesThatTakeLongAreNotWaitedFor() {
+        #expect(!DragHoldRule.mayWaitForPictures(after: 1))
     }
 }

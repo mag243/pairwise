@@ -1,7 +1,7 @@
 # M2 · The stand-in while dragging
 
 **Goal:** the partner moves with the dragged window without visible lag, through a picture in a window of Pairwise's own.
-**ADRs:** 0014, 0015, 0016, 0018, 0019, 0020, 0022, 0023 (0013 for the following it builds on)
+**ADRs:** 0014, 0015, 0016, 0018, 0019, 0020, 0022, 0023, 0024 (0013 for the following it builds on)
 
 Not in this milestone: joining, the shared seam, coming apart, choosing a partner, restoring. Those are M3.
 
@@ -12,6 +12,7 @@ Not in this milestone: joining, the shared seam, coming apart, choosing a partne
 - [x] `PairwiseWindowSystem`: the capture and the panel; ScreenCaptureKit confined there by `tools/check_dependencies.sh`.
 - [x] The app: the Screen Recording status and button, the new measurement; `nl` and `de` in the catalog.
 - [x] A test of whether a window drag can be held back (ADR 0023).
+- [x] One window of Pairwise's own while dragging, as a mode beside the stand-in (ADR 0024).
 
 ## Acceptance criteria
 - [x] `tools/build.sh verify` is green.

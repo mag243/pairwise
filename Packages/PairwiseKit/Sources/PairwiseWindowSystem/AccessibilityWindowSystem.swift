@@ -37,6 +37,10 @@ public final class AccessibilityWindowSystem: WindowSystemProviding {
             .sorted { $0.name.localizedStandardCompare($1.name) == .orderedAscending }
     }
 
+    public var isPrimaryButtonDown: Bool {
+        CGEventSource.buttonState(.combinedSessionState, button: .left)
+    }
+
     public var pointerLocation: ScreenPoint? {
         CGEvent(source: nil).map { ScreenPoint($0.location) }
     }
@@ -61,7 +65,23 @@ public final class AccessibilityWindowSystem: WindowSystemProviding {
                 completion(.failure(.captureFailed))
                 return
             }
-            completion(await WindowCapture.standIn(of: window))
+            completion(await WindowCapture.standIn(of: [window]))
+        }
+    }
+
+    public func makePairStandIn(
+        of first: any MovableWindow, beside second: any MovableWindow,
+        completion: @escaping @MainActor (Result<any WindowStandIn, WindowSystemError>) -> Void
+    ) {
+        Task { @MainActor in
+            guard
+                let first = first as? AccessibilityWindow,
+                let second = second as? AccessibilityWindow
+            else {
+                completion(.failure(.captureFailed))
+                return
+            }
+            completion(await WindowCapture.standIn(of: [first, second]))
         }
     }
 

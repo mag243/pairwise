@@ -12,12 +12,12 @@ struct FollowView: View {
     private static let lookAheadStep = 4
 
     let model: FollowModel
-    let dragTest: DragHoldTest
+    let pairDrag: PairDragModel
 
     var body: some View {
         Form {
             controls
-            DragTestSection(test: dragTest, isFollowing: model.isWatching)
+            PairDragSection(model: pairDrag, isFollowing: model.isWatching)
             Section("Last drag") {
                 if let report = model.lastDrag {
                     measurements(of: report)
@@ -37,7 +37,7 @@ struct FollowView: View {
             NotificationCenter.default.publisher(for: NSApplication.willTerminateNotification)
         ) { _ in
             model.stop()
-            dragTest.stop()
+            pairDrag.stop()
         }
     }
 
@@ -72,11 +72,11 @@ struct FollowView: View {
             Button(model.isWatching ? "Stop" : "Start") {
                 if model.isWatching { model.stop() } else { model.start() }
             }
-            .disabled(!model.isAccessibilityGranted || dragTest.isRunning)
+            .disabled(!model.isAccessibilityGranted || pairDrag.isRunning)
             Text("Drag any window by its title bar: a window of the partner app follows beside it.")
                 .foregroundStyle(.secondary)
             if let problem = model.problem {
-                Text(Self.text(for: problem)).foregroundStyle(.red)
+                Text(problem.message).foregroundStyle(.red)
             }
         }
     }
@@ -127,19 +127,6 @@ struct FollowView: View {
         LabeledContent(label) {
             Text(value, format: .number.precision(.fractionLength(Self.fractionDigits)))
                 .monospacedDigit()
-        }
-    }
-
-    private static func text(for problem: WindowSystemError) -> LocalizedStringKey {
-        switch problem {
-        case .accessibilityDenied: "Pairwise has no Accessibility access."
-        case .eventTapUnavailable:
-            "The pointer cannot be watched. Quit and reopen Pairwise after granting access."
-        case .captureFailed: "No picture of the partner: it follows by itself."
-        case .windowGone: "The window has gone."
-        case .windowRefused: "The window refuses to move."
-        case .windowBusy: "The window's app does not answer."
-        case .noPartner: "No window of the partner app to follow: open one."
         }
     }
 }

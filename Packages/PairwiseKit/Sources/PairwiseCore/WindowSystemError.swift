@@ -11,6 +11,8 @@ public enum WindowSystemError: Error, Equatable, Sendable {
     case windowRefused
     /// The window's app did not answer in time; a later try may work.
     case windowBusy
+    /// Pairwise does not have the Screen Recording permission.
+    case screenRecordingDenied
     /// The system gave no picture of the window.
     case captureFailed
     /// There is no window to follow the dragged one.

@@ -7,17 +7,17 @@ import SwiftUI
 @main
 struct PairwiseMacApp: App {
     @State private var model: FollowModel
-    @State private var dragTest: DragHoldTest
+    @State private var pairDrag: PairDragModel
 
     init() {
         let system = AccessibilityWindowSystem()
         _model = State(initialValue: FollowModel(system: system))
-        _dragTest = State(initialValue: DragHoldTest(system: system))
+        _pairDrag = State(initialValue: PairDragModel(system: system))
     }
 
     var body: some Scene {
         WindowGroup("Pairwise") {
-            FollowView(model: model, dragTest: dragTest)
+            FollowView(model: model, pairDrag: pairDrag)
         }
     }
 }

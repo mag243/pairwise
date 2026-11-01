@@ -18,6 +18,9 @@ public protocol WindowSystemProviding: AnyObject {
     /// The bundle identifier of the app that `partner(for:)` takes a window from.
     var partnerBundleIdentifier: String { get set }
 
+    /// Whether the left mouse button is down now, asked of the system and not of an event.
+    var isPrimaryButtonDown: Bool { get }
+
     /// The pointer's location now, or `nil` when the system does not tell.
     var pointerLocation: ScreenPoint? { get }
 
@@ -34,6 +37,13 @@ public protocol WindowSystemProviding: AnyObject {
     /// never during this call. The system takes a moment to give a picture.
     func makeStandIn(
         of window: any MovableWindow,
+        completion: @escaping @MainActor (Result<any WindowStandIn, WindowSystemError>) -> Void
+    )
+
+    /// Makes one stand-in of `first` and `second` side by side, tops level, not yet shown.
+    /// Its origin is that of `first`. Calls `completion` later, never during this call.
+    func makePairStandIn(
+        of first: any MovableWindow, beside second: any MovableWindow,
         completion: @escaping @MainActor (Result<any WindowStandIn, WindowSystemError>) -> Void
     )
 

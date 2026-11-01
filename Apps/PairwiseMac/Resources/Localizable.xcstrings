@@ -35,6 +35,23 @@
         }
       }
     },
+    "Drag a window by its title bar: it and the partner move as one picture." : {
+      "comment" : "How to try moving as one",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ziehe ein Fenster an der Titelleiste: Es und der Partner bewegen sich als ein Bild."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sleep een venster aan de titelbalk: het en de partner bewegen als één beeld."
+          }
+        }
+      }
+    },
     "Drag any window by its title bar: a window of the partner app follows beside it." : {
       "comment" : "How to try the spike",
       "localizations" : {
@@ -48,40 +65,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sleep een willekeurig venster aan de titelbalk: een venster van de partner-app volgt ernaast."
-          }
-        }
-      }
-    },
-    "Drag test" : {
-      "comment" : "Section: the test of holding back window drags",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ziehtest"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sleeptest"
-          }
-        }
-      }
-    },
-    "Drags held back" : {
-      "comment" : "Measurement: drag events withheld in the drag test",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zurückgehaltene Ziehbewegungen"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sleepbewegingen tegengehouden"
           }
         }
       }
@@ -235,6 +218,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Meeste punten achter"
+          }
+        }
+      }
+    },
+    "Move as one" : {
+      "comment" : "Section: moving a window and its partner as one window",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Als eines bewegen"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Als één bewegen"
           }
         }
       }
@@ -396,6 +396,23 @@
         }
       }
     },
+    "Pairwise has no Screen Recording access." : {
+      "comment" : "The Screen Recording permission is missing",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pairwise hat keinen Zugriff auf die Bildschirmaufnahme."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pairwise heeft geen toegang tot Schermopname."
+          }
+        }
+      }
+    },
     "Partner app" : {
       "comment" : "Setting: the app that gives the window following the dragged one",
       "localizations" : {
@@ -409,23 +426,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Partner-app"
-          }
-        }
-      }
-    },
-    "Pointer moved (points)" : {
-      "comment" : "Measurement: how far the pointer moved in the drag test",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zeiger bewegt (Punkte)"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Muis bewogen (punten)"
           }
         }
       }
@@ -481,19 +481,19 @@
         }
       }
     },
-    "Start test" : {
-      "comment" : "Button: starts the drag test",
+    "Start moving as one" : {
+      "comment" : "Button: starts moving windows as one",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Test starten"
+            "value" : "Bewegen als eines starten"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Test starten"
+            "value" : "Als één bewegen starten"
           }
         }
       }
@@ -515,19 +515,19 @@
         }
       }
     },
-    "Stop test" : {
-      "comment" : "Button: stops the drag test",
+    "Stop moving as one" : {
+      "comment" : "Button: stops moving windows as one",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Test beenden"
+            "value" : "Bewegen als eines beenden"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Test stoppen"
+            "value" : "Als één bewegen stoppen"
           }
         }
       }
@@ -596,40 +596,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "De app van het venster reageert niet."
-          }
-        }
-      }
-    },
-    "While the test runs, title bars of other apps' windows should not drag. Clicks should still work." : {
-      "comment" : "What the drag test should show",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Während des Tests sollten sich Titelleisten von Fenstern anderer Apps nicht ziehen lassen. Klicks sollten weiter funktionieren."
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tijdens de test horen titelbalken van vensters van andere apps niet te slepen. Klikken hoort te blijven werken."
-          }
-        }
-      }
-    },
-    "Window moved (points)" : {
-      "comment" : "Measurement: how far the window moved in the drag test",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fenster bewegt (Punkte)"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Venster bewogen (punten)"
           }
         }
       }

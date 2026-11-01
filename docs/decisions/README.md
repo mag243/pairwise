@@ -29,3 +29,4 @@ Use `0000-template.md` as the basis.
 | 0021 | Predicting the stand-in, in step with the display | Superseded by 0022 |
 | 0022 | No prediction for the stand-in | Accepted |
 | 0023 | Testing whether a window drag can be held back | Accepted |
+| 0024 | One window of Pairwise's own while dragging | Accepted |

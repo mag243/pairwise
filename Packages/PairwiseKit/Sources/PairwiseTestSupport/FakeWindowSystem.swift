@@ -17,6 +17,7 @@ public final class FakeWindowSystem: WindowSystemProviding {
     /// When set, `startWatchingPointer` throws this.
     public var watchError: WindowSystemError?
     public var partnerApps: [PartnerApp] = []
+    public var isPrimaryButtonDown = true
     public var partnerBundleIdentifier = "com.apple.finder"
     public private(set) var accessibilityRequests = 0
     public private(set) var screenRecordingRequests = 0
@@ -43,6 +44,14 @@ public final class FakeWindowSystem: WindowSystemProviding {
 
     public func makeStandIn(
         of window: any MovableWindow,
+        completion: @escaping @MainActor (Result<any WindowStandIn, WindowSystemError>) -> Void
+    ) {
+        standInRequests += 1
+        standInCompletion = completion
+    }
+
+    public func makePairStandIn(
+        of first: any MovableWindow, beside second: any MovableWindow,
         completion: @escaping @MainActor (Result<any WindowStandIn, WindowSystemError>) -> Void
     ) {
         standInRequests += 1

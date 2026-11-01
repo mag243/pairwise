@@ -13,6 +13,8 @@ The owner asked for a pair that macOS moves as one. macOS offers that only withi
 - It fails open. After 5 seconds of one drag the events pass again, an unknown window means everything passes, the tap lives only while the test runs, and the system turns off an active tap that is too slow.
 - The report per drag says how far the pointer and the window moved, and how many events were held back. A window that stays put while the pointer travels means the idea can go on.
 
+**Outcome:** while the test ran, windows could not be dragged by their title bars, and clicks kept working (by hand, not yet with the numbers). The test is replaced by ADR 0024.
+
 ## Alternatives
 - **Building the one-window drag first:** much work resting on an untried assumption.
 - **Withholding the press as well:** would block clicks until a drag is told from a click. Kept for if withholding drags alone is not enough.
