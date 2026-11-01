@@ -52,6 +52,40 @@
         }
       }
     },
+    "Drag test" : {
+      "comment" : "Section: the test of holding back window drags",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ziehtest"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sleeptest"
+          }
+        }
+      }
+    },
+    "Drags held back" : {
+      "comment" : "Measurement: drag events withheld in the drag test",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zurückgehaltene Ziehbewegungen"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sleepbewegingen tegengehouden"
+          }
+        }
+      }
+    },
     "Grant Access…" : {
       "comment" : "Button that opens the system's permission prompt",
       "localizations" : {
@@ -379,6 +413,23 @@
         }
       }
     },
+    "Pointer moved (points)" : {
+      "comment" : "Measurement: how far the pointer moved in the drag test",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zeiger bewegt (Punkte)"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Muis bewogen (punten)"
+          }
+        }
+      }
+    },
     "Screen Recording" : {
       "comment" : "The system permission the stand-in needs",
       "localizations" : {
@@ -430,6 +481,23 @@
         }
       }
     },
+    "Start test" : {
+      "comment" : "Button: starts the drag test",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Test starten"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Test starten"
+          }
+        }
+      }
+    },
     "Stop" : {
       "comment" : "Button that stops following drags",
       "localizations" : {
@@ -443,6 +511,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Stop"
+          }
+        }
+      }
+    },
+    "Stop test" : {
+      "comment" : "Button: stops the drag test",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Test beenden"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Test stoppen"
           }
         }
       }
@@ -511,6 +596,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "De app van het venster reageert niet."
+          }
+        }
+      }
+    },
+    "While the test runs, title bars of other apps' windows should not drag. Clicks should still work." : {
+      "comment" : "What the drag test should show",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Während des Tests sollten sich Titelleisten von Fenstern anderer Apps nicht ziehen lassen. Klicks sollten weiter funktionieren."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tijdens de test horen titelbalken van vensters van andere apps niet te slepen. Klikken hoort te blijven werken."
+          }
+        }
+      }
+    },
+    "Window moved (points)" : {
+      "comment" : "Measurement: how far the window moved in the drag test",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fenster bewegt (Punkte)"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Venster bewogen (punten)"
           }
         }
       }

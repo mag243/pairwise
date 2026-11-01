@@ -23,6 +23,7 @@ public final class FakeWindowSystem: WindowSystemProviding {
     public private(set) var standInRequests = 0
 
     private var pointerHandler: (@MainActor (PointerButtonEvent) -> Void)?
+    private var holdDecision: (@MainActor (PointerButtonEvent) -> Bool)?
     private var tickHandler: (@MainActor () -> Void)?
     private var standInCompletion:
         (@MainActor (Result<any WindowStandIn, WindowSystemError>) -> Void)?
@@ -68,6 +69,24 @@ public final class FakeWindowSystem: WindowSystemProviding {
 
     public func stopWatchingPointer() {
         pointerHandler = nil
+    }
+
+    public func startHoldingDrags(
+        _ decide: @escaping @MainActor (PointerButtonEvent) -> Bool
+    ) throws(WindowSystemError) {
+        if let watchError { throw watchError }
+        holdDecision = decide
+    }
+
+    public func stopHoldingDrags() {
+        holdDecision = nil
+    }
+
+    public var isHolding: Bool { holdDecision != nil }
+
+    /// Sends `event` through the hold, with the pointer there, and returns whether it passes.
+    public func send(_ event: PointerButtonEvent) -> Bool {
+        holdDecision?(event) ?? true
     }
 
     public func startTicking(

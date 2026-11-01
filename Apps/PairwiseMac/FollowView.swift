@@ -12,10 +12,12 @@ struct FollowView: View {
     private static let lookAheadStep = 4
 
     let model: FollowModel
+    let dragTest: DragHoldTest
 
     var body: some View {
         Form {
             controls
+            DragTestSection(test: dragTest, isFollowing: model.isWatching)
             Section("Last drag") {
                 if let report = model.lastDrag {
                     measurements(of: report)
@@ -35,6 +37,7 @@ struct FollowView: View {
             NotificationCenter.default.publisher(for: NSApplication.willTerminateNotification)
         ) { _ in
             model.stop()
+            dragTest.stop()
         }
     }
 
@@ -69,7 +72,7 @@ struct FollowView: View {
             Button(model.isWatching ? "Stop" : "Start") {
                 if model.isWatching { model.stop() } else { model.start() }
             }
-            .disabled(!model.isAccessibilityGranted)
+            .disabled(!model.isAccessibilityGranted || dragTest.isRunning)
             Text("Drag any window by its title bar: a window of the partner app follows beside it.")
                 .foregroundStyle(.secondary)
             if let problem = model.problem {

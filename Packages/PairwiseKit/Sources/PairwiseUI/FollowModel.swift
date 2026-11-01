@@ -102,6 +102,7 @@ public final class FollowModel {
         switch event {
         case .pressed(let point): press(at: point)
         case .released: release()
+        case .dragged: break
         }
     }
 

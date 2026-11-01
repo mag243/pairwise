@@ -10,6 +10,7 @@ public final class AccessibilityWindowSystem: WindowSystemProviding {
 
     private let systemWide = AXUIElementCreateSystemWide()
     private var tap: PointerTap?
+    private var holdingTap: HoldingTap?
     private var ticker: DisplayTicker?
     private var timer: Timer?
 
@@ -110,6 +111,20 @@ public final class AccessibilityWindowSystem: WindowSystemProviding {
     public func stopWatchingPointer() {
         tap?.stop()
         tap = nil
+    }
+
+    public func startHoldingDrags(
+        _ decide: @escaping @MainActor (PointerButtonEvent) -> Bool
+    ) throws(WindowSystemError) {
+        stopHoldingDrags()
+        let tap = HoldingTap(decide: decide)
+        try tap.start()
+        holdingTap = tap
+    }
+
+    public func stopHoldingDrags() {
+        holdingTap?.stop()
+        holdingTap = nil
     }
 
     public func startTicking(

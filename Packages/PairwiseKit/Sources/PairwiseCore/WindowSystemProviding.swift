@@ -53,6 +53,16 @@ public protocol WindowSystemProviding: AnyObject {
     /// Ends the watch; no call to the handler follows.
     func stopWatchingPointer()
 
+    /// Asks `decide` about each press, drag and release of the left mouse button; an event
+    /// it answers `false` for does not reach any app. Input passes when this fails.
+    /// Postcondition: an earlier hold has ended.
+    func startHoldingDrags(
+        _ decide: @escaping @MainActor (PointerButtonEvent) -> Bool
+    ) throws(WindowSystemError)
+
+    /// Ends the hold; all input passes.
+    func stopHoldingDrags()
+
     /// Calls `handler` once per display frame until `stopTicking`, or every `interval`
     /// seconds when the display cannot say.
     /// Postcondition: earlier ticking has ended.
