@@ -61,6 +61,15 @@ import Testing
         #expect(panel.shownAt == nil)
     }
 
+    @Test func thePanelGoesWhereThePointerTookTheWindowEvenIfItLagsBehind() {
+        _ = system.send(.pressed(Self.onTitleBar))
+        system.finishStandIn(with: .success(panel))
+        _ = system.send(.dragged(Self.further))
+        window.currentFrame.origin = ScreenPoint(x: 101, y: 100)
+        system.tick()
+        #expect(panel.shownAt == Self.moved)
+    }
+
     @Test func aMovedWindowIsHeldUntilThePictureComes() {
         _ = system.send(.pressed(Self.onTitleBar))
         dragAsMacOS()

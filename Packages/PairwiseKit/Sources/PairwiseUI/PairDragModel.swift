@@ -189,8 +189,6 @@ public final class PairDragModel {
         } else if DragHoldRule.isMove(from: pressed.frame, to: now) {
             var moved = pressed
             moved.hasWindowMoved = true
-            moved.frame = now
-            moved.pointer = pressed.lastPointer
             drag = .pressed(moved)
             if let standIn = moved.standIn { takeOver(moved, standIn: standIn) }
         }

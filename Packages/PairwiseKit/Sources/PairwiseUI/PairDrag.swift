@@ -18,10 +18,11 @@ enum PairDrag {
         let window: any MovableWindow
         let partner: any MovableWindow
         let startTime: TimeInterval
-        /// The window's frame at the press, and once it has moved, at that moment.
-        var frame: WindowFrame
-        /// The pointer's place at the moment of `frame`.
-        var pointer: ScreenPoint
+        /// The window's frame at the press. macOS keeps a window at this distance from the
+        /// pointer, so this and `pointer` tell where it belongs, also while it lags behind.
+        let frame: WindowFrame
+        /// The pointer's place at the press.
+        let pointer: ScreenPoint
         var standIn: (any WindowStandIn)?
         var hasWindowMoved = false
         var lastPointer: ScreenPoint
