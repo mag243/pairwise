@@ -42,6 +42,8 @@ Measured by hand on 2026-11-01 with the stand-in of ADR 0014, with a Finder wind
 
 **By hand, direction:** the owner sees a gap open when dragging toward the stand-in, so it runs ahead of the dragged window. ADR 0017 answers this.
 
+**By hand, third run:** while the gap or overlap grows, the pointer and the stand-in move and the dragged window stands still until it jumps along. Without Pairwise running, the pointer also sometimes shifts against the place where a Terminal window was held. So the place worked out from the pointer and the grip is not always where the window is, which ADR 0013 assumes.
+
 **Is the real partner out of sight during the drag?** Not answered yet.
 
 **Verdict:** not given yet.
