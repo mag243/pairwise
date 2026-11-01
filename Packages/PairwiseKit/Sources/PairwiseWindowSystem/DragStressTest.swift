@@ -76,6 +76,7 @@ public final class DragStressTest {
         }
         leave(dragged)
         lines.append("summary: \(counts.sorted { $0.key < $1.key })")
+        await controlTries(dragged: dragged, partner: partner)
         await liveTries(dragged: dragged)
         close(dragged)
         close(partner)
@@ -112,6 +113,19 @@ public final class DragStressTest {
             "try \(index): before \(before) ms, after \(after) ms: \(result); "
                 + "press: \(pressOutcome())")
         return result
+    }
+
+    /// The same drags with no pair, to tell what macOS does on its own: a drag this short may
+    /// not move a window with or without Pairwise.
+    private func controlTries(
+        dragged: AccessibilityWindow, partner: AccessibilityWindow
+    ) async {
+        var counts: [String: Int] = [:]
+        for index in 0..<Self.tries {
+            let result = await oneTry(index, dragged: dragged, partner: partner)
+            counts[result, default: 0] += 1
+        }
+        lines.append("control without a pair: \(counts.sorted { $0.key < $1.key })")
     }
 
     /// Drags beside a helper window that animates, for long enough to count live frames.
