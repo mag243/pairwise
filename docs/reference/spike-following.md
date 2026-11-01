@@ -127,6 +127,8 @@ With the window list kept and the pictures taken together, over 13 drags: the pi
 
 **By hand, moving as one:** when dragging starts straight after the press, only the held window moves. After a short wait the other window comes along, and then it looks very smooth.
 
+**By hand, moving as one, after taking the pictures faster:** dragging straight after the press now works every time and looks smooth.
+
 **Is the real partner out of sight during the drag?** Not answered yet.
 
 **Verdict:** not given yet.
