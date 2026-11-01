@@ -53,7 +53,8 @@ public protocol WindowSystemProviding: AnyObject {
     /// Ends the watch; no call to the handler follows.
     func stopWatchingPointer()
 
-    /// Calls `handler` every `interval` seconds until `stopTicking`.
+    /// Calls `handler` once per display frame until `stopTicking`, or every `interval`
+    /// seconds when the display cannot say.
     /// Postcondition: earlier ticking has ended.
     func startTicking(every interval: TimeInterval, _ handler: @escaping @MainActor () -> Void)
 

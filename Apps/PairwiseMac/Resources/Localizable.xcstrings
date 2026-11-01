@@ -379,6 +379,23 @@
         }
       }
     },
+    "Predict the picture's movement" : {
+      "comment" : "Switch: move the picture smoothly to a predicted place, or look ahead only",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bewegung des Bildes vorhersagen"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beweging van de foto voorspellen"
+          }
+        }
+      }
+    },
     "Screen Recording" : {
       "comment" : "The system permission the stand-in needs",
       "localizations" : {

@@ -34,6 +34,11 @@ enum FollowDrag {
             return pointer.map(target(forPointer:))
         }
 
+        /// Where the partner belongs beside the dragged window at `frame`.
+        func placeBeside(_ frame: WindowFrame) -> ScreenPoint {
+            PartnerPlacement.origin(besideWindowAt: frame.origin, size: size)
+        }
+
         /// Where the partner belongs for a pointer at `pointer`, without asking any app.
         func target(forPointer pointer: ScreenPoint) -> ScreenPoint {
             PartnerPlacement.origin(
@@ -68,14 +73,15 @@ extension MovableWindow {
 
 extension FollowReport {
     /// Writes the measurements to `logger`; a negative number means it is not known.
-    func log(to logger: Logger, lookAhead: TimeInterval) {
+    func log(to logger: Logger, lookAhead: TimeInterval, predicting: Bool) {
         logger.info(
             """
             drag: \(moves) moves, \(movesPerSecond) per second, \
             mean \(meanMove) s, p95 \(percentile95Move) s, \
             longest \(longestMove) s, \
             behind mean \(meanPointsBehind), most \(mostPointsBehind), \
-            stand-in after \(standInDelay ?? -1) s, slip \(mostSlip ?? -1), looking ahead \(lookAhead) s
+            stand-in after \(standInDelay ?? -1) s, slip \(mostSlip ?? -1), looking ahead \(lookAhead) s, \
+            predicting \(predicting)
             """)
     }
 }

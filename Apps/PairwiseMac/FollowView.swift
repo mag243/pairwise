@@ -61,6 +61,9 @@ struct FollowView: View {
             }
             if model.isScreenRecordingGranted {
                 Toggle("Use a picture of the partner", isOn: usesPicture)
+                if model.usesStandIn {
+                    Toggle("Predict the picture's movement", isOn: predictsPicture)
+                }
             }
             Stepper(
                 value: lookAheadMilliseconds, in: Self.lookAheadRange, step: Self.lookAheadStep
@@ -86,6 +89,14 @@ struct FollowView: View {
             model.partnerBundleIdentifier
         } set: {
             model.partnerBundleIdentifier = $0
+        }
+    }
+
+    private var predictsPicture: Binding<Bool> {
+        Binding {
+            model.predictsStandIn
+        } set: {
+            model.predictsStandIn = $0
         }
     }
 

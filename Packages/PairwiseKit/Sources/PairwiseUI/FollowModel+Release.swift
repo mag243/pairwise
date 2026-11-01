@@ -22,7 +22,9 @@ extension FollowModel {
             elapsed: system.uptime - following.startTime,
             standInDelay: following.standInDelay,
             mostSlip: mostSlip)
-        lastDrag?.log(to: Self.logger, lookAhead: lookAhead(for: following))
+        lastDrag?.log(
+            to: Self.logger, lookAhead: lookAhead(for: following),
+            predicting: following.standIn != nil && predictsStandIn)
         guard let finalTarget = placement else {
             endDrag()
             return

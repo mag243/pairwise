@@ -39,6 +39,7 @@ extension FollowModel {
             let now = system.uptime
             following.standIn = standIn
             following.lastTarget = nil
+            motion = MotionPrediction()
             following.standInDelay = now - following.startTime
             following.startTime = now
             stats = FollowStats()

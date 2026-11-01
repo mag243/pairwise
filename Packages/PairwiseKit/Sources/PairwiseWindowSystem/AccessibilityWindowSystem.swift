@@ -2,7 +2,7 @@ import AppKit
 import ApplicationServices
 import PairwiseCore
 
-/// The real window system: the Accessibility API, a listen-only event tap, a timer and
+/// The real window system: the Accessibility API, a listen-only event tap, display ticks and
 /// ScreenCaptureKit, all on the main actor (ADR 0013, 0014).
 @MainActor
 public final class AccessibilityWindowSystem: WindowSystemProviding {
@@ -10,6 +10,7 @@ public final class AccessibilityWindowSystem: WindowSystemProviding {
 
     private let systemWide = AXUIElementCreateSystemWide()
     private var tap: PointerTap?
+    private var ticker: DisplayTicker?
     private var timer: Timer?
 
     public init() {
@@ -115,6 +116,10 @@ public final class AccessibilityWindowSystem: WindowSystemProviding {
         every interval: TimeInterval, _ handler: @escaping @MainActor () -> Void
     ) {
         stopTicking()
+        if let ticker = DisplayTicker(handler: handler) {
+            self.ticker = ticker
+            return
+        }
         let timer = Timer(timeInterval: interval, repeats: true) { _ in
             // The timer is on the main run loop, added below.
             MainActor.assumeIsolated { handler() }
@@ -125,6 +130,8 @@ public final class AccessibilityWindowSystem: WindowSystemProviding {
     }
 
     public func stopTicking() {
+        ticker?.stop()
+        ticker = nil
         timer?.invalidate()
         timer = nil
     }

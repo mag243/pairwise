@@ -26,3 +26,4 @@ Use `0000-template.md` as the basis.
 | 0018 | Following the window server's place of the dragged window | Accepted |
 | 0019 | Looking ahead with the pointer's movement | Accepted |
 | 0020 | Comparing the stand-in with the real window | Accepted |
+| 0021 | Predicting the stand-in, in step with the display | Accepted |
