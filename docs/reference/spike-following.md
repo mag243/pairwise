@@ -143,6 +143,8 @@ With the window list kept and the pictures taken together, over 13 drags: the pi
 
 **A drag shorter than the first pictures** (the stress test's first try) moved nothing, as its events were held back and no panel came. The windows now go straight to where such a drag ended.
 
+**Live pictures (ADR 0029), by the stress test at 30 frames a second, drags of about a second:** the empty Finder window showed 0 changed frames, and the animated helper window, parked, showed 30 or 31 in each of 5 drags. So this helper goes on drawing while parked. The 40 drags moved both windows every time. A real video in a real app is still to be judged by hand.
+
 **Are the real windows out of sight during the drag?** Yes, by hand.
 
 **By hand, after the panel waits at the release:** the flash is gone.

@@ -14,7 +14,7 @@ Not in this milestone: joining, the shared seam, coming apart, choosing a partne
 - [x] A test of whether a window drag can be held back (ADR 0023).
 - [x] One window of Pairwise's own while dragging (ADR 0024).
 - [x] The other ways of following removed (ADR 0028).
-- [ ] Live pictures while dragging, with a choice of frame rate (ADR 0029).
+- [x] Live pictures while dragging, with a choice of frame rate (ADR 0029).
 
 ## Acceptance criteria
 - [x] `tools/build.sh verify` is green.
