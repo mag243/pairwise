@@ -15,6 +15,8 @@ public final class PairDragModel {
     private static let placingPatience: TimeInterval = 0.5
     /// How long the panel stays over placed windows, for their apps to draw them.
     private static let settleTime: TimeInterval = 0.05
+    /// How long the system may take to report a pressed button as down.
+    private static let buttonReportTime: TimeInterval = 0.25
     private static let logger = Logger(subsystem: "me.m-domain.pairwise", category: "pair-drag")
 
     public private(set) var isRunning = false
@@ -26,6 +28,8 @@ public final class PairDragModel {
     @ObservationIgnored private let system: any WindowSystemProviding
     @ObservationIgnored private var drag = PairDrag.none
     @ObservationIgnored private var stats = FollowStats()
+    @ObservationIgnored private var hasSeenButtonDown = false
+    @ObservationIgnored private var pressTime: TimeInterval = 0
     /// Tells a picture that arrives late from the one this press asked for.
     @ObservationIgnored private var request = 0
 
@@ -79,6 +83,8 @@ public final class PairDragModel {
         endDrag()
         problem = nil
         let before = system.uptime
+        hasSeenButtonDown = false
+        pressTime = before
         let outcome = takeOverPress(at: point)
         let elapsed = system.uptime - before
         Self.logger.info("press: \(outcome, privacy: .public), deciding took \(elapsed) s")
@@ -173,18 +179,28 @@ public final class PairDragModel {
         case .none, .passing:
             break
         case .pressed(let pressed):
-            if !system.isPrimaryButtonDown { release(at: pressed.lastPointer) }
+            if isButtonLetGo { release(at: pressed.lastPointer) }
         case .moving(let moving):
-            if system.isPrimaryButtonDown {
-                park(moving)
-            } else {
+            if isButtonLetGo {
                 release(at: moving.lastPointer)
+            } else {
+                park(moving)
             }
         case .placing(let placing):
             place(placing)
         case .settling(_, let until):
             if system.uptime >= until { endDrag() }
         }
+    }
+
+    /// A release the tap missed. The tap sees a press before the system counts the button
+    /// as down, so up means let go only once it has been down, or after some time.
+    private var isButtonLetGo: Bool {
+        if system.isPrimaryButtonDown {
+            hasSeenButtonDown = true
+            return false
+        }
+        return hasSeenButtonDown || system.uptime - pressTime >= Self.buttonReportTime
     }
 
     private func park(_ moving: PairDrag.Moving) {
@@ -253,6 +269,11 @@ public final class PairDragModel {
         }
     }
 
+}
+
+// MARK: - The end of a drag
+
+extension PairDragModel {
     /// One last try for parked windows, when something other than the release ends a drag.
     private func putWindowsBack() {
         switch drag {

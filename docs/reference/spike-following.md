@@ -135,6 +135,8 @@ With the window list kept and the pictures taken together, over 13 drags: the pi
 
 **From the log after ADR 0026's first version:** every press gave "no window under the pointer", and the partner never followed. That version stopped at the first window of any level. It now looks only at the normal level.
 
+**From the log after the window server's list:** every drag that reached the panel was fine, but some presses show "released with no panel" about 4 ms after the press, with the button still down. The tap sees a press before the system counts the button as down, so the check for a lost release ended those presses, and their drags passed. This matches the owner's report that sometimes only the held window moves. Fixed with a failing test first.
+
 **Is the real partner out of sight during the drag?** Not answered yet.
 
 **Verdict:** not given yet.

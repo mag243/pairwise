@@ -222,6 +222,29 @@ import Testing
         #expect(!system.send(.dragged(Self.onTitleBar)))
     }
 
+    @Test func aButtonNotYetSeenDownDoesNotEndThePress() {
+        system.isPrimaryButtonDown = false
+        _ = system.send(.pressed(Self.onTitleBar))
+        system.tick()
+        #expect(!system.send(.dragged(Self.further)))
+    }
+
+    @Test func aButtonSeenDownAndThenUpEndsThePress() {
+        _ = system.send(.pressed(Self.onTitleBar))
+        system.tick()
+        system.isPrimaryButtonDown = false
+        system.tick()
+        #expect(system.send(.dragged(Self.further)))
+    }
+
+    @Test func aButtonNeverSeenDownEndsThePressInTheEnd() {
+        system.isPrimaryButtonDown = false
+        _ = system.send(.pressed(Self.onTitleBar))
+        system.uptime = 0.3
+        system.tick()
+        #expect(system.send(.dragged(Self.further)))
+    }
+
     @Test func aLostReleaseIsSeenOnATick() {
         startDrag()
         system.tick()
