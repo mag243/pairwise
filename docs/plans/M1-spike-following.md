@@ -18,7 +18,7 @@ Not in this spike: joining, the shared seam, coming apart, choosing a partner, r
 - [x] `tools/build.sh verify` is green.
 - [ ] By hand: the permission stays granted after a rebuild.
 - [ ] By hand: dragging a window moves a Finder window beside it, and the partner ends level beside it after the release.
-- [ ] Measured and written down: at least 60 moves per second on a Finder window, with the duration of a move and the points behind.
+- [x] Measured and written down: at least 60 moves per second on a Finder window, with the duration of a move and the points behind.
 - [ ] The owner's verdict is in `docs/reference/spike-following.md`: smooth enough, or on to M2.
 - [ ] `tools/build.sh ci` is green (when the owner says so, ADR 0011).
 
