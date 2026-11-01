@@ -35,6 +35,7 @@ public final class DragStressTest {
     private let pressOutcome: () -> String
     private let lastLiveFrames: () -> [Int]
     private var lines: [String] = []
+    private var folders: [URL] = []
 
     /// `pressOutcome` says what became of the last press, and `lastLiveFrames` how many
     /// live frames per window the last drag got.
@@ -54,6 +55,7 @@ public final class DragStressTest {
         let start = CGEvent(source: nil)?.location
         defer {
             if let start { post(.mouseMoved, at: start) }
+            for folder in folders { try? FileManager.default.removeItem(at: folder) }
             write()
         }
         guard let (dragged, partner) = await openWindows() else {
@@ -180,9 +182,14 @@ public final class DragStressTest {
 
     private func openWindows() async -> (AccessibilityWindow, AccessibilityWindow)? {
         guard
-            let dragged = await openWindow(named: "PairwiseStressA-\(UUID().uuidString.prefix(8))"),
-            let partner = await openWindow(named: "PairwiseStressB-\(UUID().uuidString.prefix(8))")
+            let dragged = await openWindow(named: "PairwiseStressA-\(UUID().uuidString.prefix(8))")
         else { return nil }
+        guard
+            let partner = await openWindow(named: "PairwiseStressB-\(UUID().uuidString.prefix(8))")
+        else {
+            close(dragged)
+            return nil
+        }
         for window in [dragged, partner] {
             var size = Self.size
             if let value = AXValueCreate(.cgSize, &size) {
@@ -192,26 +199,26 @@ public final class DragStressTest {
         return (dragged, partner)
     }
 
-    /// Opens a new empty folder in Finder and finds its window by its title.
+    /// Opens a new empty folder in Finder and finds its window as the one that was not
+    /// there before; Finder does not always title it after the folder at once.
     private func openWindow(named name: String) async -> AccessibilityWindow? {
         let folder = FileManager.default.temporaryDirectory.appendingPathComponent(name)
         guard
-            (try? FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true))
-                != nil
+            (try? FileManager.default.createDirectory(
+                at: folder, withIntermediateDirectories: true)) != nil,
+            let finder = NSRunningApplication.runningApplications(
+                withBundleIdentifier: "com.apple.finder"
+            ).first
         else { return nil }
+        folders.append(folder)
+        let element = AXUIElementCreateApplication(finder.processIdentifier)
+        let before = element.attribute(kAXWindowsAttribute) as? [AXUIElement] ?? []
         NSWorkspace.shared.open(folder)
         for _ in 0..<Self.windowLookups {
             await wait(Self.windowWait)
-            let apps = NSRunningApplication.runningApplications(
-                withBundleIdentifier: "com.apple.finder")
-            guard let app = apps.first else { continue }
-            let element = AXUIElementCreateApplication(app.processIdentifier)
             let windows = element.attribute(kAXWindowsAttribute) as? [AXUIElement] ?? []
-            if let found = windows.first(where: {
-                $0.attribute(kAXTitleAttribute) as? String == name
-            }) {
-                return AccessibilityWindow(element: found)
-            }
+            let new = windows.first { window in !before.contains { CFEqual($0, window) } }
+            if let new { return AccessibilityWindow(element: new) }
         }
         return nil
     }
