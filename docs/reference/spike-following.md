@@ -42,6 +42,14 @@ Measured by hand on 2026-11-01 with the stand-in of ADR 0014, with a Finder wind
 
 The largest grip offset with a still pointer, in the same order for these last four drags: 84.0, 52.8, 33.5 and 82.6 points. It does not follow the hold-back.
 
+Following the window server's place (ADR 0018), moves per second is how often that place changed, and a move includes reading it:
+
+| Dragged window | Moves | Moves per second | Mean move (ms) | 95th percentile (ms) | Longest move (ms) | Stand-in after (ms) | Most slip (points) |
+|---|---|---|---|---|---|---|---|
+| Not noted | 940 | 54.3 | 2.64 | 5.02 | 18.34 | 2.4 | 49.5 |
+| Not noted | 153 | 60.4 | 1.77 | 5.27 | 11.38 | 4.4 | 35.7 |
+| Not noted | 305 | 56.0 | 2.43 | 6.32 | 12.33 | 1.8 | 22.6 |
+
 **By hand, first run:** a little lag remains, the Finder window sometimes stands a small distance from the dragged window, the swap is not seen, and after the release the Finder window is behind another window. ADR 0015 answers these.
 
 **By hand, second run, on drag events:** less lag, with a short delay at the start of a drag. While dragging, the stand-in sometimes stands a small distance from the dragged window and sometimes overlaps it; after the release the two are tight. ADR 0016 answers these.
