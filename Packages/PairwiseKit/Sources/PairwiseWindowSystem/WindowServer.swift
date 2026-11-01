@@ -16,17 +16,8 @@ enum WindowServer {
         let frame: WindowFrame
     }
 
-    /// The frontmost normal window at `point`, or `nil` when there is none or it is a window
-    /// of `ownProcess`.
-    static func topWindow(at point: ScreenPoint, excludingProcess ownProcess: pid_t)
-        -> OnScreenWindow?
-    {
-        let options: CGWindowListOption = [.optionOnScreenOnly, .excludeDesktopElements]
-        let list = CGWindowListCopyWindowInfo(options, kCGNullWindowID) as? [[String: Any]]
-        return topWindow(at: point, excludingProcess: ownProcess, in: list ?? [])
-    }
-
-    /// As above, from `descriptions` in the window server's order: frontmost first.
+    /// The frontmost normal window at `point` in `descriptions`, which are in the window
+    /// server's order, or `nil` when there is none or it is a window of `ownProcess`.
     static func topWindow(
         at point: ScreenPoint, excludingProcess ownProcess: pid_t, in descriptions: [[String: Any]]
     ) -> OnScreenWindow? {
@@ -43,27 +34,17 @@ enum WindowServer {
         return OnScreenWindow(number: number, processID: processID, frame: frame)
     }
 
-    /// The number of the on-screen window of `processID` that matches `frame`.
-    static func windowNumber(ofProcess processID: pid_t, matching frame: WindowFrame) -> CGWindowID?
-    {
-        let options: CGWindowListOption = [.optionOnScreenOnly, .excludeDesktopElements]
-        guard
-            let list = CGWindowListCopyWindowInfo(options, kCGNullWindowID)
-                as? [[String: Any]]
-        else { return nil }
-        let windows = list.filter { $0[kCGWindowOwnerPID as String] as? pid_t == processID }
+    /// The number of the window of `processID` in `descriptions` that matches `frame`.
+    static func windowNumber(
+        ofProcess processID: pid_t, matching frame: WindowFrame, in descriptions: [[String: Any]]
+    ) -> CGWindowID? {
+        let windows = descriptions.filter { $0[kCGWindowOwnerPID as String] as? pid_t == processID }
         let frames = windows.map {
             Self.frame(from: $0) ?? WindowFrame(x: 0, y: 0, width: 0, height: 0)
         }
         return WindowMatch.index(of: frame, among: frames).flatMap {
             windows[$0][kCGWindowNumber as String] as? CGWindowID
         }
-    }
-
-    /// The window's frame now, or `nil` when it has gone.
-    static func frame(ofWindow number: CGWindowID) -> WindowFrame? {
-        let list = CGWindowListCopyWindowInfo(.optionIncludingWindow, number) as? [[String: Any]]
-        return list?.first.flatMap(frame(from:))
     }
 
     /// The frame in a window's description from the window server.

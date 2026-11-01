@@ -74,4 +74,19 @@ import Testing
             in: [description(number: 1, process: 1, level: 25)])
         #expect(top == nil)
     }
+
+    @Test func aWindowsNumberComesFromItsProcessAndFrame() {
+        let frame = WindowFrame(x: 0, y: 0, width: 100, height: 100)
+        let number = WindowServer.windowNumber(
+            ofProcess: 2, matching: frame,
+            in: [description(number: 1, process: 1), description(number: 2, process: 2)])
+        #expect(number == 2)
+    }
+
+    @Test func noMatchGivesNoNumber() {
+        let frame = WindowFrame(x: 0, y: 0, width: 999, height: 100)
+        let number = WindowServer.windowNumber(
+            ofProcess: 1, matching: frame, in: [description(number: 1, process: 1)])
+        #expect(number == nil)
+    }
 }

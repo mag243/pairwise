@@ -15,28 +15,29 @@ public final class AccessibilityWindowSystem: WindowSystemProviding {
     /// The window `partner(for:)` gives whatever the app, for the stress test (ADR 0027).
     var pinnedPartner: AccessibilityWindow?
 
+    private let access: any SystemAccess
     private var holdingTap: HoldingTap?
     private var ticker: DisplayTicker?
     private var timer: Timer?
 
-    public init() {}
+    public convenience init() {
+        self.init(access: LiveSystemAccess())
+    }
+
+    init(access: any SystemAccess) {
+        self.access = access
+    }
 
     public var isAccessibilityGranted: Bool { AXIsProcessTrusted() }
 
     public var isScreenRecordingGranted: Bool { CGPreflightScreenCaptureAccess() }
 
     public var parkingOrigin: ScreenPoint? {
-        PartnerPlacement.parkingOrigin(onDisplays: NSScreen.globalFrames)
+        PartnerPlacement.parkingOrigin(onDisplays: access.displays())
     }
 
     public var partnerApps: [PartnerApp] {
-        NSWorkspace.shared.runningApplications
-            .filter { $0.activationPolicy == .regular && $0 != .current }
-            .compactMap { app in
-                guard let identifier = app.bundleIdentifier else { return nil }
-                return PartnerApp(
-                    bundleIdentifier: identifier, name: app.localizedName ?? identifier)
-            }
+        access.regularApps()
             .sorted { $0.name.localizedStandardCompare($1.name) == .orderedAscending }
     }
 
@@ -76,23 +77,24 @@ public final class AccessibilityWindowSystem: WindowSystemProviding {
     public func window(at point: ScreenPoint) -> (any MovableWindow)? {
         guard
             let top = WindowServer.topWindow(
-                at: point, excludingProcess: ProcessInfo.processInfo.processIdentifier)
+                at: point, excludingProcess: access.ownProcess, in: access.onScreenWindows())
         else {
             Self.logger.info("no normal window of another app on top at the pointer")
             return nil
         }
-        let app = AXUIElementCreateApplication(top.processID)
+        let app = access.application(top.processID)
         app.limitMessagingTime()
-        let elements = app.attribute(kAXWindowsAttribute) as? [AXUIElement] ?? []
-        let windows = elements.map(AccessibilityWindow.init(element:))
-        let frames = windows.map {
-            (try? $0.frame()) ?? WindowFrame(x: 0, y: 0, width: 0, height: 0)
+        let elements = app.elements(of: kAXWindowsAttribute)
+        let frames = elements.map {
+            (try? AccessibilityWindow(element: $0, access: access).frame())
+                ?? WindowFrame(x: 0, y: 0, width: 0, height: 0)
         }
         guard let index = WindowMatch.index(of: top.frame, among: frames) else {
             Self.logger.info("the app's \(elements.count) windows do not match the one on top")
             return nil
         }
-        return AccessibilityWindow(element: elements[index], serverWindowNumber: top.number)
+        return AccessibilityWindow(
+            element: elements[index], serverWindowNumber: top.number, access: access)
     }
 
     public func partner(
@@ -100,20 +102,18 @@ public final class AccessibilityWindowSystem: WindowSystemProviding {
     ) throws(WindowSystemError) -> any MovableWindow {
         if let pinnedPartner { return pinnedPartner }
         let dragged = (window as? AccessibilityWindow)?.element
-        let apps = NSRunningApplication.runningApplications(
-            withBundleIdentifier: partnerBundleIdentifier)
-        guard let app = apps.first else { throw .noPartner }
-        let appElement = AXUIElementCreateApplication(app.processIdentifier)
-        appElement.limitMessagingTime()
-        let windows = appElement.attribute(kAXWindowsAttribute) as? [AXUIElement] ?? []
-        let partner = windows.first { candidate in
-            Self.canFollow(candidate) && dragged.map { !CFEqual($0, candidate) } ?? true
+        guard let process = access.processes(bundleIdentifier: partnerBundleIdentifier).first
+        else { throw .noPartner }
+        let app = access.application(process)
+        app.limitMessagingTime()
+        let partner = app.elements(of: kAXWindowsAttribute).first { candidate in
+            Self.canFollow(candidate) && dragged.map { !$0.isSame(as: candidate) } ?? true
         }
         guard let partner else { throw .noPartner }
-        return AccessibilityWindow(element: partner)
+        return AccessibilityWindow(element: partner, access: access)
     }
 
-    private static func canFollow(_ window: AXUIElement) -> Bool {
+    private static func canFollow(_ window: any AccessibilityElement) -> Bool {
         window.attribute(kAXSubroleAttribute) as? String == kAXStandardWindowSubrole
             && window.attribute(kAXMinimizedAttribute) as? Bool != true
     }

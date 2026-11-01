@@ -2,7 +2,6 @@
 
 **Goal:** Pairwise as people would use it, without any plug-in: bring any two windows together, and they stay a pair until they are pulled apart. Everything so far works on a fixed partner; this makes pairs real.
 **ADRs:** 0024, 0028, 0029, 0030 as the base. New ones as marked below, each written before its step.
-**Status of this plan:** a proposal. The choices at the end are the owner's, and the steps follow from them.
 
 Not in this milestone: the plug-in (M4), distribution, top and bottom pairs, more than two windows in a group, and more than one display's special cases beyond what the steps name.
 
@@ -27,10 +26,10 @@ Done first because everything below adds code to this module.
 - [ ] The panel holds the pair in its own order, with the partner on either side.
 
 ### 4. Joining
-- [ ] ADR: the gesture (choice 1).
+- [ ] ADR: the gesture (owner's choice 1).
 - [ ] `PairwiseCore`, test-first: when a dragged window is close enough to another window's edge to join. The snap distance is a named constant.
 - [ ] A guide shows where the window will land, and at the release the two click together, with the seam lighting up briefly (the design notes in `PLAN.md`).
-- [ ] The heights after joining (choice 2).
+- [ ] The heights after joining (owner's choice 2).
 
 ### 5. Coming apart
 - [ ] ADR, with the gesture of step 4.
@@ -44,7 +43,7 @@ Done first because everything below adds code to this module.
 
 ### 7. Together in other ways
 - [ ] Bringing one window of a pair forward brings the other forward, without taking focus from the first.
-- [ ] Minimizing one minimizes the other (choice 3).
+- [ ] Minimizing one minimizes the other (owner's choice 3).
 
 ### 8. Not losing windows
 - [ ] ADR: what a crash leaves behind.
@@ -56,7 +55,7 @@ Done first because everything below adds code to this module.
 - [ ] Pairs are saved, and restored at the start where both windows are found. A pair that cannot be found with confidence is dropped, and no window is moved.
 
 ### 10. The app itself
-- [ ] ADR: menu bar app or window (open decision 2 in `PLAN.md`, choice 4).
+- [ ] ADR: menu bar app or window (open decision 2 in `PLAN.md`, owner's choice 4).
 - [ ] The measurements, the frame rate and the choice of partner app leave the main interface. The permissions stay, explained plainly. The stress test stays.
 - [ ] Complete `nl` and `de`, with the translation tools of ADR 0010 brought over.
 
@@ -68,19 +67,12 @@ Done first because everything below adds code to this module.
 - [ ] Coverage targets are met: Core ≥ 90 %, WindowSystem ≥ 75 %, UI state ≥ 70 %.
 - [ ] `tools/build.sh ci` is green (when the owner says so, ADR 0011).
 
-## Choices for the owner
-1. **How two windows join and come apart.**
-   - **A modifier while dragging (proposed):** hold a key while dragging to an edge to join, and hold it while dragging to come apart. Nothing happens by accident, and normal dragging stays normal. The key still has to be chosen, and it must not clash with macOS.
-   - **Automatic at the edge:** the most magnetic, but every window dragged past another may join, and an earlier project found telling those apart hard.
-   - **A glue mode with a shortcut:** as Window Glue's F9. Clear, but an extra step each time.
-2. **Heights after joining.**
-   - **The dragged window takes the other's height and top (proposed):** a tidy pair, and the seam runs the full height. It does change one window's size.
-   - **Both keep their size, tops level:** nothing is resized, but the pair can look uneven.
-3. **Minimize together:** yes (proposed), or leave it for later?
-4. **Menu bar app or window.**
-   - **A menu bar app with no Dock icon (proposed):** it fits something that runs in the background, and a settings window holds the rest.
-   - **A normal app with a window:** simpler, but it sits in the Dock for no reason.
-5. **The name.** `PLAN.md` leaves it until before the first release. Renaming later touches the bundle identifier and so the permissions; it needs no decision for this milestone unless "Click!" or another name is already certain.
+## The owner's choices
+1. **Joining and coming apart:** a key held while dragging: to an edge to join, away to come apart. Normal dragging stays normal. The key is still to be chosen.
+2. **Heights after joining:** the dragged window takes the other's height and top.
+3. **Minimizing:** together.
+4. **The app:** a menu bar app with no Dock icon, with a settings window.
+5. **The name:** before the first release, as in `PLAN.md`.
 
 ## Risks
 - **The seam** may lag in the way following did, and a picture does not help as easily while the content itself changes size. Step 6 starts with a spike for this reason.

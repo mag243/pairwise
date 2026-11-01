@@ -48,7 +48,7 @@ final class HoldingTap {
     }
 
     /// Whether the event passes; anything but the three button events always does.
-    fileprivate func passes(_ type: CGEventType, at location: CGPoint) -> Bool {
+    func passes(_ type: CGEventType, at location: CGPoint) -> Bool {
         switch type {
         case .leftMouseDown: return decide(.pressed(ScreenPoint(location)))
         case .leftMouseDragged: return decide(.dragged(ScreenPoint(location)))

@@ -36,3 +36,4 @@ Use `0000-template.md` as the basis.
 | 0028 | One window while dragging is the way; the rest goes | Accepted |
 | 0029 | Live pictures while dragging | Accepted |
 | 0030 | Moving a window without its animation | Accepted |
+| 0031 | A seam around the system calls | Accepted |

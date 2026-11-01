@@ -154,7 +154,7 @@ public final class DragStressTest {
         let element = AXUIElementCreateApplication(process.processIdentifier)
         for _ in 0..<Self.windowLookups {
             await wait(Self.windowWait)
-            let windows = element.attribute(kAXWindowsAttribute) as? [AXUIElement] ?? []
+            let windows = element.elements(of: kAXWindowsAttribute)
             if let first = windows.first { return (AccessibilityWindow(element: first), process) }
         }
         process.terminate()
@@ -193,7 +193,7 @@ public final class DragStressTest {
         for window in [dragged, partner] {
             var size = Self.size
             if let value = AXValueCreate(.cgSize, &size) {
-                AXUIElementSetAttributeValue(window.element, kAXSizeAttribute as CFString, value)
+                _ = window.element.setAttribute(kAXSizeAttribute, to: value)
             }
         }
         return (dragged, partner)
@@ -217,7 +217,7 @@ public final class DragStressTest {
         for _ in 0..<Self.windowLookups {
             await wait(Self.windowWait)
             let new = standardWindows(of: element).filter { window in
-                !before.contains { CFEqual($0, window) }
+                !before.contains { $0.isSame(as: window) }
             }
             // More than one could be a window of the user's, which must not be touched.
             if new.count == 1 { return AccessibilityWindow(element: new[0]) }
@@ -226,9 +226,8 @@ public final class DragStressTest {
         return nil
     }
 
-    private func standardWindows(of app: AXUIElement) -> [AXUIElement] {
-        let windows = app.attribute(kAXWindowsAttribute) as? [AXUIElement] ?? []
-        return windows.filter {
+    private func standardWindows(of app: any AccessibilityElement) -> [any AccessibilityElement] {
+        app.elements(of: kAXWindowsAttribute).filter {
             $0.attribute(kAXSubroleAttribute) as? String == kAXStandardWindowSubrole
         }
     }
@@ -240,7 +239,7 @@ public final class DragStressTest {
 
     private func close(_ window: AccessibilityWindow) {
         if let button = window.element.elementAttribute(kAXCloseButtonAttribute) {
-            AXUIElementPerformAction(button, kAXPressAction as CFString)
+            _ = button.performAction(kAXPressAction)
         }
     }
 

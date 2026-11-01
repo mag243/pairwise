@@ -1,5 +1,6 @@
 import CoreMedia
 import CoreVideo
+import PairwiseCore
 import QuartzCore
 import ScreenCaptureKit
 
@@ -9,10 +10,9 @@ import ScreenCaptureKit
 final class LiveStream: NSObject {
     /// The layer that shows the frames.
     var layer: CALayer?
-    /// How many frames differed from the one before at the window's centre. The system also
-    /// sends frames of a window that has not changed, so counting all of them says nothing.
-    private(set) var frames = 0
-    private var lastPixel: UInt32?
+    /// How many frames showed a change.
+    var frames: Int { counter.changes }
+    private var counter = ChangedFrameCounter()
 
     private let filter: SCContentFilter
     private let configuration = SCStreamConfiguration()
@@ -46,8 +46,7 @@ final class LiveStream: NSObject {
     }
 
     fileprivate func show(_ surface: IOSurfaceRef, centrePixel: UInt32?) {
-        if let lastPixel, centrePixel != lastPixel { frames += 1 }
-        lastPixel = centrePixel
+        counter.note(centrePixel)
         CATransaction.begin()
         CATransaction.setDisableActions(true)
         layer?.contents = surface

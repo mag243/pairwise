@@ -7,20 +7,26 @@ import PairwiseCore
 final class AccessibilityWindow: MovableWindow {
     private static let enhancedInterfaceAttribute = "AXEnhancedUserInterface"
 
-    let element: AXUIElement
+    let element: any AccessibilityElement
+    private let access: any SystemAccess
     /// The window server's number for this window, found on first use (ADR 0018).
     private var serverWindowNumber: CGWindowID?
     private var hasLookedUpWindowNumber = false
 
     /// Precondition: `element` is a window.
-    init(element: AXUIElement) {
+    init(element: any AccessibilityElement, access: any SystemAccess = LiveSystemAccess()) {
         self.element = element
+        self.access = access
         element.limitMessagingTime()
     }
 
     /// Precondition: `element` is the window the window server numbers `serverWindowNumber`.
-    init(element: AXUIElement, serverWindowNumber: CGWindowID) {
+    init(
+        element: any AccessibilityElement, serverWindowNumber: CGWindowID,
+        access: any SystemAccess = LiveSystemAccess()
+    ) {
         self.element = element
+        self.access = access
         self.serverWindowNumber = serverWindowNumber
         hasLookedUpWindowNumber = true
         element.limitMessagingTime()
@@ -37,10 +43,13 @@ final class AccessibilityWindow: MovableWindow {
             hasLookedUpWindowNumber = true
             if let processID = element.processID, let frame = try? frame() {
                 serverWindowNumber = WindowServer.windowNumber(
-                    ofProcess: processID, matching: frame)
+                    ofProcess: processID, matching: frame, in: access.onScreenWindows())
             }
         }
-        return serverWindowNumber.flatMap(WindowServer.frame(ofWindow:))
+        return
+            serverWindowNumber
+            .flatMap(access.windowDescription)
+            .flatMap(WindowServer.frame(from:))
     }
 
     func move(to origin: ScreenPoint) throws(WindowSystemError) {
@@ -48,8 +57,7 @@ final class AccessibilityWindow: MovableWindow {
         defer { restoreAnimation() }
         var point = origin.cgPoint
         guard let value = AXValueCreate(.cgPoint, &point) else { throw .windowRefused }
-        let result = AXUIElementSetAttributeValue(
-            element, kAXPositionAttribute as CFString, value)
+        let result = element.setAttribute(kAXPositionAttribute, to: value)
         guard result == .success else { throw WindowSystemError(result) }
     }
 
@@ -57,24 +65,23 @@ final class AccessibilityWindow: MovableWindow {
     /// the screen (ADR 0030). Returns what puts the attribute back.
     private func turnOffMoveAnimation() -> () -> Void {
         guard let processID = element.processID else { return {} }
-        let app = AXUIElementCreateApplication(processID)
+        let app = access.application(processID)
         app.limitMessagingTime()
-        let name = Self.enhancedInterfaceAttribute as CFString
-        guard app.attribute(Self.enhancedInterfaceAttribute) as? Bool == true else { return {} }
-        AXUIElementSetAttributeValue(app, name, kCFBooleanFalse)
-        return { AXUIElementSetAttributeValue(app, name, kCFBooleanTrue) }
+        let name = Self.enhancedInterfaceAttribute
+        guard app.attribute(name) as? Bool == true else { return {} }
+        _ = app.setAttribute(name, to: kCFBooleanFalse)
+        return { _ = app.setAttribute(name, to: kCFBooleanTrue) }
     }
 
     func raise() throws(WindowSystemError) {
-        let result = AXUIElementPerformAction(element, kAXRaiseAction as CFString)
+        let result = element.performAction(kAXRaiseAction)
         guard result == .success else { throw WindowSystemError(result) }
     }
 
     private func read<Value: BitwiseCopyable>(
         _ attribute: String, as type: AXValueType, initial: Value
     ) throws(WindowSystemError) -> Value {
-        var raw: CFTypeRef?
-        let result = AXUIElementCopyAttributeValue(element, attribute as CFString, &raw)
+        let (raw, result) = element.copyAttribute(attribute)
         guard result == .success else { throw WindowSystemError(result) }
         guard let raw, CFGetTypeID(raw) == AXValueGetTypeID() else { throw .windowRefused }
         var value = initial

@@ -19,9 +19,8 @@ final class StandInPanel: WindowStandIn {
     /// Each stream, if any, updates the picture at the same place in `pictures`.
     init(pictures: [Picture], streams: [LiveStream]) {
         self.streams = streams
-        let size = CGSize(
-            width: pictures.map(\.size.width).reduce(0, +),
-            height: pictures.map(\.size.height).max() ?? 0)
+        let layout = Self.layout(of: pictures.map(\.size))
+        let size = layout.size
         panel = NSPanel(
             contentRect: CGRect(origin: .zero, size: size),
             styleMask: [.borderless, .nonactivatingPanel], backing: .buffered, defer: false)
@@ -34,20 +33,28 @@ final class StandInPanel: WindowStandIn {
         panel.collectionBehavior = [.transient, .ignoresCycle, .fullScreenAuxiliary]
         let view = NSView(frame: CGRect(origin: .zero, size: size))
         view.wantsLayer = true
-        var left: CGFloat = 0
         for (index, picture) in pictures.enumerated() {
             let layer = CALayer()
             layer.contents = picture.image
             layer.contentsGravity = .resize
-            // A layer's origin is at its bottom left, and the tops are level.
-            layer.frame = CGRect(
-                x: left, y: size.height - picture.size.height,
-                width: picture.size.width, height: picture.size.height)
+            layer.frame = layout.frames[index]
             view.layer?.addSublayer(layer)
             if streams.indices.contains(index) { streams[index].layer = layer }
-            left += picture.size.width
         }
         panel.contentView = view
+    }
+
+    /// Where pictures of these sizes go side by side, tops level, in a panel of the size
+    /// given. A layer's origin is at its bottom left.
+    static func layout(of sizes: [CGSize]) -> (size: CGSize, frames: [CGRect]) {
+        let height = sizes.map(\.height).max() ?? 0
+        var left: CGFloat = 0
+        let frames = sizes.map { size in
+            defer { left += size.width }
+            return CGRect(
+                x: left, y: height - size.height, width: size.width, height: size.height)
+        }
+        return (CGSize(width: left, height: height), frames)
     }
 
     func show(at origin: ScreenPoint) {
