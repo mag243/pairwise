@@ -8,3 +8,5 @@ All notable changes to Pairwise are recorded here. The format follows
 
 ### Added
 - A spike: a Finder window follows a dragged window through the Accessibility API, with the measurements of each drag.
+- A stand-in while dragging: a picture of the partner that follows the pointer, with the Screen Recording permission.
+- The app icon.
