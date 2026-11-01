@@ -1,7 +1,7 @@
 # M2 · The stand-in while dragging
 
 **Goal:** the partner moves with the dragged window without visible lag, through a picture in a window of Pairwise's own.
-**ADRs:** 0014, 0015, 0016, 0018, 0019, 0020, 0022, 0023, 0024 (0013 for the following it builds on)
+**ADRs:** 0014, 0015, 0016, 0018, 0019, 0020, 0022, 0023, 0024, 0025 (0013 for the following it builds on)
 
 Not in this milestone: joining, the shared seam, coming apart, choosing a partner, restoring. Those are M3.
 

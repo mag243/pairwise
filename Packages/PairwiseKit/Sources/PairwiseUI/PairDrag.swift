@@ -10,6 +10,8 @@ enum PairDrag {
     case pressed(Pressed)
     case moving(Moving)
     case placing(Placing)
+    /// Both windows are placed; the panel stays until they have had time to draw.
+    case settling(standIn: any WindowStandIn, until: TimeInterval)
 
     @MainActor
     struct Pressed {

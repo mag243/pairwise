@@ -17,7 +17,7 @@ Measured on 2026-11-01. The partner is a Finder window, and the dragged windows 
 
 **What the numbers do not show:** when the partner appears at its new place on screen, or the distance between the two windows. Those are for the eye, which is why the verdict below is the owner's.
 
-**Does the permission survive a rebuild?** Not settled.
+**Does the permission survive a rebuild?** Yes: across many rebuilds Pairwise stayed on under Accessibility and the terminal stayed off, confirmed by the owner.
 
 **By hand:** the Finder window moves along with the dragged window, and it visibly lags behind.
 
@@ -128,6 +128,8 @@ With the window list kept and the pictures taken together, over 13 drags: the pi
 **By hand, moving as one:** when dragging starts straight after the press, only the held window moves. After a short wait the other window comes along, and then it looks very smooth.
 
 **By hand, moving as one, after taking the pictures faster:** dragging straight after the press now works every time and looks smooth.
+
+**By hand, moving as one, later:** pressing at a new place on the title bar and dragging at once sometimes moves only the held window; after a short wait both go along every time. A small flash at the release, not very noticeable.
 
 **Is the real partner out of sight during the drag?** Not answered yet.
 

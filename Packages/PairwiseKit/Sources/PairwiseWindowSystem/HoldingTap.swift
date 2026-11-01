@@ -1,11 +1,14 @@
 import CoreGraphics
 import PairwiseCore
+import os
 
 /// An active event tap on the left mouse button, on the main run loop, that can withhold
 /// an event (ADR 0023, 0024). When this tap fails or is too slow, the system turns it off and
 /// input passes.
 @MainActor
 final class HoldingTap {
+    private static let logger = Logger(subsystem: "me.m-domain.pairwise", category: "pair-drag")
+
     private let decide: @MainActor (PointerButtonEvent) -> Bool
     private var port: CFMachPort?
     private var source: CFRunLoopSource?
@@ -52,6 +55,7 @@ final class HoldingTap {
         case .leftMouseUp: return decide(.released(ScreenPoint(location)))
         case .tapDisabledByTimeout, .tapDisabledByUserInput:
             // Turned back on, or the drag would go on with no more moves; these events have passed.
+            Self.logger.info("the system turned the tap off: events passed")
             if let port { CGEvent.tapEnable(tap: port, enable: true) }
             return true
         default: return true

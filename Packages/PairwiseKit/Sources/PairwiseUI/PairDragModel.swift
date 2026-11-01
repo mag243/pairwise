@@ -13,6 +13,8 @@ public final class PairDragModel {
     private static let tickInterval: TimeInterval = 1.0 / 120
     /// How long a busy app gets to answer at the release, with the panel up.
     private static let placingPatience: TimeInterval = 0.5
+    /// How long the panel stays over placed windows, for their apps to draw them.
+    private static let settleTime: TimeInterval = 0.05
     private static let logger = Logger(subsystem: "me.m-domain.pairwise", category: "pair-drag")
 
     public private(set) var isRunning = false
@@ -76,12 +78,20 @@ public final class PairDragModel {
         putWindowsBack()
         endDrag()
         problem = nil
-        guard
-            let window = system.window(at: point),
-            let frame = window.serverFrame() ?? (try? window.frame()),
-            DragHoldRule.isInTitleBand(point, of: frame),
-            let partner = try? system.partner(for: window)
-        else { return }
+        let before = system.uptime
+        let outcome = takeOverPress(at: point)
+        let elapsed = system.uptime - before
+        Self.logger.info("press: \(outcome, privacy: .public), deciding took \(elapsed) s")
+    }
+
+    /// Says what became of the press, for the log.
+    private func takeOverPress(at point: ScreenPoint) -> String {
+        guard let window = system.window(at: point) else { return "no window under the pointer" }
+        guard let frame = window.serverFrame() ?? (try? window.frame()) else {
+            return "the window gave no frame"
+        }
+        guard DragHoldRule.isInTitleBand(point, of: frame) else { return "not on the title bar" }
+        guard let partner = try? system.partner(for: window) else { return "no partner" }
         drag = .pressed(
             PairDrag.Pressed(
                 window: window, partner: partner, frame: frame, pointer: point,
@@ -92,6 +102,7 @@ public final class PairDragModel {
             guard let self, current == request else { return }
             receive(result)
         }
+        return "taken over"
     }
 
     private func receive(_ result: Result<any WindowStandIn, WindowSystemError>) {
@@ -112,7 +123,7 @@ public final class PairDragModel {
 
     private func holdsDrag(at point: ScreenPoint) -> Bool {
         switch drag {
-        case .none, .passing, .placing:
+        case .none, .passing, .placing, .settling:
             return false
         case .pressed(var pressed):
             guard DragHoldRule.mayWaitForPictures(after: system.uptime - pressed.startTime)
@@ -174,6 +185,8 @@ public final class PairDragModel {
             }
         case .placing(let placing):
             place(placing)
+        case .settling(_, let until):
+            if system.uptime >= until { endDrag() }
         }
     }
 
@@ -229,7 +242,7 @@ public final class PairDragModel {
             // Raised last, the dragged window ends on top; a failure leaves it in place.
             try? current.partner.raise()
             try? current.window.raise()
-            endDrag()
+            drag = .settling(standIn: current.standIn, until: system.uptime + Self.settleTime)
         } catch {
             drag = .placing(current)
             if error == .windowBusy, system.uptime < current.deadline { return }
@@ -264,6 +277,7 @@ public final class PairDragModel {
         system.stopTicking()
         if case .moving(let moving) = drag { moving.standIn.dismiss() }
         if case .placing(let placing) = drag { placing.standIn.dismiss() }
+        if case .settling(let standIn, _) = drag { standIn.dismiss() }
         request += 1
         drag = .none
     }

@@ -32,6 +32,35 @@ import Testing
         _ = system.send(.dragged(Self.further))
     }
 
+    /// Lets the time pass that the panel stays over placed windows.
+    private func letWindowsSettle() {
+        system.uptime += 1
+        system.tick()
+    }
+
+    @Test func thePanelStaysAMomentOverPlacedWindows() {
+        startDrag()
+        _ = system.send(.released(Self.further))
+        #expect(!panel.isDismissed)
+        #expect(system.isTicking)
+        letWindowsSettle()
+        #expect(panel.isDismissed)
+        #expect(!system.isTicking)
+    }
+
+    @Test func aPressBringsASettlingPanelDownAtOnce() {
+        startDrag()
+        _ = system.send(.released(Self.further))
+        _ = system.send(.pressed(Self.inContent))
+        #expect(panel.isDismissed)
+    }
+
+    @Test func aDragEventWhileSettlingPasses() {
+        startDrag()
+        _ = system.send(.released(Self.further))
+        #expect(system.send(.dragged(Self.further)))
+    }
+
     @Test func withoutScreenRecordingNothingIsTakenOver() {
         model.stop()
         system.isScreenRecordingGranted = false
@@ -125,6 +154,7 @@ import Testing
         #expect(system.send(.released(Self.further)))
         #expect(window.moves.last == ScreenPoint(x: 140, y: 130))
         #expect(partner.moves.last == ScreenPoint(x: 540, y: 130))
+        letWindowsSettle()
         #expect(panel.isDismissed)
         #expect(!system.isTicking)
     }
@@ -156,6 +186,7 @@ import Testing
         system.tick()
         #expect(partner.moves.last == ScreenPoint(x: 540, y: 130))
         #expect(window.moves.count == 1)
+        letWindowsSettle()
         #expect(panel.isDismissed)
     }
 
@@ -197,6 +228,7 @@ import Testing
         system.isPrimaryButtonDown = false
         system.tick()
         #expect(window.moves.last == ScreenPoint(x: 140, y: 130))
+        letWindowsSettle()
         #expect(panel.isDismissed)
     }
 
