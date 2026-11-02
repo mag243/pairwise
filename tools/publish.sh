@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Publishes the release that tools/build.sh package left in build/release/
 # (ADR 0058): signs the zip into the Sparkle feed, creates the GitHub Release,
-# pushes the feed to the branch gh-pages, and writes the Homebrew cask (ADR 0059).
+# pushes the feed and the page to the branch gh-pages, and writes the Homebrew cask (ADR 0059).
 #
 # Usage: tools/publish.sh [--dry-run]
 #   --dry-run   Sign and write the feed under build/publish/, and stop before
@@ -39,8 +39,6 @@ clone_feed() {
   else
     git init --quiet --initial-branch "$FEED_BRANCH" "$clone"
     git -C "$clone" remote add origin "$url"
-    # Pages serves the files as they are, without building a site from them.
-    touch "$clone/.nojekyll"
   fi
 }
 
@@ -81,6 +79,9 @@ mkdir -p "$WORK"
 "$TOOLS_DIR/release_notes.sh" "$version" >"$WORK/notes.md"
 clone_feed "$WORK/pages"
 update_feed "$zip" "$tag" "$WORK/notes.md" "$WORK/pages"
+# The page goes out with the feed, built by Pages with Jekyll (ADR 0061).
+cp -R "$TOOLS_DIR/site/." "$WORK/pages/"
+rm -f "$WORK/pages/.nojekyll"
 ok "The feed has $APP_NAME $version, signed"
 
 if ((dry_run)); then

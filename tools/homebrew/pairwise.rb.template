@@ -7,7 +7,7 @@ cask "pairwise" do
   url "https://github.com/mag243/pairwise/releases/download/v#{version.csv.first}/Pairwise-#{version.csv.first}-#{version.csv.second}.zip"
   name "Pairwise"
   desc "Join two windows so they move and resize together"
-  homepage "https://github.com/mag243/pairwise"
+  homepage "https://mag243.github.io/pairwise/"
 
   livecheck do
     url "https://mag243.github.io/pairwise/appcast.xml"

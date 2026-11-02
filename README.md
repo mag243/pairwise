@@ -1,6 +1,6 @@
 # Pairwise
 
-*Snap groups for your Mac.* Two windows of any app, brought together side by side, join: they move together, share their seam and come apart again easily, without anything from the apps.
+*Snap groups for your Mac.* ([Website](https://mag243.github.io/pairwise/)) Two windows of any app, brought together side by side, join: they move together, share their seam and come apart again easily, without anything from the apps.
 
 Status: early, version 0.x. Joining, moving together, the shared seam and coming apart work, and pairs last through a quit and a restart.
 

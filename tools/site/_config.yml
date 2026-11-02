@@ -1,0 +1,5 @@
+# The page at https://mag243.github.io/pairwise/ (ADR 0061). tools/publish.sh copies
+# this folder to the branch gh-pages, where GitHub Pages builds it with Jekyll.
+title: Pairwise
+description: Snap groups for your Mac. Two windows of any app join, move together and share their seam.
+theme: jekyll-theme-primer
