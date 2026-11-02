@@ -11,6 +11,8 @@ struct MainView: View {
     private static let millisecondsPerSecond = 1000.0
     private static let fractionDigits = 1
     private static let frameRates = [15, 30, 60]
+    /// The trial without any capture, in the picker of frame rates (plan M3a).
+    private static let placeholderTag = -1
     #endif
     private static let joinScopeKey = "joinScope"
     private static let playsSoundsKey = "playsSounds"
@@ -210,6 +212,7 @@ struct MainView: View {
     @ViewBuilder private var testing: some View {
         Section("For testing") {
             Picker("Live pictures", selection: liveFrames) {
+                Text("Placeholder").tag(Self.placeholderTag)
                 Text("Still").tag(0)
                 ForEach(Self.frameRates, id: \.self) { rate in
                     Text("\(rate) frames a second").tag(rate)
@@ -225,9 +228,10 @@ struct MainView: View {
 
     private var liveFrames: Binding<Int> {
         Binding {
-            model.liveFramesPerSecond
+            model.showsPlaceholders ? Self.placeholderTag : model.liveFramesPerSecond
         } set: {
-            model.liveFramesPerSecond = $0
+            model.showsPlaceholders = $0 == Self.placeholderTag
+            model.liveFramesPerSecond = max(0, $0)
         }
     }
 

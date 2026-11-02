@@ -33,6 +33,9 @@ final class AccessibilityWindow: MovableWindow {
         element.limitMessagingTime()
     }
 
+    /// The window's title, when its app gives one.
+    var title: String? { element.attribute(kAXTitleAttribute) as? String }
+
     func frame() throws(WindowSystemError) -> WindowFrame {
         let origin = try read(kAXPositionAttribute, as: .cgPoint, initial: CGPoint.zero)
         let size = try read(kAXSizeAttribute, as: .cgSize, initial: CGSize.zero)

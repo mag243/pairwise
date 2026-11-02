@@ -17,6 +17,7 @@ public final class AccessibilityWindowSystem: WindowSystemProviding {
     private static let pointerTimerTolerance = 0.02
 
     public var liveFramesPerSecond = DragPictures.live.framesPerSecond
+    public var showsPlaceholders = false
     private let access: any SystemAccess
     /// The only windows that count as normal windows, for the join test, so that it cannot
     /// join a window of the user's (ADR 0027).
@@ -96,6 +97,10 @@ public final class AccessibilityWindowSystem: WindowSystemProviding {
                 let second = second as? AccessibilityWindow
             else {
                 completion(.failure(.captureFailed))
+                return
+            }
+            if showsPlaceholders {
+                completion(placeholderStandIn(of: [first, second]))
                 return
             }
             completion(

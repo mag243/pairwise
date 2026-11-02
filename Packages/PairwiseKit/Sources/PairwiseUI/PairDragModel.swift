@@ -27,6 +27,11 @@ public final class PairDragModel {
         didSet { system.liveFramesPerSecond = liveFramesPerSecond }
     }
 
+    /// Whether the pictures are placeholders and nothing is captured, on trial (plan M3a).
+    public var showsPlaceholders = false {
+        didSet { system.showsPlaceholders = showsPlaceholders }
+    }
+
     /// Which windows the join key joins; the scope key gives the other choice (ADR 0043).
     public var joinScope = JoinScope.anyWindow
     /// Whether a join and a parting by the user make a sound (ADR 0051).

@@ -32,6 +32,11 @@ import Testing
         #expect(waiting.isScreenRecordingGranted)
     }
 
+    @Test func theChoiceOfPlaceholdersReachesTheSystem() {
+        model.showsPlaceholders = true
+        #expect(system.showsPlaceholders)
+    }
+
     @Test func withoutAccessibilityNothingIsTakenOver() {
         model.stop()
         system.isAccessibilityGranted = false

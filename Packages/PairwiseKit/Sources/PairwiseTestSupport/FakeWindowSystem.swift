@@ -15,6 +15,7 @@ public final class FakeWindowSystem: WindowSystemProviding {
     public var watchError: WindowSystemError?
     public var isPrimaryButtonDown = true
     public var liveFramesPerSecond = 0
+    public var showsPlaceholders = false
     public private(set) var accessibilityRequests = 0
     public private(set) var screenRecordingRequests = 0
     /// Whether the presses and drags sent carry the join key.

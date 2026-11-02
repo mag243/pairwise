@@ -21,6 +21,9 @@ public protocol WindowSystemProviding: AnyObject {
     /// How many live frames a second a new stand-in asks for per window; 0 keeps it still.
     var liveFramesPerSecond: Int { get set }
 
+    /// Whether a new stand-in shows placeholders and captures nothing, on trial (plan M3a).
+    var showsPlaceholders: Bool { get set }
+
     /// Whether the left mouse button is down now, asked of the system and not of an event.
     var isPrimaryButtonDown: Bool { get }
 
