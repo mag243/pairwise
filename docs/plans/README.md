@@ -8,7 +8,7 @@ One plan per milestone, numbered in order, worked through one by one, directly o
 | [M1](M1-spike-following.md) | Spike: following the pointer | Done |
 | [M2](M2-stand-in.md) | Moving together while dragging | Done |
 | [M3](M3-pairs.md) | Pairwise without plug-in | Done |
-| [M3a](M3a-release.md) | Release: Homebrew and Sparkle | In progress |
+| [M3a](M3a-release.md) | Release: Homebrew and Sparkle | Done |
 | M4 | The plug-in, first in our own apps only | Todo |
 | M5 | The plug-in public, only if Pairwise has users | Todo |
 

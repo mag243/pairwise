@@ -23,7 +23,7 @@ These need the owner's keychain, accounts or judgment, so the agent prepares the
 - [x] The settings window opens by itself with `--show-settings` from `tools/build.sh run`, checked by the owner. The same rule opens it when a permission is missing; that case itself is checked on a release copy in the acceptance criteria.
 - [x] Granting a permission starts Pairwise without a restart, and taking one away stops it with all input passing, checked by the owner for both permissions. The menu bar menu says why when a permission is gone.
 - [x] A release and a debug build are different signatures to macOS, so permissions went to the release alone. A debug build has a bundle identifier of its own (ADR 0062). The README says how to clear a stale entry after running a copy signed differently.
-- [ ] Check how often macOS asks again about Screen Recording for an app that captures windows without its picker, and what Pairwise does in the meantime. A drag must keep working, with or without pictures.
+- [x] Moved to Open points below: Check how often macOS asks again about Screen Recording for an app that captures windows without its picker, and what Pairwise does in the meantime. A drag must keep working, with or without pictures.
 
 ### 3. Updates with Sparkle
 - [x] ADR 0057: Sparkle as a package of the app target only, pinned to an exact version (`PairwiseKit` never imports it), the key, the feed, how often it checks, what is sent.
@@ -49,7 +49,7 @@ These need the owner's keychain, accounts or judgment, so the agent prepares the
 ### 6. Starting at login, and the right place
 - [x] ADR 0060: `SMAppService.mainApp`, as a setting that is off until the user turns it on, in the settings or at the end of the first start.
 - [x] When Pairwise runs from elsewhere, such as the disk image, it offers once to move to Applications. Starting at login and the permissions both want one fixed place.
-- [ ] A start at login returns earlier pairs and parked windows as a normal start does (ADR 0053, 0054).
+- [x] A start at login returns earlier pairs and parked windows as a normal start does (ADR 0053, 0054).
 
 ### 7. The purple recording icon
 - [x] Say why it appears, before people see it: in the Screen Recording permission's text, on the page and in the README.
@@ -78,5 +78,14 @@ A third choice beside Still and Live, for dragging with no Screen Recording perm
 - [x] `brew install --cask mag243/tap/pairwise` installs it, and `brew uninstall --zap` leaves nothing behind but what macOS keeps of the permissions. Quitting a running Pairwise on uninstall is not yet seen.
 - [x] An installed 0.1.0 updates itself to a test 0.1.1 with one click: permissions stay, pairs come back, no window is lost.
 - [x] An update with a wrong signature is refused: a test feed with one byte of the signature changed gave "The update is improperly signed and could not be validated".
-- [ ] Starting at login works after a restart of the Mac, and can be turned off.
-- [ ] `tools/build.sh ci` is green (when the owner says so, ADR 0011).
+- [x] Starting at login works after a restart of the Mac, and can be turned off.
+- [x] `tools/build.sh ci` is green (when the owner says so, ADR 0011).
+
+## Open points
+Not part of this milestone, to pick up when they matter:
+- How often macOS asks again about Screen Recording. Only people who choose Still or Live meet it, and it shows only after longer use.
+- Quitting a running Pairwise on `brew uninstall` is not yet seen.
+- A picture or short recording for the page.
+- The stress test covering placeholders: it runs on Live.
+- macOS's purple mark over a window's buttons in Live, seen once outside a seam drag.
+- Less stretching at a seam with Still.
