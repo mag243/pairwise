@@ -5,7 +5,7 @@
 - **Milestone:** M0
 
 ## Context
-Checking, building and testing must be possible from the command line, the same way locally, in CI, in the git hooks and by the agent. A new machine must be ready to build with a single command. an earlier project and the owner's other projects use this setup.
+Checking, building and testing must be possible from the command line, the same way locally, in CI, in the git hooks and by the agent. A new machine must be ready to build with a single command. An earlier project and the owner's other projects use this setup.
 
 ## Decision
 - **`tools/build.sh`** is *the* way to check, build and test. Subcommands: `check`, `format`, `test [filter]`, `coverage`, `build`, `apptest [filter]`, `run`, `clean` and the composite gates `quick` (check + test), `verify` (check + test + build) and `ci` (verify + apptest, the default). All output goes under `build/`.

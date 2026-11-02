@@ -4,7 +4,7 @@
 **Subtitle:** *Snap groups for your Mac.*
 
 ## Why
-an earlier project tried magnetic windows (in an earlier project) and dropped them (ADR 0043): joining windows does not belong in a file manager. Joining *any* two windows, like Snap Groups in Windows 11, belongs in an app of its own. Pairwise fits the an earlier project family by name.
+An earlier project tried magnetic windows and dropped them: joining windows does not belong in a file manager. Joining *any* two windows, like Snap Groups in Windows 11, belongs in an app of its own. Pairwise fits the an earlier project family by name.
 
 ## What it does
 - Two windows of any app, brought together side by side, join: they move together, share their seam (resizing one resizes the other), and come apart again easily.
@@ -82,5 +82,5 @@ tools/                            setup, build, hooks, pinned versions
 ## Open decisions
 1. **Keeping the Accessibility permission while developing:** settled in ADR 0012.
 2. **Menu bar app or windowed app:** settled in ADR 0034.
-3. **Distribution:** Developer ID or the Mac App Store, and whether the App Store allows what Pairwise needs. an earlier project's route (signed, notarized, disk image, Sparkle, tap) is the default; its tools come over when Pairwise is ready to ship.
+3. **Distribution:** Developer ID or the Mac App Store, and whether the App Store allows what Pairwise needs. An earlier project's route (signed, notarized, disk image, Sparkle, tap) is the default; its tools come over when Pairwise is ready to ship.
 4. **The name and the domain,** see What exists already; before the first release.

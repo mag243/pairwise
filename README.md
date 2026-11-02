@@ -44,3 +44,7 @@ tools/build.sh --help   # every command
 | `tools` | Setup, build, git hooks and pinned versions |
 
 The rules for working in this repository are in [`CLAUDE.md`](CLAUDE.md).
+
+## License
+
+[MIT](LICENSE). The sounds are from [Interface Sounds by Kenney](https://opengameart.org/content/interface-sounds), under CC0. See [`CONTRIBUTING.md`](CONTRIBUTING.md) on contributions.

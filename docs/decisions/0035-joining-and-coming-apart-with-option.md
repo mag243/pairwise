@@ -5,7 +5,7 @@
 - **Milestone:** M3
 
 ## Context
-Pairs exist as a model (ADR 0033), but nothing makes them. The owner chose a key held while dragging, so that normal dragging stays normal, and the dragged window taking the other's height and top. an earlier project found it hard to tell a drag meant to join from one that is not, so nothing here guesses.
+Pairs exist as a model (ADR 0033), but nothing makes them. The owner chose a key held while dragging, so that normal dragging stays normal, and the dragged window taking the other's height and top. An earlier project found it hard to tell a drag meant to join from one that is not, so nothing here guesses.
 
 ## Decision
 - **The key is Option,** read at the press. Starting with Option from memory: macOS uses Option during a window drag for tiling, which may clash, and this is to be judged by hand.

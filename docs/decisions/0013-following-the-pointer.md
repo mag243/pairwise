@@ -5,7 +5,7 @@
 - **Milestone:** M1
 
 ## Context
-M1 answers one question: does a partner window moved through the Accessibility API, from the pointer, feel smooth enough? an earlier project's spike (an earlier spike) found that moves are reported about ten times a second, that reading the pointer with the grip kept from the start of the drag gives the window's place at once, and that the only reliable end of a drag is the mouse button coming up. Its XCUITest drags did not move windows.
+M1 answers one question: does a partner window moved through the Accessibility API, from the pointer, feel smooth enough? An earlier project's spike found that moves are reported about ten times a second, that reading the pointer with the grip kept from the start of the drag gives the window's place at once, and that the only reliable end of a drag is the mouse button coming up. Its XCUITest drags did not move windows.
 
 ## Decision
 - **Watching.** A listen-only event tap sees the left mouse button go down and up, and nothing else. It cannot hold up or change input.

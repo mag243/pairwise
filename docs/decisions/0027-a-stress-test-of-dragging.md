@@ -17,7 +17,7 @@ A press lands on whatever is on top, and in Finder a drag from a file list copie
 It takes over the pointer for as long as it runs, so it runs only when the owner has asked for it (as ADR 0011 for UI tests).
 
 ## Alternatives
-- **An XCUITest:** an earlier project found that its drags did not move windows.
+- **An XCUITest:** An earlier project found that its drags did not move windows.
 - **A script outside the app:** it would need the permission for the terminal, which the owner keeps off.
 - **More logging, by hand:** the rounds this replaces.
 
