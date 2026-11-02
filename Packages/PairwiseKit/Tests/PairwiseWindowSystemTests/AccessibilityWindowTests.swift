@@ -129,6 +129,20 @@ import Testing
         #expect(makeWindow().isAvailable)
     }
 
+    @Test func aWindowSaysWhetherItIsMinimized() {
+        #expect(!makeWindow().isMinimized)
+        element.attributes[kAXMinimizedAttribute] = kCFBooleanTrue
+        #expect(makeWindow().isMinimized)
+    }
+
+    @Test func aWindowCanBeMinimizedAndBroughtBack() throws {
+        let window = makeWindow()
+        try window.setMinimized(true)
+        #expect(window.isMinimized)
+        try window.setMinimized(false)
+        #expect(!window.isMinimized)
+    }
+
     @Test func aMinimizedWindowIsNotAvailable() {
         element.attributes[kAXMinimizedAttribute] = kCFBooleanTrue
         #expect(!makeWindow().isAvailable)

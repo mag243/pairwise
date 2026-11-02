@@ -28,6 +28,9 @@ extension PairDragModel {
     func endPair(of number: UInt32) {
         if let partner = book.partner(of: number) { pairedWindows[partner.window] = nil }
         pairedWindows[number] = nil
+        if let pair = book.pair(containing: number) {
+            togetherWatch.minimized.remove(pair.left)
+        }
         book.end(pairContaining: number)
         if let pair = lockWatch.lock?.pair, pair.left == number || pair.right == number {
             hideLock()

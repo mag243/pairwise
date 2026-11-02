@@ -52,6 +52,7 @@ public final class PairDragModel {
     @ObservationIgnored var drag = PairDrag.none
     @ObservationIgnored var stats = DragStats()
     @ObservationIgnored var lockWatch = SeamLockWatch()
+    @ObservationIgnored var togetherWatch = TogetherWatch()
     @ObservationIgnored var hasSeenButtonDown = false
     @ObservationIgnored private var pressTime: TimeInterval = 0
     /// Tells a picture that arrives late from the one this press asked for.

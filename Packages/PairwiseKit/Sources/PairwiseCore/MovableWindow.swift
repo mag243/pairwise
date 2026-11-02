@@ -9,6 +9,12 @@ public protocol MovableWindow: AnyObject {
     /// screen. Asked of its app.
     var isAvailable: Bool { get }
 
+    /// Whether the window is minimized. Asked of its app.
+    var isMinimized: Bool { get }
+
+    /// Minimizes the window or brings it back.
+    func setMinimized(_ isMinimized: Bool) throws(WindowSystemError)
+
     /// The window's current frame, asked of its app.
     func frame() throws(WindowSystemError) -> WindowFrame
 

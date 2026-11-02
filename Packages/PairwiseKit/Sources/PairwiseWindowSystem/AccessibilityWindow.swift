@@ -100,6 +100,17 @@ final class AccessibilityWindow: MovableWindow {
             && element.attribute(Self.fullScreenAttribute) as? Bool != true
     }
 
+    var isMinimized: Bool {
+        element.attribute(kAXMinimizedAttribute) as? Bool == true
+    }
+
+    func setMinimized(_ isMinimized: Bool) throws(WindowSystemError) {
+        let value = isMinimized ? kCFBooleanTrue : kCFBooleanFalse
+        guard let value else { throw .windowRefused }
+        let result = element.setAttribute(kAXMinimizedAttribute, to: value)
+        guard result == .success else { throw WindowSystemError(result) }
+    }
+
     func raise() throws(WindowSystemError) {
         let result = element.performAction(kAXRaiseAction)
         guard result == .success else { throw WindowSystemError(result) }

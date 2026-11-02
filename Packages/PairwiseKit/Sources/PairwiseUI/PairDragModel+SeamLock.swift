@@ -37,6 +37,7 @@ extension PairDragModel {
             hideLock()
             return
         }
+        lookAtPairs()
         let pointer = system.pointerLocation
         guard pointer != lockWatch.lastPointer || lockWatch.lock != nil else { return }
         updateLock(forPointerAt: pointer)

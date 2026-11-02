@@ -8,6 +8,9 @@ public final class FakeWindow: MovableWindow {
     /// The process that owns the window, as the window server tells it.
     public var owner: Int32 = 0
     public var isAvailable = true
+    public var isMinimized = false
+    /// What the window was asked to become, in order.
+    public private(set) var minimizeRequests: [Bool] = []
     /// What `serverFrame()` gives; without one the window server does not tell.
     public var currentServerFrame: WindowFrame?
     public private(set) var moves: [ScreenPoint] = []
@@ -63,6 +66,11 @@ public final class FakeWindow: MovableWindow {
         }
         if let minimumWidth { currentFrame.size.width = max(currentFrame.size.width, minimumWidth) }
         if let maximumWidth { currentFrame.size.width = min(currentFrame.size.width, maximumWidth) }
+    }
+
+    public func setMinimized(_ isMinimized: Bool) throws(WindowSystemError) {
+        minimizeRequests.append(isMinimized)
+        self.isMinimized = isMinimized
     }
 
     public func raise() throws(WindowSystemError) {

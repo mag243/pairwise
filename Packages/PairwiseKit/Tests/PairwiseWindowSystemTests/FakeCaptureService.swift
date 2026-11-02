@@ -16,6 +16,8 @@ struct FakeCapturable: CapturableWindow {
 final class FakePlainWindow: MovableWindow {
     var windowNumber: UInt32? { nil }
     var isAvailable: Bool { true }
+    var isMinimized: Bool { false }
+    func setMinimized(_ isMinimized: Bool) throws(WindowSystemError) {}
 
     func frame() throws(WindowSystemError) -> WindowFrame {
         WindowFrame(x: 0, y: 0, width: 1, height: 1)
