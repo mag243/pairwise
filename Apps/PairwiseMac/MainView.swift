@@ -99,7 +99,7 @@ struct MainView: View {
             } label: {
                 Text("Screen Recording")
                 Text(
-                    "Lets Pairwise show pictures of joined windows while you drag them. They are not saved or sent anywhere."
+                    "Lets Pairwise show live pictures of the two joined windows while you drag them. macOS shows its purple recording icon during that time. The pictures stay in memory, and are not saved or sent anywhere."
                 )
             }
             if !model.isScreenRecordingGranted {

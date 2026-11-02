@@ -34,7 +34,13 @@ Started from anywhere else, Pairwise offers once to move itself into Application
 Pairwise lives in the menu bar and asks for two permissions in System Settings:
 
 - **Accessibility,** to move and resize the windows you join.
-- **Screen Recording,** to show pictures of joined windows while you drag them. They stay in memory, and are not saved or sent anywhere.
+- **Screen Recording,** to show live pictures of the two joined windows while you drag them. macOS shows its purple recording icon during that time. The pictures stay in memory, and are not saved or sent anywhere.
+
+## Why does a purple icon appear when I drag?
+
+While you drag a pair, Pairwise shows live pictures of those two windows, because moving the real windows themselves lags visibly behind the pointer. Capturing a window is what macOS's purple recording icon reports, and that is what it is for: you can see when an app does this.
+
+Pairwise captures only the two windows of a pair, and only from the moment you press one of them or their seam until you let go. The pictures stay in memory, and are not saved or sent anywhere. Pairwise is open source, so you can [check this in the code](https://github.com/mag243/pairwise/blob/main/Packages/PairwiseKit/Sources/PairwiseWindowSystem/LiveStream.swift).
 
 ## Updates
 

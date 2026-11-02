@@ -240,6 +240,7 @@
       }
     },
     "It can then start at login and update itself. It will not ask again." : {
+      "comment" : "Alert text: why to move the app",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -253,8 +254,7 @@
             "value" : "Het kan dan starten bij het inloggen en zichzelf bijwerken. Deze vraag komt niet terug."
           }
         }
-      },
-      "comment" : "Alert text: why to move the app"
+      }
     },
     "Joining" : {
       "comment" : "Section of settings",
@@ -290,22 +290,22 @@
         }
       }
     },
-    "Lets Pairwise show pictures of joined windows while you drag them. They are not saved or sent anywhere." : {
-      "comment" : "Text in the settings window",
+    "Lets Pairwise show live pictures of the two joined windows while you drag them. macOS shows its purple recording icon during that time. The pictures stay in memory, and are not saved or sent anywhere." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Damit kann Pairwise Bilder verbundener Fenster zeigen, während du sie ziehst. Sie werden weder gespeichert noch irgendwohin gesendet."
+            "value" : "Damit zeigt Pairwise Live-Bilder der beiden verbundenen Fenster, während du sie ziehst. macOS zeigt in dieser Zeit sein violettes Aufnahmesymbol. Die Bilder bleiben im Arbeitsspeicher und werden weder gesichert noch versendet."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Hiermee kan Pairwise beelden van gekoppelde vensters tonen terwijl je ze sleept. Die worden niet bewaard en nergens heen gestuurd."
+            "value" : "Hiermee toont Pairwise livebeelden van de twee gekoppelde vensters terwijl je ze sleept. macOS laat in die tijd zijn paarse opname-icoon zien. De beelden blijven in het geheugen, en worden niet opgeslagen of verstuurd."
           }
         }
-      }
+      },
+      "comment" : "Text in the settings window"
     },
     "Live frames, window %lld" : {
       "comment" : "Measurement: live frames that arrived for one window",
@@ -376,6 +376,7 @@
       }
     },
     "Move Pairwise to Applications?" : {
+      "comment" : "Alert title when the app runs from outside Applications",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -389,8 +390,7 @@
             "value" : "Pairwise naar Apps verplaatsen?"
           }
         }
-      },
-      "comment" : "Alert title when the app runs from outside Applications"
+      }
     },
     "Move pairs together" : {
       "comment" : "Menu: the switch for moving pairs of windows together",
@@ -410,6 +410,7 @@
       }
     },
     "Move to Applications" : {
+      "comment" : "Alert button",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -423,8 +424,7 @@
             "value" : "Verplaats naar Apps"
           }
         }
-      },
-      "comment" : "Alert button"
+      }
     },
     "Moves" : {
       "comment" : "Measurement: how often the partner window was moved",
@@ -495,6 +495,7 @@
       }
     },
     "Not Now" : {
+      "comment" : "Alert button",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -508,8 +509,7 @@
             "value" : "Niet nu"
           }
         }
-      },
-      "comment" : "Alert button"
+      }
     },
     "Not granted" : {
       "comment" : "The Accessibility permission's status",
@@ -529,6 +529,7 @@
       }
     },
     "Open at login" : {
+      "comment" : "Setting: start Pairwise when the user logs in",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -542,14 +543,14 @@
             "value" : "Openen bij inloggen"
           }
         }
-      },
-      "comment" : "Setting: start Pairwise when the user logs in"
+      }
     },
     "Pairwise" : {
       "comment" : "The app's name, the title of its window",
       "shouldTranslate" : false
     },
     "Pairwise could not be moved" : {
+      "comment" : "Alert title when copying the app failed",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -563,8 +564,7 @@
             "value" : "Pairwise kon niet worden verplaatst"
           }
         }
-      },
-      "comment" : "Alert title when copying the app failed"
+      }
     },
     "Pairwise has no Accessibility access." : {
       "comment" : "Problem message",
@@ -720,6 +720,7 @@
       }
     },
     "Startup and updates" : {
+      "comment" : "Section of the settings",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -733,8 +734,7 @@
             "value" : "Opstarten en updates"
           }
         }
-      },
-      "comment" : "Section of the settings"
+      }
     },
     "Still" : {
       "comment" : "Setting: the pictures do not update during a drag",

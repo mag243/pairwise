@@ -51,7 +51,11 @@ These need the owner's keychain, accounts or judgment, so the agent prepares the
 - [x] When Pairwise runs from elsewhere, such as the disk image, it offers once to move to Applications. Starting at login and the permissions both want one fixed place.
 - [ ] A start at login returns earlier pairs and parked windows as a normal start does (ADR 0053, 0054).
 
-### 7. Translations and README
+### 7. The purple recording icon
+- [x] Say why it appears, before people see it: in the Screen Recording permission's text, on the page and in the README.
+- [ ] By hand, with the debug setting Live pictures at Still: does the icon stay away during a drag of a pair and of a seam, and how does that look? If it does and looks well enough, an ADR for a setting.
+
+### 8. Translations and README
 - [x] All new text in en, nl and de (ADR 0010).
 - [x] The README says how to install with Homebrew and from the disk image, which permissions Pairwise asks for and why, and how to remove it.
 
