@@ -34,7 +34,7 @@ enum PairDrag {
         let pointerXAtPress: Double
         var limits = SeamLimits()
         var lastPartnerFrame: WindowFrame?
-        /// The width the partner would have with no reach, to tell how it is changing.
+        /// The width the partner would have with no reach, to tell whether it is growing.
         var lastExactWidth: Double
         var reach = 0.0
         /// Set by the release, so that the next tick and not the event calls the apps.

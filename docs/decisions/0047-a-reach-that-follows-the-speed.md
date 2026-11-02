@@ -1,6 +1,6 @@
 # 0047. A reach that follows the speed
 
-- **Status:** Accepted
+- **Status:** Deprecated
 - **Date:** 2026-11-02
 - **Milestone:** M3
 
@@ -16,6 +16,9 @@ ADR 0045 and 0046 have a growing partner reach 40 points under the held window, 
 - **No reach at all:** a gap of up to 20 points in the spike while growing.
 - **A reach only when the held window is in front:** a see-through window still shows it, and the jump at the release stays.
 - **Raising the held window at the start of a resize:** it changes which window is in front, which a resize by itself does not ask for.
+
+## Outcome
+Tried by hand and taken back at the owner's wish: the window being dragged jumped, which disturbed more than the steady reach of ADR 0045 and 0046. Why it jumped was not measured. Likely causes are the calls to the app on every tick, which hold up the drag events on the same thread, or a changing reach being taken for a limit.
 
 ## Consequences
 - Positive: nothing stands over or under the other window once the hand stops, and the release moves nothing.

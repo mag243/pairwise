@@ -8,7 +8,6 @@ import Testing
 @Suite struct PairDragModelSeamResizeTests {
     private static let press = ScreenPoint(x: 499, y: 200)
     private static let reach = SeamFollow.reachUnderHeldWindow
-    private static let ticksInATenthOfASecond = 12
 
     private let system = FakeWindowSystem()
     private let left = FakeWindow(
@@ -91,21 +90,6 @@ import Testing
             on: right, whileResizing: left,
             to: WindowFrame(x: 50, y: 100, width: 450, height: 300))
         #expect(right.moves.isEmpty && right.resizes.isEmpty)
-    }
-
-    @Test func aGrowingPartnerIsAtTheSeamSoonAfterTheSeamStands() {
-        resize(left, to: WindowFrame(x: 100, y: 100, width: 350, height: 300))
-        for _ in 0..<Self.ticksInATenthOfASecond { system.tick() }
-        #expect(right.currentFrame == WindowFrame(x: 450, y: 100, width: 250, height: 200))
-    }
-
-    @Test func theReleaseOfASeamThatStoodStillMovesNothing() {
-        resize(left, to: WindowFrame(x: 100, y: 100, width: 350, height: 300))
-        for _ in 0..<Self.ticksInATenthOfASecond { system.tick() }
-        let moves = right.moves.count
-        _ = system.send(.released(Self.press))
-        system.tick()
-        #expect(right.moves.count == moves)
     }
 
     @Test func thePartnerKeepsItsHeight() {
