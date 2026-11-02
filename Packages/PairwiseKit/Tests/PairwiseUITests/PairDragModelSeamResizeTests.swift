@@ -35,16 +35,28 @@ import Testing
 
     private let wider = WindowFrame(x: 100, y: 100, width: 450, height: 300)
 
-    @Test func thePartnerOnTheRightFollowsAndReachesUnderTheWindow() {
+    @Test func aShrinkingPartnerOnTheRightMeetsTheSeam() {
         resize(left, to: wider)
-        #expect(right.currentFrame.origin.x == 550 - Self.reach)
+        #expect(right.currentFrame.origin.x == 550)
         #expect(right.currentFrame.maxX == 700)
     }
 
-    @Test func thePartnerOnTheLeftFollowsAndReachesUnderTheWindow() {
+    @Test func aShrinkingPartnerOnTheLeftMeetsTheSeam() {
         resize(right, to: WindowFrame(x: 450, y: 100, width: 250, height: 200))
         #expect(left.currentFrame.origin.x == 100)
-        #expect(left.currentFrame.maxX == 450 + Self.reach)
+        #expect(left.currentFrame.maxX == 450)
+    }
+
+    @Test func aGrowingPartnerOnTheRightReachesUnderTheWindow() {
+        resize(left, to: WindowFrame(x: 100, y: 100, width: 350, height: 300))
+        #expect(right.currentFrame.origin.x == 450 - Self.reach)
+        #expect(right.currentFrame.maxX == 700)
+    }
+
+    @Test func aGrowingPartnerOnTheLeftReachesUnderTheWindow() {
+        resize(right, to: WindowFrame(x: 550, y: 100, width: 150, height: 200))
+        #expect(left.currentFrame.origin.x == 100)
+        #expect(left.currentFrame.maxX == 550 + Self.reach)
     }
 
     @Test func thePartnerKeepsItsHeight() {
@@ -66,11 +78,12 @@ import Testing
     }
 
     @Test func theReleaseActsOnTheNextTickAndNotOnTheEvent() {
-        resize(left, to: wider)
+        let narrower = WindowFrame(x: 100, y: 100, width: 350, height: 300)
+        resize(left, to: narrower)
         _ = system.send(.released(Self.press))
-        #expect(right.currentFrame.origin.x == 550 - Self.reach)
+        #expect(right.currentFrame.origin.x == 450 - Self.reach)
         system.tick()
-        #expect(right.currentFrame == WindowFrame(x: 550, y: 100, width: 150, height: 200))
+        #expect(right.currentFrame == WindowFrame(x: 450, y: 100, width: 250, height: 200))
         #expect(!system.isTicking)
     }
 

@@ -15,6 +15,8 @@ protocol AccessibilityElement {
     func elements(of attribute: String) -> [any AccessibilityElement]
     /// The attribute's value when it is another element.
     func elementAttribute(_ name: String) -> (any AccessibilityElement)?
+    /// The names of all attributes this element has.
+    var attributeNames: [String] { get }
     /// The process that owns this element, or `nil` when the element has gone.
     var processID: pid_t? { get }
     /// Whether `other` is the same element of the same app.

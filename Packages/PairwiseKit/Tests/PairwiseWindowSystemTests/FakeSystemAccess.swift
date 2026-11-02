@@ -33,6 +33,8 @@ final class FakeElement: AccessibilityElement {
         return element
     }
 
+    var attributeNames: [String] { Array(attributes.keys) }
+
     func limitMessagingTime() {
         timeLimits += 1
     }

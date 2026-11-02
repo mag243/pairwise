@@ -5,6 +5,12 @@ extension AXUIElement: AccessibilityElement {
     /// must not hold up Pairwise for longer, since the calls run on the main thread.
     private static let messagingTimeout: Float = 0.1
 
+    var attributeNames: [String] {
+        var names: CFArray?
+        guard AXUIElementCopyAttributeNames(self, &names) == .success else { return [] }
+        return names as? [String] ?? []
+    }
+
     func limitMessagingTime() {
         AXUIElementSetMessagingTimeout(self, Self.messagingTimeout)
     }

@@ -71,20 +71,22 @@ extension DragStressTest {
             window, at: ScreenPoint(x: Self.leftOrigin.x + size.width, y: Self.leftOrigin.y))
         await wait(Self.settleWait)
         report("set up for the seam", window, other)
-        await dragSeam(of: window, by: -100)
+        await dragSeam(of: window, partner: other, by: -100)
         lines.append("expect the seam moved by -100, far edges where they were")
         report("resized at the seam", window, other)
-        await dragSeam(of: window, by: -300)
-        lines.append("expect the other at Finder's minimum of 520, the seam shared")
+        await dragSeam(of: window, partner: other, by: -300)
+        lines.append("expect the other at Finder's minimum of 520 during the drag, seam shared")
         report("resized to the other's minimum", window, other)
-        await dragSeam(of: other, atRightEdge: true, by: 500)
-        lines.append("expect the first at Finder's minimum of 520, far edge at 1500, seam shared")
+        await dragSeam(of: other, partner: window, atRightEdge: true, by: 500)
+        lines.append(
+            "expect the first at Finder's minimum of 520 during the drag, far edge at 1500")
         report("resized to the minimum on the right", window, other)
     }
 
     /// Drags an edge of `window`, away from the lock in the middle of the seam.
     private func dragSeam(
-        of window: AccessibilityWindow, atRightEdge: Bool = false, by distance: Double
+        of window: AccessibilityWindow, partner: AccessibilityWindow, atRightEdge: Bool = false,
+        by distance: Double
     ) async {
         guard let frame = window.serverFrame() else { return }
         try? window.raise()
@@ -102,6 +104,7 @@ extension DragStressTest {
         }
         await wait(Self.windowWait)
         lines.append("press: \(pressOutcome())")
+        report("during the drag, still held", window, partner)
         post(.leftMouseUp, at: point)
         await wait(Self.settleWait)
     }

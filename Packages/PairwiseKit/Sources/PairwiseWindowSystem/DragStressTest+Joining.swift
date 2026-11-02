@@ -41,6 +41,7 @@ extension DragStressTest {
         await place(other, at: Self.otherOrigin)
         await wait(Self.settleWait)
         report("set up", window, other)
+        lines.append("a window's attributes: \(window.element.attributeNames.sorted())")
         // Asked only now: just after opening, the window server may not know a window's size
         // yet, and a window's number is found by its size.
         guard let first = window.windowNumber, let second = other.windowNumber, first != second

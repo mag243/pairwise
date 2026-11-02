@@ -22,6 +22,10 @@ public final class FakeWindow: MovableWindow {
     /// When set, a width asked for is rounded down to a multiple of this, as with an app that
     /// sizes in whole characters.
     public var widthStep: Double?
+    /// When set, a width is kept from going below this, as an app does without saying so.
+    public var minimumWidth: Double?
+    /// When set, a width is kept from going above this, as an app does without saying so.
+    public var maximumWidth: Double?
     /// When set, raising throws this.
     public var raiseError: WindowSystemError?
     /// Runs during each raise, to let a test see what stands at that moment.
@@ -57,6 +61,8 @@ public final class FakeWindow: MovableWindow {
         if let widthStep {
             currentFrame.size.width = (size.width / widthStep).rounded(.down) * widthStep
         }
+        if let minimumWidth { currentFrame.size.width = max(currentFrame.size.width, minimumWidth) }
+        if let maximumWidth { currentFrame.size.width = min(currentFrame.size.width, maximumWidth) }
     }
 
     public func raise() throws(WindowSystemError) {

@@ -1,7 +1,7 @@
 /// How a partner follows a window being resized at their seam (ADR 0045).
 public enum SeamFollow {
-    /// How far a partner reaches under the held window while it is being resized, in points,
-    /// so that a partner lagging behind shows no gap.
+    /// How far a growing partner reaches under the held window while it is being resized, in
+    /// points, so that lagging behind shows no gap (ADR 0046).
     public static let reachUnderHeldWindow = 40.0
     /// The width below which a partner is not asked to go, in points. Apps have their own,
     /// larger minimum.
@@ -45,15 +45,26 @@ public enum SeamFollow {
     public static func heldFrame(
         _ held: WindowFrame, meeting partner: WindowFrame, partnerOn side: PairSide
     ) -> WindowFrame {
+        heldFrame(held, seamAt: side == .right ? partner.origin.x : partner.maxX, partnerOn: side)
+    }
+
+    /// The frame for `held` with the seam at `x`, and its far edge where it is.
+    public static func heldFrame(
+        _ held: WindowFrame, seamAt x: Double, partnerOn side: PairSide
+    ) -> WindowFrame {
         switch side {
         case .right:
             return WindowFrame(
-                x: held.origin.x, y: held.origin.y, width: partner.origin.x - held.origin.x,
+                x: held.origin.x, y: held.origin.y, width: x - held.origin.x,
                 height: held.size.height)
         case .left:
             return WindowFrame(
-                x: partner.maxX, y: held.origin.y, width: held.maxX - partner.maxX,
-                height: held.size.height)
+                x: x, y: held.origin.y, width: held.maxX - x, height: held.size.height)
         }
+    }
+
+    /// Where the seam of `held` is.
+    public static func seam(of held: WindowFrame, partnerOn side: PairSide) -> Double {
+        side == .right ? held.maxX : held.origin.x
     }
 }

@@ -51,3 +51,4 @@ Use `0000-template.md` as the basis.
 | 0043 | Joining within one app | Accepted |
 | 0044 | A lock that joins and parts | Accepted |
 | 0045 | Following at the seam | Accepted |
+| 0046 | Stopping the seam at a window's limit | Accepted |

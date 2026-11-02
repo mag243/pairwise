@@ -43,7 +43,7 @@ Done first because everything below adds code to this module.
 ### 6. The shared seam
 - [x] A short spike first, as this is the least known part: can Pairwise see a resize soon enough, and should it follow the app's notifications or take over the drag as in ADR 0024? The outcome goes in ADR 0045.
 - [x] Resizing a window at the seam resizes the other, so the seam stays shared. Outer edges resize one window only.
-- [x] Minimum sizes: the seam stops where either window refuses to go, the partner's at the release.
+- [x] Minimum and maximum sizes: the seam stops where either window refuses to go, during the drag (ADR 0046).
 - [x] Measured, on Finder windows, in `docs/reference/spike-following.md`.
 - [ ] Judged by hand, in Terminal and an Electron app too.
 

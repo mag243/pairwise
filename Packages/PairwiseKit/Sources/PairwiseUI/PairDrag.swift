@@ -28,7 +28,15 @@ enum PairDrag {
         /// The partner's frame at the press, which holds its far edge.
         let partnerStart: WindowFrame
         let side: PairSide
+        /// The seam's place and the pointer's at the press, which tell where the seam goes
+        /// without asking any app.
+        let seamAtPress: Double
+        let pointerXAtPress: Double
+        var limits = SeamLimits()
         var lastPartnerFrame: WindowFrame?
+        /// The width the partner would have with no reach, to tell whether it is growing.
+        var lastExactWidth: Double
+        var reach = 0.0
         /// Set by the release, so that the next tick and not the event calls the apps.
         var isReleased = false
     }
