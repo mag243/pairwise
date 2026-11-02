@@ -7,6 +7,9 @@ import os
 /// input passes.
 @MainActor
 final class HoldingTap: PointerHold {
+    /// The key that joins and parts windows (ADR 0036).
+    private static let joinKey = CGEventFlags.maskCommand
+
     private static let logger = Logger(subsystem: "me.m-domain.pairwise", category: "pair-drag")
 
     private let decide: @MainActor (PointerButtonEvent) -> Bool
@@ -48,9 +51,11 @@ final class HoldingTap: PointerHold {
     }
 
     /// Whether the event passes; anything but the three button events always does.
-    func passes(_ type: CGEventType, at location: CGPoint) -> Bool {
+    func passes(_ type: CGEventType, at location: CGPoint, flags: CGEventFlags) -> Bool {
         switch type {
-        case .leftMouseDown: return decide(.pressed(ScreenPoint(location)))
+        case .leftMouseDown:
+            return decide(
+                .pressed(ScreenPoint(location), isJoinKeyDown: flags.contains(Self.joinKey)))
         case .leftMouseDragged: return decide(.dragged(ScreenPoint(location)))
         case .leftMouseUp: return decide(.released(ScreenPoint(location)))
         case .tapDisabledByTimeout, .tapDisabledByUserInput:
@@ -70,8 +75,9 @@ private func holdingTapCallback(
     guard let info else { return Unmanaged.passUnretained(event) }
     let tap = Unmanaged<HoldingTap>.fromOpaque(info)
     let location = event.location
+    let flags = event.flags
     let passes = MainActor.assumeIsolated {
-        tap.takeUnretainedValue().passes(type, at: location)
+        tap.takeUnretainedValue().passes(type, at: location, flags: flags)
     }
     return passes ? Unmanaged.passUnretained(event) : nil
 }

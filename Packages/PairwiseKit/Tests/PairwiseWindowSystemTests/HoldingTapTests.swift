@@ -19,8 +19,18 @@ import Testing
             seen = event
             return false
         }
-        #expect(!tap.passes(type, at: Self.location))
+        #expect(!tap.passes(type, at: Self.location, flags: []))
         #expect(seen == expected)
+    }
+
+    @Test func aPressSaysWhetherTheJoinKeyWasDownInTheEventItself() {
+        var seen: PointerButtonEvent?
+        let tap = HoldingTap { event in
+            seen = event
+            return true
+        }
+        _ = tap.passes(.leftMouseDown, at: Self.location, flags: .maskCommand)
+        #expect(seen == .pressed(ScreenPoint(x: 5, y: 6), isJoinKeyDown: true))
     }
 
     @Test(arguments: [
@@ -32,7 +42,7 @@ import Testing
             decisions += 1
             return false
         }
-        #expect(tap.passes(type, at: Self.location))
+        #expect(tap.passes(type, at: Self.location, flags: []))
         #expect(decisions == 0)
     }
 }

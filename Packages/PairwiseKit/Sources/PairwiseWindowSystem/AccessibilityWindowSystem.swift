@@ -49,10 +49,6 @@ public final class AccessibilityWindowSystem: WindowSystemProviding {
         PartnerPlacement.parkingOrigin(onDisplays: access.displays())
     }
 
-    public var isJoinKeyDown: Bool {
-        CGEventSource.flagsState(.combinedSessionState).contains(.maskCommand)
-    }
-
     public var isPrimaryButtonDown: Bool {
         CGEventSource.buttonState(.combinedSessionState, button: .left)
     }

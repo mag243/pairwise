@@ -17,6 +17,7 @@ public final class FakeWindowSystem: WindowSystemProviding {
     public var liveFramesPerSecond = 0
     public private(set) var accessibilityRequests = 0
     public private(set) var screenRecordingRequests = 0
+    /// Whether the presses sent carry the join key.
     public var isJoinKeyDown = false
     /// The windows `normalWindows()` and `window(number:)` know about.
     public var knownWindows: [FakeWindow] = []
@@ -98,7 +99,10 @@ public final class FakeWindowSystem: WindowSystemProviding {
 
     /// Sends `event` through the hold, and returns whether it passes.
     public func send(_ event: PointerButtonEvent) -> Bool {
-        holdDecision?(event) ?? true
+        if case .pressed(let point, _) = event {
+            return holdDecision?(.pressed(point, isJoinKeyDown: isJoinKeyDown)) ?? true
+        }
+        return holdDecision?(event) ?? true
     }
 
     public func startTicking(

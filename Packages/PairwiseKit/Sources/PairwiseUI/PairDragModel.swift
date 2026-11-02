@@ -86,8 +86,8 @@ public final class PairDragModel {
     /// Whether `event` passes. Only drag events after the window has moved are withheld.
     private func decide(_ event: PointerButtonEvent) -> Bool {
         switch event {
-        case .pressed(let point):
-            press(at: point)
+        case .pressed(let point, let isJoinKeyDown):
+            press(at: point, isJoinKeyDown: isJoinKeyDown)
             return true
         case .dragged(let point):
             return !holdsDrag(at: point)
@@ -97,14 +97,14 @@ public final class PairDragModel {
         }
     }
 
-    private func press(at point: ScreenPoint) {
+    private func press(at point: ScreenPoint, isJoinKeyDown: Bool) {
         putWindowsBack()
         endDrag()
         problem = nil
         let before = system.uptime
         hasSeenButtonDown = false
         pressTime = before
-        let outcome = takeOverPress(at: point)
+        let outcome = takeOverPress(at: point, isJoinKeyDown: isJoinKeyDown)
         lastPressOutcome = outcome
         let elapsed = system.uptime - before
         Self.logger.info("press: \(outcome, privacy: .public), deciding took \(elapsed) s")
@@ -112,11 +112,11 @@ public final class PairDragModel {
 
     /// Says what became of the press, for the log. A window in no pair costs only the window
     /// number, as most presses are on such windows (ADR 0033).
-    private func takeOverPress(at point: ScreenPoint) -> String {
+    private func takeOverPress(at point: ScreenPoint, isJoinKeyDown: Bool) -> String {
         guard let number = system.windowNumber(at: point) else {
             return "no window under the pointer"
         }
-        if system.isJoinKeyDown { return startJoining(number, pointer: point) }
+        if isJoinKeyDown { return startJoining(number, pointer: point) }
         guard
             let partnerEntry = book.partner(of: number),
             let window = pairedWindows[number],

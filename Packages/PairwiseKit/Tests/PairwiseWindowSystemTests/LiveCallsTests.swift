@@ -71,7 +71,6 @@ import Testing
 
     @Test func aHiddenGuideCostsNothing() {
         let system = AccessibilityWindowSystem()
-        _ = system.isJoinKeyDown
         system.hideJoinGuide()
     }
 
