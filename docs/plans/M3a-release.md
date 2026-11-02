@@ -62,7 +62,7 @@ A third choice beside Still and Live, for dragging with no Screen Recording perm
 - [x] Trial, in the debug setting: during a drag and at a seam, each window shows as an empty plane that follows light or dark mode, with the app's icon in its middle, and a title bar holding the three buttons, the icon and the window's title, read through the Accessibility API. Nothing is captured.
 - [x] By hand: does it move and resize cleanly, and how does the jump to the real content at the release feel?
 - [x] Decide with the owner whether it stays, and whether it is the default. If it stays: an ADR first, then Pairwise works with Accessibility alone, the permission is asked only for Still or Live, and the first start, the settings' texts, the page, the README and the translations follow.
-- [ ] Moving the real windows stays out: M1 showed that the partner visibly lags (ADR 0024).
+- [x] Moving the real windows stays out: M1 showed that the partner visibly lags (ADR 0024).
 
 ### 9. Translations and README
 - [x] All new text in en, nl and de (ADR 0010).
