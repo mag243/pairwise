@@ -70,6 +70,47 @@ import Testing
         #expect(system.send(.dragged(Self.further)))
     }
 
+    /// macOS can go on saying that Screen Recording is on after it was turned off, until the
+    /// app restarts; only the capture then fails.
+    @Test func aFailedCaptureFallsBackOnPlaceholdersForTheSameDrag() {
+        model.dragPictures = .still
+        _ = system.send(.pressed(Self.onTitleBar))
+        let requests = system.standInRequests
+        system.finishStandIn(with: .failure(.captureFailed))
+        #expect(system.showsPlaceholders)
+        #expect(system.standInRequests == requests + 1)
+        #expect(model.problem == nil)
+        #expect(model.hasCaptureFailed)
+    }
+
+    @Test func theNextDragTriesACaptureAgain() {
+        model.dragPictures = .still
+        _ = system.send(.pressed(Self.onTitleBar))
+        system.finishStandIn(with: .failure(.captureFailed))
+        system.finishStandIn(with: .success(panel))
+        #expect(!system.showsPlaceholders)
+        #expect(model.hasCaptureFailed)
+    }
+
+    @Test func aCaptureThatWorksClearsTheFailure() {
+        model.dragPictures = .still
+        _ = system.send(.pressed(Self.onTitleBar))
+        system.finishStandIn(with: .failure(.captureFailed))
+        system.finishStandIn(with: .success(panel))
+        _ = system.send(.released(Self.onTitleBar))
+        _ = system.send(.pressed(Self.onTitleBar))
+        system.finishStandIn(with: .success(panel))
+        #expect(!model.hasCaptureFailed)
+    }
+
+    @Test func placeholdersThatFailStayAProblem() {
+        _ = system.send(.pressed(Self.onTitleBar))
+        let requests = system.standInRequests
+        system.finishStandIn(with: .failure(.captureFailed))
+        #expect(system.standInRequests == requests)
+        #expect(model.problem == .captureFailed)
+    }
+
     @Test func withoutScreenRecordingPairwiseRunsWithPlaceholders() {
         model.stop()
         system.isScreenRecordingGranted = false

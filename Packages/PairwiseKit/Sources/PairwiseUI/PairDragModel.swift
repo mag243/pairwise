@@ -27,6 +27,9 @@ public final class PairDragModel {
         didSet { system.liveFramesPerSecond = liveFramesPerSecond }
     }
 
+    /// Whether the last capture failed. macOS can go on saying that Screen Recording is on after
+    /// it was turned off, until the app restarts, so only this shows it (ADR 0064).
+    public internal(set) var hasCaptureFailed = false
     /// What the pictures show during a drag, the user's choice (ADR 0064).
     public var dragPictures = DragPictures.standard {
         didSet { applyDragPictures() }
@@ -180,17 +183,13 @@ public final class PairDragModel {
                 frame: frame,
                 pointer: point, lastPointer: point))
         system.startTicking(every: Self.tickInterval) { [weak self] in self?.tick() }
-        let current = request
         let first = partner.side == .right ? window : partnerWindow
         let second = partner.side == .right ? partnerWindow : window
-        system.makePairStandIn(of: first, beside: second) { [weak self] result in
-            guard let self, current == request else { return }
-            receive(result)
-        }
+        askForPictures(of: first, beside: second)
         return "watching"
     }
 
-    private func receive(_ result: Result<any WindowStandIn, WindowSystemError>) {
+    func receive(_ result: Result<any WindowStandIn, WindowSystemError>) {
         if case .resizingSeam(let resizing) = drag {
             receive(result, for: resizing)
             return

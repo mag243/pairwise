@@ -12,6 +12,7 @@ A third choice in Pictures while dragging, **Placeholder**, and the default: an 
 
 - Pairwise needs Accessibility alone: it starts without Screen Recording, and the settings window opens by itself only for Accessibility.
 - Still and Live stay, and need Screen Recording. Choosing one asks for it. Until it is given, or when it is taken away, Pairwise uses placeholders and says so in the settings. It does not stop.
+- macOS can go on saying that Screen Recording is on after it was turned off, until the app restarts. So a capture that fails also falls back on placeholders, for that drag, the settings then say it is not on, and the next drag tries a capture again.
 - At a seam a placeholder is layers that only change place, as drawing it anew at every move was visibly slow.
 
 ## Alternatives

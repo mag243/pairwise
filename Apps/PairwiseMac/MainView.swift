@@ -105,14 +105,14 @@ struct MainView: View {
                 Button("Grant Access…") { model.requestAccessibility() }
             }
             LabeledContent {
-                Text(model.isScreenRecordingGranted ? "Granted" : "Not granted")
+                Text(isScreenRecordingWorking ? "Granted" : "Not granted")
             } label: {
                 Text("Screen Recording")
                 Text(
                     "Only for still or live pictures while dragging. The pictures stay in memory, and are not saved or sent anywhere."
                 )
             }
-            if !model.isScreenRecordingGranted {
+            if !isScreenRecordingWorking {
                 Button("Grant Screen Recording…") { model.requestScreenRecording() }
             }
             if !model.isAccessibilityGranted {
@@ -136,11 +136,18 @@ struct MainView: View {
                 Text("Live").tag(DragPictures.live)
             }
             Text(dragPicturesExplanation).foregroundStyle(.secondary)
-            if model.dragPictures.needsScreenRecording, !model.isScreenRecordingGranted {
-                Text("Placeholders are used until Screen Recording is on, under General.")
-                    .foregroundStyle(.secondary)
+            if model.dragPictures.needsScreenRecording, !isScreenRecordingWorking {
+                Text(
+                    "Placeholders are used until Screen Recording is on, under General. After turning it on, restart Pairwise."
+                )
+                .foregroundStyle(.secondary)
             }
         }
+    }
+
+    /// macOS can go on saying that it is on after it was turned off, until the app restarts.
+    private var isScreenRecordingWorking: Bool {
+        model.isScreenRecordingGranted && !model.hasCaptureFailed
     }
 
     private var dragPicturesExplanation: LocalizedStringKey {
