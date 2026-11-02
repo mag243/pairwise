@@ -34,7 +34,7 @@ Done first because everything below adds code to this module.
 ### 5. Coming apart
 - [x] Command at a press or during the drag of a pair ends the pair, and only that window moves (ADR 0035, 0036, 0040).
 - [x] A lock on the seam shows near the pointer, and a click on it ends the pair with both windows staying in place (ADR 0042).
-- [ ] Check by hand.
+- [x] Checked by hand, with the lock.
 
 ### 6. The shared seam
 - [ ] A short spike first, as this is the least known part: can Pairwise see a resize soon enough, and should it follow the app's notifications or take over the drag as in ADR 0024? The outcome goes in an ADR.
