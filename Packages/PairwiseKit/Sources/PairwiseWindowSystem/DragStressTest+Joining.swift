@@ -36,13 +36,21 @@ extension DragStressTest {
             lines.append("could not open the test windows")
             return
         }
-        system.onlyNormalWindows = Set(
-            [window.windowNumber, other.windowNumber].compactMap(\.self))
         try? other.resize(to: WindowSize(width: Double(Self.size.width), height: Self.otherHeight))
         await place(window, at: Self.leftOrigin)
         await place(other, at: Self.otherOrigin)
         await wait(Self.settleWait)
         report("set up", window, other)
+        // Asked only now: just after opening, the window server may not know a window's size
+        // yet, and a window's number is found by its size.
+        guard let first = window.windowNumber, let second = other.windowNumber, first != second
+        else {
+            lines.append("the test windows have no numbers of their own: nothing was tested")
+            close(window)
+            close(other)
+            return
+        }
+        system.onlyNormalWindows = [first, second]
         await joinFromTheLeft(window, other)
         await dragTogether(window, other)
         await part(window, other)
