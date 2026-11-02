@@ -27,10 +27,16 @@ public final class FakeWindowSystem: WindowSystemProviding {
     public private(set) var isGuideShowing = false
     public private(set) var seamFlashes: [WindowFrame] = []
     public private(set) var standInRequests = 0
+    public private(set) var normalWindowsRequests = 0
+    public var pointerLocation = ScreenPoint(x: 0, y: 0)
+    public private(set) var lockFrames: [WindowFrame] = []
+    public private(set) var isLockShowing = false
+    public private(set) var openedLocks: [WindowFrame] = []
     public private(set) var windowNumberRequests = 0
 
     private var holdDecision: (@MainActor (PointerButtonEvent) -> Bool)?
     private var tickHandler: (@MainActor () -> Void)?
+    private var pointerHandler: (@MainActor () -> Void)?
     private var standInCompletion:
         (@MainActor (Result<any WindowStandIn, WindowSystemError>) -> Void)?
 
@@ -55,7 +61,8 @@ public final class FakeWindowSystem: WindowSystemProviding {
     }
 
     public func normalWindows() -> [ScreenWindow] {
-        knownWindows.compactMap { window in
+        normalWindowsRequests += 1
+        return knownWindows.compactMap { window in
             window.windowNumber.map { ScreenWindow(number: $0, frame: window.currentFrame) }
         }
     }
@@ -75,6 +82,37 @@ public final class FakeWindowSystem: WindowSystemProviding {
 
     public func flashSeam(at frame: WindowFrame) {
         seamFlashes.append(frame)
+    }
+
+    public func showSeamLock(at frame: WindowFrame) {
+        lockFrames.append(frame)
+        isLockShowing = true
+    }
+
+    public func hideSeamLock() {
+        isLockShowing = false
+    }
+
+    public func flashOpenSeamLock(at frame: WindowFrame) {
+        openedLocks.append(frame)
+    }
+
+    public func startWatchingPointer(
+        every interval: TimeInterval, _ handler: @escaping @MainActor () -> Void
+    ) {
+        pointerHandler = handler
+    }
+
+    public func stopWatchingPointer() {
+        pointerHandler = nil
+    }
+
+    public var isWatchingPointer: Bool { pointerHandler != nil }
+
+    /// Puts the pointer at `point`, and lets the watching see it.
+    public func movePointer(to point: ScreenPoint) {
+        pointerLocation = point
+        pointerHandler?()
     }
 
     public func windowNumber(at point: ScreenPoint) -> UInt32? {

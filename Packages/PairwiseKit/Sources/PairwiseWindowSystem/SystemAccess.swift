@@ -40,6 +40,8 @@ protocol SystemAccess {
     func windowDescription(_ number: CGWindowID) -> [String: Any]?
     /// All displays in global screen coordinates.
     func displays() -> [WindowFrame]
+    /// Where the pointer is now, in global screen coordinates.
+    var pointerLocation: ScreenPoint { get }
     /// This app's own process.
     var ownProcess: pid_t { get }
 }
@@ -59,5 +61,16 @@ protocol ScreenMark: AnyObject {
     /// Shows the mark over `frame`, or moves it there.
     func show(at frame: WindowFrame)
     /// Takes the mark off the screen.
+    func hide()
+}
+
+/// A lock on a seam, above other windows (ADR 0042).
+@MainActor
+protocol SeamLockMark: AnyObject {
+    /// Shows the closed lock over `frame`, or moves it there.
+    func showClosed(at frame: WindowFrame)
+    /// Shows the open lock over `frame`.
+    func showOpen(at frame: WindowFrame)
+    /// Takes the lock off the screen.
     func hide()
 }

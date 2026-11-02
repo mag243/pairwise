@@ -10,6 +10,8 @@ extension DragStressTest {
     private static let joinKeyStep = 10
     private static let guideWait: UInt64 = 300
     private static let floatingLevel = 3
+    /// The level of the lock on a seam, which tells it from the guide.
+    private static let lockLevel = 8
     private static let pictureMargin = 60.0
     private static let otherHeight = 500.0
     private static let leftOrigin = ScreenPoint(x: 100, y: 120)
@@ -43,6 +45,7 @@ extension DragStressTest {
         await dragTogether(window, other)
         await part(window, other)
         await joinFromTheRight(window, other)
+        await partWithTheLock(window, other)
         close(window)
         close(other)
         lines.append("join test ended")
@@ -97,6 +100,28 @@ extension DragStressTest {
         report("joined with Shift", window, other)
     }
 
+    /// Expects the first window on the right, as the steps before leave it.
+    private func partWithTheLock(_ window: AccessibilityWindow, _ other: AccessibilityWindow) async
+    {
+        guard let first = window.serverFrame(), let second = other.serverFrame() else { return }
+        let middle = CGPoint(
+            x: first.origin.x,
+            y: first.origin.y + min(first.size.height, second.size.height) / 2)
+        post(.mouseMoved, at: CGPoint(x: middle.x + Self.snapGap, y: middle.y))
+        await wait(Self.guideWait)
+        lines.append("near the seam: lock \(ownMarks(atLevel: Self.lockLevel))")
+        post(.mouseMoved, at: middle)
+        await wait(Self.windowWait)
+        post(.leftMouseDown, at: middle)
+        await wait(Self.windowWait)
+        post(.leftMouseUp, at: middle)
+        await wait(Self.settleWait)
+        lines.append("press: \(pressOutcome()); after the click: first still at its place")
+        report("parted with the lock", window, other)
+        await drag(window, byX: 30, byY: 0, withJoinKey: false, picture: nil)
+        report("a plain drag after the lock: only the first moved, by 30", window, other)
+    }
+
     private func drag(
         _ window: AccessibilityWindow, byX: Double, byY: Double, withJoinKey: Bool, picture: String?
     ) async {
@@ -147,11 +172,15 @@ extension DragStressTest {
 
     /// What this app shows above normal windows: the guide, if any.
     private func guideFrames() -> [String] {
+        ownMarks(atLevel: Self.floatingLevel)
+    }
+
+    private func ownMarks(atLevel level: Int) -> [String] {
         LiveSystemAccess().onScreenWindows()
             .filter { description in
                 description[kCGWindowOwnerPID as String] as? pid_t
                     == ProcessInfo.processInfo.processIdentifier
-                    && description[kCGWindowLayer as String] as? Int == Self.floatingLevel
+                    && description[kCGWindowLayer as String] as? Int == level
             }
             .compactMap(WindowServer.frame(from:))
             .map(Self.text(of:))

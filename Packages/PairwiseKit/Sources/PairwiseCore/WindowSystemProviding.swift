@@ -18,6 +18,9 @@ public protocol WindowSystemProviding: AnyObject {
     /// Whether the left mouse button is down now, asked of the system and not of an event.
     var isPrimaryButtonDown: Bool { get }
 
+    /// Where the pointer is now, asked of the system.
+    var pointerLocation: ScreenPoint { get }
+
     /// A monotonic time in seconds, for measuring.
     var uptime: TimeInterval { get }
 
@@ -48,6 +51,25 @@ public protocol WindowSystemProviding: AnyObject {
 
     /// Lights up a seam briefly.
     func flashSeam(at frame: WindowFrame)
+
+    /// Shows a closed lock at `frame`, or moves it there. It takes no mouse events: the hold
+    /// sees a press on it first (ADR 0042).
+    func showSeamLock(at frame: WindowFrame)
+
+    /// Takes the closed lock away, if it shows.
+    func hideSeamLock()
+
+    /// Shows an open lock at `frame` for a moment.
+    func flashOpenSeamLock(at frame: WindowFrame)
+
+    /// Calls `handler` every `interval` seconds until `stopWatchingPointer`. It costs little
+    /// and asks no app, unlike what `handler` may go on to do.
+    /// Postcondition: earlier watching has ended.
+    func startWatchingPointer(
+        every interval: TimeInterval, _ handler: @escaping @MainActor () -> Void)
+
+    /// Ends the watching; no call to the handler follows.
+    func stopWatchingPointer()
 
     /// The number of the normal window on top at `point`, or `nil` when there is none or it
     /// is one of Pairwise's own. Asks no app.

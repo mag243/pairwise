@@ -11,6 +11,10 @@ public final class AccessibilityWindowSystem: WindowSystemProviding {
     private static let defaultLiveFramesPerSecond = 30
     /// How long a seam stays lit after two windows join.
     private static let seamFlashTime = Duration.milliseconds(400)
+    /// How long a lock stays open after a click on it.
+    private static let openLockTime = Duration.milliseconds(400)
+    /// How much later the pointer's timer may fire, for the system to save energy.
+    private static let pointerTimerTolerance = 0.02
 
     public var liveFramesPerSecond = AccessibilityWindowSystem.defaultLiveFramesPerSecond
     private let access: any SystemAccess
@@ -19,8 +23,11 @@ public final class AccessibilityWindowSystem: WindowSystemProviding {
     var onlyNormalWindows: Set<UInt32>?
     private let capture: WindowCapture
     private let makeMark: () -> any ScreenMark
+    private let makeLock: () -> any SeamLockMark
     private let makeHold: (@escaping @MainActor (PointerButtonEvent) -> Bool) -> any PointerHold
     private var joinGuide: (any ScreenMark)?
+    private var seamLock: (any SeamLockMark)?
+    private var pointerTimer: Timer?
     private var holdingTap: (any PointerHold)?
     private var ticker: DisplayTicker?
     private var timer: Timer?
@@ -32,11 +39,13 @@ public final class AccessibilityWindowSystem: WindowSystemProviding {
     init(
         access: any SystemAccess, captureService: any CaptureService,
         makeMark: @escaping () -> any ScreenMark = { JoinMarkPanel() },
+        makeLock: @escaping () -> any SeamLockMark = { SeamLockPanel() },
         makeHold: @escaping (@escaping @MainActor (PointerButtonEvent) -> Bool) -> any PointerHold =
             { HoldingTap(decide: $0) }
     ) {
         self.access = access
         self.makeMark = makeMark
+        self.makeLock = makeLock
         self.makeHold = makeHold
         capture = WindowCapture(service: captureService)
     }
@@ -52,6 +61,8 @@ public final class AccessibilityWindowSystem: WindowSystemProviding {
     public var isPrimaryButtonDown: Bool {
         CGEventSource.buttonState(.combinedSessionState, button: .left)
     }
+
+    public var pointerLocation: ScreenPoint { access.pointerLocation }
 
     public var uptime: TimeInterval { ProcessInfo.processInfo.systemUptime }
 
@@ -149,6 +160,44 @@ public final class AccessibilityWindowSystem: WindowSystemProviding {
             try? await Task.sleep(for: Self.seamFlashTime)
             mark.hide()
         }
+    }
+
+    public func showSeamLock(at frame: WindowFrame) {
+        let lock = seamLock ?? makeLock()
+        seamLock = lock
+        lock.showClosed(at: frame)
+    }
+
+    public func hideSeamLock() {
+        seamLock?.hide()
+        seamLock = nil
+    }
+
+    public func flashOpenSeamLock(at frame: WindowFrame) {
+        let lock = makeLock()
+        lock.showOpen(at: frame)
+        Task {
+            try? await Task.sleep(for: Self.openLockTime)
+            lock.hide()
+        }
+    }
+
+    public func startWatchingPointer(
+        every interval: TimeInterval, _ handler: @escaping @MainActor () -> Void
+    ) {
+        stopWatchingPointer()
+        let timer = Timer(timeInterval: interval, repeats: true) { _ in
+            // The timer is on the main run loop, added below.
+            MainActor.assumeIsolated { handler() }
+        }
+        timer.tolerance = Self.pointerTimerTolerance
+        RunLoop.main.add(timer, forMode: .common)
+        pointerTimer = timer
+    }
+
+    public func stopWatchingPointer() {
+        pointerTimer?.invalidate()
+        pointerTimer = nil
     }
 
     public func startHoldingDrags(

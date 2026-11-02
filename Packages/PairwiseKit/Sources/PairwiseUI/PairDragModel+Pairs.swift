@@ -12,6 +12,7 @@ extension PairDragModel {
         try book.join(number, to: otherNumber, on: side)
         pairedWindows[number] = window
         pairedWindows[otherNumber] = other
+        updatePointerWatching()
     }
 
     /// Ends the pair that `window` is in, if any.
@@ -23,5 +24,9 @@ extension PairDragModel {
         if let partner = book.partner(of: number) { pairedWindows[partner.window] = nil }
         pairedWindows[number] = nil
         book.end(pairContaining: number)
+        if let pair = lockWatch.lock?.pair, pair.left == number || pair.right == number {
+            hideLock()
+        }
+        updatePointerWatching()
     }
 }

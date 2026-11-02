@@ -131,7 +131,9 @@ extension PairDragModel {
             try joining.window.move(to: target.frame.origin)
             try? joining.window.raise()
             try join(joining.window, to: other, on: target.side)
-            system.flashSeam(at: Self.seam(of: target))
+            if let seam = Self.seam(of: target) {
+                system.flashSeam(at: seam.frame(width: Self.seamWidth))
+            }
         } catch {
             Self.logger.info(
                 "the windows did not join: \(String(describing: error), privacy: .public)")
@@ -151,10 +153,9 @@ extension PairDragModel {
             """)
     }
 
-    private static func seam(of target: JoinTarget) -> WindowFrame {
-        let x = target.side == .right ? target.other.frame.maxX : target.other.frame.origin.x
-        return WindowFrame(
-            x: x - seamWidth / 2, y: target.frame.origin.y, width: seamWidth,
-            height: min(target.frame.size.height, target.other.frame.size.height))
+    private static func seam(of target: JoinTarget) -> Seam? {
+        target.side == .right
+            ? Seam.between(left: target.other.frame, right: target.frame)
+            : Seam.between(left: target.frame, right: target.other.frame)
     }
 }

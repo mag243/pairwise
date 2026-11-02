@@ -46,6 +46,7 @@ public final class PairDragModel {
     @ObservationIgnored var pairedWindows: [UInt32: any MovableWindow] = [:]
     @ObservationIgnored var drag = PairDrag.none
     @ObservationIgnored var stats = DragStats()
+    @ObservationIgnored var lockWatch = SeamLockWatch()
     @ObservationIgnored var hasSeenButtonDown = false
     @ObservationIgnored private var pressTime: TimeInterval = 0
     /// Tells a picture that arrives late from the one this press asked for.
@@ -73,6 +74,7 @@ public final class PairDragModel {
             try system.startHoldingDrags { [weak self] event in self?.decide(event) ?? true }
             problem = nil
             isRunning = true
+            updatePointerWatching()
         } catch {
             problem = error
         }
@@ -84,12 +86,14 @@ public final class PairDragModel {
         endDrag()
         system.stopHoldingDrags()
         isRunning = false
+        updatePointerWatching()
     }
 
     /// Whether `event` passes. Only drag events after the window has moved are withheld.
     private func decide(_ event: PointerButtonEvent) -> Bool {
         switch event {
         case .pressed(let point, let isJoinKeyDown):
+            if pressLock(at: point) { return false }
             press(at: point, isJoinKeyDown: isJoinKeyDown)
             return true
         case .dragged(let point, let isJoinKeyDown, let isEqualHeightKeyDown):
@@ -97,6 +101,7 @@ public final class PairDragModel {
                 at: point, isJoinKeyDown: isJoinKeyDown,
                 isEqualHeightKeyDown: isEqualHeightKeyDown)
         case .released(let point):
+            if releaseLock(at: point) { return false }
             release(at: point)
             return true
         case .keysChanged(let isJoinKeyDown, let isEqualHeightKeyDown):
@@ -187,6 +192,8 @@ public final class PairDragModel {
             return false
         case .passing, .placing, .settling:
             return false
+        case .clickingLock:
+            return true
         case .joining(var joining):
             joining.pointer = point
             joining.isKeyDown = isJoinKeyDown
@@ -251,7 +258,7 @@ public final class PairDragModel {
     /// up all input.
     func tick() {
         switch drag {
-        case .none, .passing:
+        case .none, .passing, .clickingLock:
             break
         case .pressed(let pressed):
             if isButtonLetGo {

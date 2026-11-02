@@ -17,6 +17,7 @@ import Testing
 
     private final class MarkBox {
         var marks: [FakeMark] = []
+        var locks: [FakeLockMark] = []
     }
 
     private let holdBox = HoldBox()
@@ -32,6 +33,11 @@ import Testing
                 let mark = FakeMark()
                 markBox.marks.append(mark)
                 return mark
+            },
+            makeLock: {
+                let lock = FakeLockMark()
+                markBox.locks.append(lock)
+                return lock
             },
             makeHold: { _ in
                 let hold = FakeHold()
@@ -85,10 +91,50 @@ import Testing
         #expect(marks.count == 2)
     }
 
+    @Test func theClosedLockIsOneMarkThatMoves() {
+        system.showSeamLock(at: Self.frame)
+        system.showSeamLock(at: Self.frame)
+        #expect(markBox.locks.count == 1)
+        #expect(markBox.locks.first?.closedFrames.count == 2)
+    }
+
+    @Test func hidingTheLockTakesItAway() {
+        system.showSeamLock(at: Self.frame)
+        system.hideSeamLock()
+        #expect(markBox.locks.first?.isHidden == true)
+    }
+
+    @Test func anOpenLockIsAMarkOfItsOwn() {
+        system.showSeamLock(at: Self.frame)
+        system.hideSeamLock()
+        system.flashOpenSeamLock(at: Self.frame)
+        #expect(markBox.locks.count == 2)
+        #expect(markBox.locks.last?.openFrames == [Self.frame])
+    }
+
     @Test func aSeamLightsUpOnAMarkOfItsOwn() {
         system.showJoinGuide(at: Self.frame)
         system.flashSeam(at: Self.frame)
         #expect(marks.count == 2)
         #expect(marks.last?.frames == [Self.frame])
+    }
+}
+
+@MainActor
+private final class FakeLockMark: SeamLockMark {
+    private(set) var closedFrames: [WindowFrame] = []
+    private(set) var openFrames: [WindowFrame] = []
+    private(set) var isHidden = false
+
+    func showClosed(at frame: WindowFrame) {
+        closedFrames.append(frame)
+    }
+
+    func showOpen(at frame: WindowFrame) {
+        openFrames.append(frame)
+    }
+
+    func hide() {
+        isHidden = true
     }
 }

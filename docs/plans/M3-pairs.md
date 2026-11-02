@@ -33,6 +33,7 @@ Done first because everything below adds code to this module.
 
 ### 5. Coming apart
 - [x] Command at a press or during the drag of a pair ends the pair, and only that window moves (ADR 0035, 0036, 0040).
+- [x] A lock on the seam shows near the pointer, and a click on it ends the pair with both windows staying in place (ADR 0042).
 - [ ] Check by hand.
 
 ### 6. The shared seam

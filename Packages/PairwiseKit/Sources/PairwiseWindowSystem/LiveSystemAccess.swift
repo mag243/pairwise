@@ -22,5 +22,9 @@ struct LiveSystemAccess: SystemAccess {
         NSScreen.globalFrames(of: NSScreen.screens.map(\.frame))
     }
 
+    var pointerLocation: ScreenPoint {
+        ScreenPoint(CGEvent(source: nil)?.location ?? .zero)
+    }
+
     var ownProcess: pid_t { ProcessInfo.processInfo.processIdentifier }
 }
