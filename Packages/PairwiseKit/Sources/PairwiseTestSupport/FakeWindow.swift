@@ -5,6 +5,8 @@ import PairwiseCore
 public final class FakeWindow: MovableWindow {
     public var currentFrame: WindowFrame
     public var windowNumber: UInt32?
+    /// The process that owns the window, as the window server tells it.
+    public var owner: Int32 = 0
     public var isAvailable = true
     /// What `serverFrame()` gives; without one the window server does not tell.
     public var currentServerFrame: WindowFrame?

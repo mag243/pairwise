@@ -42,6 +42,8 @@ enum PairDrag {
         var isKeyDown = true
         /// Whether the window is to take the other's height.
         var isTakingHeight = false
+        /// Whether the key is down that gives the other scope (ADR 0043).
+        var isScopeKeyDown = false
         /// Set when the drag events are withheld, so that Pairwise moves the window (ADR 0040).
         var held: Held?
         var target: JoinTarget?

@@ -27,6 +27,9 @@ public final class PairDragModel {
         didSet { system.liveFramesPerSecond = liveFramesPerSecond }
     }
 
+    /// Which windows the join key joins; the scope key gives the other choice (ADR 0043).
+    public var joinScope = JoinScope.anyWindow
+
     public internal(set) var isAccessibilityGranted: Bool
     public internal(set) var isScreenRecordingGranted: Bool
     public private(set) var isRunning = false
@@ -96,16 +99,18 @@ public final class PairDragModel {
             if pressLock(at: point) { return false }
             press(at: point, isJoinKeyDown: isJoinKeyDown)
             return true
-        case .dragged(let point, let isJoinKeyDown, let isEqualHeightKeyDown):
+        case .dragged(let point, let isJoinKeyDown, let isEqualHeightKeyDown, let isScopeKeyDown):
             return !holdsDrag(
                 at: point, isJoinKeyDown: isJoinKeyDown,
-                isEqualHeightKeyDown: isEqualHeightKeyDown)
+                isEqualHeightKeyDown: isEqualHeightKeyDown, isScopeKeyDown: isScopeKeyDown)
         case .released(let point):
             if releaseLock(at: point) { return false }
             release(at: point)
             return true
-        case .keysChanged(let isJoinKeyDown, let isEqualHeightKeyDown):
-            keysChanged(isJoinKeyDown: isJoinKeyDown, isEqualHeightKeyDown: isEqualHeightKeyDown)
+        case .keysChanged(let isJoinKeyDown, let isEqualHeightKeyDown, let isScopeKeyDown):
+            keysChanged(
+                isJoinKeyDown: isJoinKeyDown, isEqualHeightKeyDown: isEqualHeightKeyDown,
+                isScopeKeyDown: isScopeKeyDown)
             return true
         }
     }
@@ -180,47 +185,6 @@ public final class PairDragModel {
             pressed.standIn = standIn
             drag = .pressed(pressed)
             if pressed.hasWindowMoved { takeOver(pressed, standIn: standIn) }
-        }
-    }
-
-    private func holdsDrag(
-        at point: ScreenPoint, isJoinKeyDown: Bool, isEqualHeightKeyDown: Bool
-    ) -> Bool {
-        switch drag {
-        case .none:
-            if isJoinKeyDown { startJoiningFreeWindow(at: point) }
-            return false
-        case .passing, .placing, .settling:
-            return false
-        case .clickingLock:
-            return true
-        case .joining(var joining):
-            joining.pointer = point
-            joining.isKeyDown = isJoinKeyDown
-            joining.isTakingHeight = isEqualHeightKeyDown
-            drag = .joining(joining)
-            return joining.held != nil
-        case .pressed(var pressed):
-            pressed.lastPointer = point
-            drag = .pressed(pressed)
-            if isJoinKeyDown { return part(pressed, at: point) }
-            guard pressed.hasWindowMoved else { return false }
-            let elapsed = system.uptime - pressed.startTime
-            if pressed.standIn == nil, !DragHoldRule.mayWaitForPictures(after: elapsed) {
-                Self.logger.info("pictures took too long: the drag passes")
-                problem = .captureFailed
-                letDragPass()
-                return false
-            }
-            return true
-        case .moving(var moving):
-            let before = system.uptime
-            moving.standIn.move(to: moving.panelOrigin(forPointer: point))
-            stats.record(moveDuration: system.uptime - before)
-            moving.lastPointer = point
-            moving.wantsParting = moving.wantsParting || isJoinKeyDown
-            drag = .moving(moving)
-            return true
         }
     }
 

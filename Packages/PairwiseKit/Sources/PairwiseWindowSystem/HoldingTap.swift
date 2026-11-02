@@ -63,13 +63,15 @@ final class HoldingTap: PointerHold {
             return decide(
                 .dragged(
                     ScreenPoint(location), isJoinKeyDown: flags.contains(Self.joinKey),
-                    isEqualHeightKeyDown: flags.contains(.maskShift)))
+                    isEqualHeightKeyDown: flags.contains(.maskShift),
+                    isScopeKeyDown: flags.contains(.maskControl)))
         case .leftMouseUp: return decide(.released(ScreenPoint(location)))
         case .flagsChanged:
             _ = decide(
                 .keysChanged(
                     isJoinKeyDown: flags.contains(Self.joinKey),
-                    isEqualHeightKeyDown: flags.contains(.maskShift)))
+                    isEqualHeightKeyDown: flags.contains(.maskShift),
+                    isScopeKeyDown: flags.contains(.maskControl)))
             return true
         case .tapDisabledByTimeout, .tapDisabledByUserInput:
             // Turned back on, or the drag would go on with no more moves; these events have passed.

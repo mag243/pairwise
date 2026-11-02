@@ -115,7 +115,7 @@ public final class AccessibilityWindowSystem: WindowSystemProviding {
             excludingProcess: access.ownProcess, in: access.onScreenWindows()
         )
         .filter { onlyNormalWindows?.contains($0.number) ?? true }
-        .map { ScreenWindow(number: $0.number, frame: $0.frame) }
+        .map { ScreenWindow(number: $0.number, frame: $0.frame, owner: $0.processID) }
     }
 
     public func window(number: UInt32) -> (any MovableWindow)? {

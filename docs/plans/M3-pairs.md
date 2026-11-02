@@ -30,6 +30,8 @@ Done first because everything below adds code to this module.
 - [x] A guide shows where the window will land, and at the release the two click together, with the seam lighting up briefly (the design notes in `PLAN.md`).
 - [x] The dragged window keeps its height, with the tops level, and takes the other's height with Shift added (ADR 0040).
 - [x] Checked by hand with a real Command key, pressed during the drag (ADR 0039). Option clashed with tiling (ADR 0036).
+- [x] A setting says whether Command joins any window or the same app's, and Control during the drag gives the other choice (ADR 0043).
+- [ ] Check the setting and Control by hand.
 
 ### 5. Coming apart
 - [x] Command at a press or during the drag of a pair ends the pair, and only that window moves (ADR 0035, 0036, 0040).

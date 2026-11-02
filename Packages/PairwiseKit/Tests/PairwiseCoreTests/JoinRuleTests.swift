@@ -20,6 +20,41 @@ import Testing
             for: frame, pointer: pointer, among: windows, takingHeight: takingHeight)
     }
 
+    private static let dragged = ScreenWindow(
+        number: 1, frame: WindowFrame(x: 0, y: 0, width: 10, height: 10), owner: 40)
+    private static let sameApp = ScreenWindow(
+        number: 2, frame: WindowFrame(x: 0, y: 0, width: 10, height: 10), owner: 40)
+    private static let otherApp = ScreenWindow(
+        number: 3, frame: WindowFrame(x: 0, y: 0, width: 10, height: 10), owner: 41)
+
+    @Test func anyWindowIsACandidateButTheDraggedOne() {
+        let candidates = JoinRule.candidates(
+            for: 1, among: [Self.dragged, Self.sameApp, Self.otherApp], scope: .anyWindow)
+        #expect(candidates == [Self.sameApp, Self.otherApp])
+    }
+
+    @Test func withinOneAppOnlyItsWindowsAreCandidates() {
+        let candidates = JoinRule.candidates(
+            for: 1, among: [Self.dragged, Self.sameApp, Self.otherApp], scope: .sameApp)
+        #expect(candidates == [Self.sameApp])
+    }
+
+    @Test func withinOneAppAnUnknownDraggedWindowHasNoCandidates() {
+        let candidates = JoinRule.candidates(
+            for: 9, among: [Self.sameApp, Self.otherApp], scope: .sameApp)
+        #expect(candidates.isEmpty)
+    }
+
+    @Test(arguments: [
+        (JoinScope.anyWindow, false, JoinScope.anyWindow),
+        (.anyWindow, true, .sameApp),
+        (.sameApp, false, .sameApp),
+        (.sameApp, true, .anyWindow),
+    ])
+    func theKeyGivesTheOtherScope(setting: JoinScope, isKeyDown: Bool, expected: JoinScope) {
+        #expect(setting.switched(if: isKeyDown) == expected)
+    }
+
     @Test func noWindowsGiveNoTarget() {
         #expect(target(frame(x: 0), among: []) == nil)
     }

@@ -52,19 +52,53 @@
         }
       }
     },
-    "Drag a window and hold Command over another window to join them; add Shift to give it the same height. To part them, click the lock on their seam, or hold Command while dragging one." : {
-      "comment" : "How to join and part windows",
+    "Any window" : {
+      "comment" : "Setting value: Command joins any window",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ziehe ein Fenster und halte die Befehlstaste über einem anderen Fenster, um sie zu verbinden; mit Umschalt erhält es dieselbe Höhe. Klicke zum Trennen auf das Schloss an ihrer Naht, oder halte beim Ziehen eines der Fenster die Befehlstaste."
+            "value" : "Beliebigem Fenster"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sleep een venster en houd Command ingedrukt boven een ander venster om ze te koppelen; met Shift erbij krijgt het dezelfde hoogte. Klik om ze los te maken op het slotje op hun naad, of houd Command ingedrukt terwijl je er een sleept."
+            "value" : "Elk venster"
+          }
+        }
+      }
+    },
+    "Command joins with" : {
+      "comment" : "Setting: which windows the Command key joins",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Befehlstaste verbindet mit"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Command koppelt met"
+          }
+        }
+      }
+    },
+    "Drag a window and hold Command over another window to join them; add Shift to give it the same height, or Control for the other choice of windows. To part them, click the lock on their seam, or hold Command while dragging one." : {
+      "comment" : "How to join and part windows",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ziehe ein Fenster und halte die Befehlstaste über einem anderen Fenster, um sie zu verbinden; mit Umschalt erhält es dieselbe Höhe, mit Control gilt die andere Fensterwahl. Klicke zum Trennen auf das Schloss an ihrer Naht, oder halte beim Ziehen eines der Fenster die Befehlstaste."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sleep een venster en houd Command ingedrukt boven een ander venster om ze te koppelen; met Shift erbij krijgt het dezelfde hoogte, met Control geldt de andere keuze van vensters. Klik om ze los te maken op het slotje op hun naad, of houd Command ingedrukt terwijl je er een sleept."
           }
         }
       }
@@ -528,6 +562,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "De app van het venster reageert niet."
+          }
+        }
+      }
+    },
+    "Windows of the same app" : {
+      "comment" : "Setting value: Command joins only windows of the same app",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fenstern derselben App"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vensters van dezelfde app"
           }
         }
       }

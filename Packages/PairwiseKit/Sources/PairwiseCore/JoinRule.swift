@@ -2,10 +2,25 @@
 public struct ScreenWindow: Equatable, Sendable {
     public let number: UInt32
     public let frame: WindowFrame
+    /// The process that owns the window: two windows of one process are of the same app.
+    public let owner: Int32
 
-    public init(number: UInt32, frame: WindowFrame) {
+    public init(number: UInt32, frame: WindowFrame, owner: Int32 = 0) {
         self.number = number
         self.frame = frame
+        self.owner = owner
+    }
+}
+
+/// Which windows a dragged window may join (ADR 0043).
+public enum JoinScope: String, CaseIterable, Sendable {
+    case anyWindow
+    case sameApp
+
+    /// This scope, or the other while the key that switches it is down.
+    public func switched(if isKeyDown: Bool) -> JoinScope {
+        guard isKeyDown else { return self }
+        return self == .anyWindow ? .sameApp : .anyWindow
     }
 }
 
@@ -23,6 +38,17 @@ public struct JoinTarget: Equatable, Sendable {
 public enum JoinRule {
     /// How far apart two edges may be to join, in points.
     private static let snapDistance = 24.0
+
+    /// The windows among `windows` that window `number` may join in `scope`. Without knowing
+    /// its app, a window has none within one app.
+    public static func candidates(
+        for number: UInt32, among windows: [ScreenWindow], scope: JoinScope
+    ) -> [ScreenWindow] {
+        let others = windows.filter { $0.number != number }
+        guard scope == .sameApp else { return others }
+        guard let dragged = windows.first(where: { $0.number == number }) else { return [] }
+        return others.filter { $0.owner == dragged.owner }
+    }
 
     /// The place for a window at `frame` to join one of `windows`, frontmost first, with the
     /// pointer at `pointer`. The frontmost window under the pointer comes first, on the side

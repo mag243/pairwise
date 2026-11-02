@@ -48,3 +48,4 @@ Use `0000-template.md` as the basis.
 | 0040 | Own heights, and parting during a drag | Accepted |
 | 0041 | Seeing keys as they change | Accepted |
 | 0042 | A lock on the seam | Accepted |
+| 0043 | Joining within one app | Accepted |

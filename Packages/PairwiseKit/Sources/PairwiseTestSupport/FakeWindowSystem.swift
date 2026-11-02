@@ -21,6 +21,8 @@ public final class FakeWindowSystem: WindowSystemProviding {
     public var isJoinKeyDown = false
     /// Whether the drags sent carry the key that takes the other's height.
     public var isEqualHeightKeyDown = false
+    /// Whether the drags sent carry the key that switches which windows can join.
+    public var isScopeKeyDown = false
     /// The windows `normalWindows()` and `window(number:)` know about.
     public var knownWindows: [FakeWindow] = []
     public private(set) var guideFrames: [WindowFrame] = []
@@ -63,7 +65,9 @@ public final class FakeWindowSystem: WindowSystemProviding {
     public func normalWindows() -> [ScreenWindow] {
         normalWindowsRequests += 1
         return knownWindows.compactMap { window in
-            window.windowNumber.map { ScreenWindow(number: $0, frame: window.currentFrame) }
+            window.windowNumber.map {
+                ScreenWindow(number: $0, frame: window.currentFrame, owner: window.owner)
+            }
         }
     }
 
@@ -142,11 +146,12 @@ public final class FakeWindowSystem: WindowSystemProviding {
         if case .pressed(let point, _) = event {
             return holdDecision?(.pressed(point, isJoinKeyDown: isJoinKeyDown)) ?? true
         }
-        if case .dragged(let point, _, _) = event {
+        if case .dragged(let point, _, _, _) = event {
             return holdDecision?(
                 .dragged(
                     point, isJoinKeyDown: isJoinKeyDown,
-                    isEqualHeightKeyDown: isEqualHeightKeyDown)) ?? true
+                    isEqualHeightKeyDown: isEqualHeightKeyDown, isScopeKeyDown: isScopeKeyDown))
+                ?? true
         }
         return holdDecision?(event) ?? true
     }

@@ -52,11 +52,12 @@ extension PairDragModel {
 
     /// A key changed, perhaps with the pointer standing still. The next tick acts on it.
     /// Elsewhere the next drag event carries the same keys (ADR 0041).
-    func keysChanged(isJoinKeyDown: Bool, isEqualHeightKeyDown: Bool) {
+    func keysChanged(isJoinKeyDown: Bool, isEqualHeightKeyDown: Bool, isScopeKeyDown: Bool) {
         switch drag {
         case .joining(var joining):
             joining.isKeyDown = isJoinKeyDown
             joining.isTakingHeight = isEqualHeightKeyDown
+            joining.isScopeKeyDown = isScopeKeyDown
             drag = .joining(joining)
         case .moving(var moving):
             moving.wantsParting = moving.wantsParting || isJoinKeyDown
@@ -84,9 +85,10 @@ extension PairDragModel {
             drag = .joining(joining)
             return
         }
-        let candidates = system.normalWindows().filter { window in
-            window.number != joining.number && book.pair(containing: window.number) == nil
-        }
+        let candidates = JoinRule.candidates(
+            for: joining.number, among: system.normalWindows(),
+            scope: joinScope.switched(if: joining.isScopeKeyDown)
+        ).filter { book.pair(containing: $0.number) == nil }
         var current = joining
         current.target = JoinRule.target(
             for: now, pointer: joining.pointer, among: candidates,

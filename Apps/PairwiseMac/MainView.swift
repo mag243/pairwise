@@ -9,6 +9,13 @@ struct MainView: View {
     private static let millisecondsPerSecond = 1000.0
     private static let fractionDigits = 1
     private static let frameRates = [15, 30, 60]
+    private static let joinScopeKey = "joinScope"
+
+    /// The choice of which windows Command joins, as stored the last time.
+    static var storedJoinScope: JoinScope {
+        UserDefaults.standard.string(forKey: joinScopeKey).flatMap(JoinScope.init(rawValue:))
+            ?? .anyWindow
+    }
 
     let model: PairDragModel
 
@@ -53,6 +60,10 @@ struct MainView: View {
                 Text("Without it, windows move one at a time.")
                     .foregroundStyle(.secondary)
             }
+            Picker("Command joins with", selection: joinScope) {
+                Text("Any window").tag(JoinScope.anyWindow)
+                Text("Windows of the same app").tag(JoinScope.sameApp)
+            }
             Picker("Live pictures", selection: liveFrames) {
                 Text("Still").tag(0)
                 ForEach(Self.frameRates, id: \.self) { rate in
@@ -64,12 +75,21 @@ struct MainView: View {
             }
             .disabled(!model.isAccessibilityGranted || !model.isScreenRecordingGranted)
             Text(
-                "Drag a window and hold Command over another window to join them; add Shift to give it the same height. To part them, click the lock on their seam, or hold Command while dragging one."
+                "Drag a window and hold Command over another window to join them; add Shift to give it the same height, or Control for the other choice of windows. To part them, click the lock on their seam, or hold Command while dragging one."
             )
             .foregroundStyle(.secondary)
             if let problem = model.problem {
                 Text(problem.message).foregroundStyle(.red)
             }
+        }
+    }
+
+    private var joinScope: Binding<JoinScope> {
+        Binding {
+            model.joinScope
+        } set: {
+            model.joinScope = $0
+            UserDefaults.standard.set($0.rawValue, forKey: Self.joinScopeKey)
         }
     }
 
