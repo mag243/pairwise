@@ -7,6 +7,7 @@ final class LaunchTests: XCTestCase {
     @MainActor
     func testShowsWindow() {
         let app = XCUIApplication()
+        app.launchArguments = ["--show-settings"]
         app.launch()
         XCTAssertTrue(app.windows.firstMatch.waitForExistence(timeout: Self.launchTimeout))
         XCTAssertEqual(app.windows.firstMatch.title, "Pairwise")

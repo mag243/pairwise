@@ -188,6 +188,23 @@
         }
       }
     },
+    "Move pairs together" : {
+      "comment" : "Menu: the switch for moving pairs of windows together",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paare zusammen bewegen"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paren samen bewegen"
+          }
+        }
+      }
+    },
     "Moves" : {
       "comment" : "Measurement: how often the partner window was moved",
       "localizations" : {
@@ -328,6 +345,23 @@
         }
       }
     },
+    "Quit Pairwise" : {
+      "comment" : "Menu: quits the app",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pairwise beenden"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stop Pairwise"
+          }
+        }
+      }
+    },
     "Screen Recording" : {
       "comment" : "The system permission the stand-in needs",
       "localizations" : {
@@ -341,6 +375,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Schermopname"
+          }
+        }
+      }
+    },
+    "Settings…" : {
+      "comment" : "Menu: opens the settings window",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einstellungen …"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Instellingen…"
           }
         }
       }

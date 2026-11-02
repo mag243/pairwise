@@ -39,3 +39,4 @@ Use `0000-template.md` as the basis.
 | 0031 | A seam around the system calls | Accepted |
 | 0032 | Taking over once the window has moved | Accepted |
 | 0033 | Pairs as a model | Accepted |
+| 0034 | A menu bar app | Accepted |

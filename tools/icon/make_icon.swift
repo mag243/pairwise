@@ -1,4 +1,4 @@
-// Draws the app icon and writes the PNGs of Apps/PairwiseMac's AppIcon.
+// Draws the app icon and the menu bar icon, and writes the PNGs of Apps/PairwiseMac.
 // Run from the repository root: swift tools/icon/make_icon.swift
 //
 // The icon is drawn on a grid of 100 units with y growing downwards: two halves of a
@@ -9,7 +9,9 @@ import Foundation
 import ImageIO
 
 let outputDirectory = "Apps/PairwiseMac/Resources/Assets.xcassets/AppIcon.appiconset"
+let menuBarDirectory = "Apps/PairwiseMac/Resources/Assets.xcassets/MenuBarIcon.imageset"
 let pixelSizes = [16, 32, 64, 128, 256, 512, 1024]
+let menuBarPixelSizes = [18, 36]
 let gridUnits = 100.0
 /// macOS icons leave a margin around the tile: 824 of 1024 pixels.
 let tileShare = 824.0 / 1024.0
@@ -103,8 +105,49 @@ func writeIcon(pixelSize: Int) throws {
     guard CGImageDestinationFinalize(destination) else { throw CocoaError(.fileWriteUnknown) }
 }
 
+/// The menu bar icon: the two halves in one colour on nothing, as a template image. The gap
+/// between them stands in for the seam, since a template has no second colour.
+func drawMenuBarIcon(in context: CGContext, pixelSize: Int) {
+    let scale = Double(pixelSize) / gridUnits
+    context.translateBy(x: 0, y: Double(pixelSize))
+    context.scaleBy(x: scale, y: -scale)
+    context.saveGState()
+    let window = CGPath(
+        roundedRect: CGRect(x: 4, y: 14, width: 92, height: 72),
+        cornerWidth: 12, cornerHeight: 12, transform: nil)
+    context.addPath(window)
+    context.clip()
+    draw(polygon([(4, 14), (46, 14), (46, 38), (62, 30), (62, 70), (46, 62), (46, 86), (4, 86)]), in: context, hex: 0x000000)
+    draw(polygon([(54, 14), (96, 14), (96, 86), (54, 86), (54, 66), (70, 74), (70, 26), (54, 34)]), in: context, hex: 0x000000)
+    context.restoreGState()
+}
+
+func writePNG(pixelSize: Int, to path: String, draw: (CGContext, Int) -> Void) throws {
+    let space = CGColorSpace(name: CGColorSpace.sRGB)!
+    guard
+        let context = CGContext(
+            data: nil, width: pixelSize, height: pixelSize, bitsPerComponent: 8, bytesPerRow: 0,
+            space: space, bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)
+    else { throw CocoaError(.fileWriteUnknown) }
+    draw(context, pixelSize)
+    guard
+        let image = context.makeImage(),
+        let destination = CGImageDestinationCreateWithURL(
+            URL(fileURLWithPath: path) as CFURL, "public.png" as CFString, 1, nil)
+    else { throw CocoaError(.fileWriteUnknown) }
+    CGImageDestinationAddImage(destination, image, nil)
+    guard CGImageDestinationFinalize(destination) else { throw CocoaError(.fileWriteUnknown) }
+}
+
 try FileManager.default.createDirectory(
     atPath: outputDirectory, withIntermediateDirectories: true)
 for pixelSize in pixelSizes {
     try writeIcon(pixelSize: pixelSize)
+}
+try FileManager.default.createDirectory(
+    atPath: menuBarDirectory, withIntermediateDirectories: true)
+for pixelSize in menuBarPixelSizes {
+    try writePNG(pixelSize: pixelSize, to: "\(menuBarDirectory)/menubar_\(pixelSize).png") {
+        drawMenuBarIcon(in: $0, pixelSize: $1)
+    }
 }

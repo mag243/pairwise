@@ -54,7 +54,8 @@ Done first because everything below adds code to this module.
 - [ ] Pairs are saved, and restored at the start where both windows are found. A pair that cannot be found with confidence is dropped, and no window is moved.
 
 ### 10. The app itself
-- [ ] ADR: menu bar app or window (open decision 2 in `PLAN.md`, owner's choice 4).
+- [x] ADR 0034: a menu bar app (open decision 2 in `PLAN.md`, owner's choice 4). Done before step 4, at the owner's wish.
+- [x] The menu bar icon, the menu, and the window as settings.
 - [ ] The measurements and the frame rate leave the main interface. The permissions stay, explained plainly. The stress test stays.
 - [ ] Complete `nl` and `de`, with the translation tools of ADR 0010 brought over.
 

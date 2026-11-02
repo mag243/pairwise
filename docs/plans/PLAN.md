@@ -81,6 +81,6 @@ tools/                            setup, build, hooks, pinned versions
 
 ## Open decisions
 1. **Keeping the Accessibility permission while developing:** settled in ADR 0012.
-2. **Menu bar app or windowed app.** M0 shows a window only to have something to launch. Decide in M1 or M3.
+2. **Menu bar app or windowed app:** settled in ADR 0034.
 3. **Distribution:** Developer ID or the Mac App Store, and whether the App Store allows what Pairwise needs. an earlier project's route (signed, notarized, disk image, Sparkle, tap) is the default; its tools come over when Pairwise is ready to ship.
 4. **The name and the domain,** see What exists already; before the first release.

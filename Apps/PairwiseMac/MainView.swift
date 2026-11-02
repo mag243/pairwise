@@ -2,8 +2,7 @@ import PairwiseCore
 import PairwiseUI
 import SwiftUI
 
-/// The app's window: the permissions, the partner app, Start and Stop, and the last drag's
-/// numbers.
+/// The settings window: the permissions, Start and Stop, and the last drag's numbers.
 struct MainView: View {
     private static let minimumWidth: CGFloat = 360
     private static let minimumHeight: CGFloat = 420
