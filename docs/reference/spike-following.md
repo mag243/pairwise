@@ -156,3 +156,5 @@ With the window list kept and the pictures taken together, over 13 drags: the pi
 **Verdict:** moving as one window works well. It stays, and the other ways of following go (ADR 0028).
 
 **The join test (ADR 0027) with Option:** the guide stood right, at x 380, y 120, 520 by 500, and at the release macOS tiled the window over half the screen. ADR 0036 moves to Command.
+
+**By hand, joining with a real Command key pressed during the drag (ADR 0039):** works. Command at the press missed most times when read from the system's key state, and on a window's title it opens a folder menu.

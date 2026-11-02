@@ -29,7 +29,7 @@ Done first because everything below adds code to this module.
 - [x] `PairwiseCore`, test-first: when a dragged window is close enough to another window's edge to join. The snap distance is a named constant.
 - [x] A guide shows where the window will land, and at the release the two click together, with the seam lighting up briefly (the design notes in `PLAN.md`).
 - [x] The dragged window takes the other's height and top (owner's choice 2).
-- [ ] Check by hand; the join test covers the rest. Option clashed with tiling (ADR 0036).
+- [x] Checked by hand with a real Command key, pressed during the drag (ADR 0039). Option clashed with tiling (ADR 0036).
 
 ### 5. Coming apart
 - [x] Command at a press on a window in a pair ends the pair (ADR 0036), and only that window moves (ADR 0035).

@@ -11,7 +11,7 @@ So far every press on another app's window takes a picture and watches for a dra
 - **`PairBook` in `PairwiseCore`** holds the pairs by window number, with which window is on the left. A window is in one pair at most, and not in a pair with itself.
 - **A press asks the window server only for the number of the window on top.** A number in no pair ends the matter: no call to any app, no picture, no ticks.
 - **The partner can be on either side,** and the panel shows the pair in its own order.
-- **A pair ends when one window has closed, is minimized or is full screen.** This is seen at the next press on either window, without watching for it. The other window stays where it is, and that drag passes. Minimizing together (step 7) changes the minimized case.
+- **A pair ends when one window has closed, is minimized or is full screen.** This is seen at the next press on either window, without watching for it. The other window stays where it is, and that drag passes. An app that is busy for a moment does not end a pair: that drag passes, and the pair stays. Minimizing together (step 7) changes the minimized case.
 - **The choice of partner app goes,** as pairs replace it. Until joining exists (step 4), only the stress test makes pairs.
 
 ## Alternatives

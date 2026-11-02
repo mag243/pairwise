@@ -99,6 +99,17 @@ import Testing
         #expect(model.lastPressOutcome == "not in a pair")
     }
 
+    @Test func aBusyAppLetsTheDragPassAndKeepsThePair() throws {
+        try model.join(window, to: partner, on: .left)
+        partner.frameError = .windowBusy
+        _ = system.send(.pressed(Self.press))
+        #expect(system.send(.dragged(Self.further)))
+        #expect(model.lastPressOutcome == "a window does not answer")
+        partner.frameError = nil
+        _ = system.send(.pressed(Self.press))
+        #expect(model.lastPressOutcome == "watching")
+    }
+
     @Test func leavingEndsThePair() throws {
         try model.join(window, to: partner, on: .left)
         model.leavePair(of: partner)

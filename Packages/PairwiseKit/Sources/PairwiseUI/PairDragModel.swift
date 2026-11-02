@@ -129,14 +129,14 @@ public final class PairDragModel {
             freeWindowPressed = number
             return "not in a pair"
         }
-        guard
-            window.isAvailable, partnerWindow.isAvailable,
-            let partnerFrame = partnerWindow.serverFrame() ?? (try? partnerWindow.frame()),
-            let frame = window.serverFrame() ?? (try? window.frame())
-        else {
+        guard window.isAvailable, partnerWindow.isAvailable else {
             endPair(of: number)
             return "the pair ended: a window is gone, minimized or full screen"
         }
+        guard
+            let partnerFrame = partnerWindow.serverFrame() ?? (try? partnerWindow.frame()),
+            let frame = window.serverFrame() ?? (try? window.frame())
+        else { return "a window does not answer" }
         let partner = PairDrag.Partner(
             window: partnerWindow, size: partnerFrame.size, side: partnerEntry.side)
         drag = .pressed(

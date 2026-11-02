@@ -89,7 +89,13 @@ final class AccessibilityWindow: MovableWindow {
     }
 
     var isAvailable: Bool {
-        guard (try? frame()) != nil else { return false }
+        // Only a window that has gone says so; an app that is busy for a moment does not end
+        // a pair.
+        do {
+            _ = try frame()
+        } catch {
+            return error != .windowGone
+        }
         return element.attribute(kAXMinimizedAttribute) as? Bool != true
             && element.attribute(Self.fullScreenAttribute) as? Bool != true
     }

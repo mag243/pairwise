@@ -139,6 +139,11 @@ import Testing
         #expect(!makeWindow().isAvailable)
     }
 
+    @Test func aWindowOfABusyAppIsStillAvailable() {
+        element.errors[kAXPositionAttribute] = .cannotComplete
+        #expect(makeWindow().isAvailable)
+    }
+
     @Test func aClosedWindowIsNotAvailable() {
         element.errors[kAXPositionAttribute] = .invalidUIElement
         #expect(!makeWindow().isAvailable)
