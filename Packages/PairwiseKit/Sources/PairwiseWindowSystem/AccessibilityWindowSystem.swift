@@ -58,7 +58,9 @@ public final class AccessibilityWindowSystem: WindowSystemProviding {
 
     /// The app's folder in Application Support, where a new run finds its records.
     static let defaultRecordsFolder = URL.applicationSupportDirectory
-        .appending(path: "me.m-domain.pairwise", directoryHint: .isDirectory)
+        .appending(
+            path: Bundle.main.bundleIdentifier ?? "me.m-domain.pairwise",
+            directoryHint: .isDirectory)
 
     public var isAccessibilityGranted: Bool { AXIsProcessTrusted() }
 

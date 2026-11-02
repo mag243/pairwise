@@ -22,7 +22,7 @@ These need the owner's keychain, accounts or judgment, so the agent prepares the
 ### 2. The first start, on a Mac that has never seen Pairwise
 - [x] The settings window opens by itself with `--show-settings` from `tools/build.sh run`, checked by the owner. The same rule opens it when a permission is missing; that case itself is checked on a release copy in the acceptance criteria.
 - [x] Granting a permission starts Pairwise without a restart, and taking one away stops it with all input passing, checked by the owner for both permissions. The menu bar menu says why when a permission is gone.
-- [ ] A release copy and a debug build are different signatures to macOS. Check what that does to permissions already granted, and say in the README how to clear a stale entry.
+- [x] A release and a debug build are different signatures to macOS, so permissions went to the release alone. A debug build has a bundle identifier of its own (ADR 0062). The README says how to clear a stale entry after running a copy signed differently.
 - [ ] Check how often macOS asks again about Screen Recording for an app that captures windows without its picker, and what Pairwise does in the meantime. A drag must keep working, with or without pictures.
 
 ### 3. Updates with Sparkle
