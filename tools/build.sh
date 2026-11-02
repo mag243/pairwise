@@ -17,6 +17,9 @@
 #   package     A release: export, notarize with the keychain profile pairwise-notary, staple
 #               and check, then build/release/Pairwise-<version>-<build>.zip and a notarized
 #               .dmg beside it (ADR 0056). Needs the owner's certificate and profile.
+#   publish     A release from this Mac (ADR 0058): checks that the tree is clean, that the
+#               tag v<version> points at HEAD and that origin/main holds it, runs package,
+#               then tools/publish.sh. It publishes, so the owner runs it.
 #   apptest     The macOS app's tests, including the XCUITest smoke tests. Followed by
 #               a filter, only those tests, as Class or Class/testName, several
 #               separated by commas: tools/build.sh apptest LaunchTests/testShowsWindow
@@ -61,7 +64,7 @@ NOTARY_PROFILE="pairwise-notary"
 # CI has no certificate and nothing there needs the Accessibility permission (ADR 0012).
 CI_SIGNING=()
 [[ "${CI:-}" == true ]] && CI_SIGNING=(CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual DEVELOPMENT_TEAM=)
-COMMANDS=" check format test coverage build release export package apptest run quick verify ci clean help "
+COMMANDS=" check format test coverage build release export package publish apptest run quick verify ci clean help "
 declare -a SUMMARY=()
 
 usage() { sed -n '2,/^$/p' "$0" | sed 's/^# \{0,1\}//'; }
@@ -152,7 +155,7 @@ cmd_check() {
   python3 "$TOOLS_DIR/i18n/translate.py" check || fail "Translations are incomplete (ADR 0010, tools/i18n)"
   ok "Translations"
   has shellcheck || fail "shellcheck not found. Run tools/setup.sh."
-  shellcheck -x "$TOOLS_DIR"/*.sh "$TOOLS_DIR"/xcode/*.sh "$TOOLS_DIR"/git-hooks/* || fail "shellcheck reported problems"
+  shellcheck -x "$TOOLS_DIR"/*.sh "$TOOLS_DIR"/homebrew/*.sh "$TOOLS_DIR"/xcode/*.sh "$TOOLS_DIR"/git-hooks/* || fail "shellcheck reported problems"
   ok "shellcheck"
 }
 
@@ -369,6 +372,26 @@ cmd_package() {
   ok "$APP_NAME $version ($build) -> ${base#"$ROOT_DIR"/}.zip and .dmg"
 }
 
+# What is published is exactly the source that is public under its tag (ADR 0058).
+cmd_publish() {
+  step "Publish checks"
+  require_project
+  local version tag head
+  [[ -z "$(git -C "$ROOT_DIR" status --porcelain)" ]] || fail "The working tree has changes; commit them first."
+  version="$(grep -o 'MARKETING_VERSION = [^;]*' "$XCODE_PROJECT/project.pbxproj" | sort -u | sed 's/MARKETING_VERSION = //')"
+  tag="v$version"
+  head="$(git -C "$ROOT_DIR" rev-parse HEAD)"
+  git -C "$ROOT_DIR" rev-parse --quiet --verify "$tag^{commit}" >/dev/null \
+    || fail "No tag $tag; tag the release first: git tag $tag"
+  [[ "$(git -C "$ROOT_DIR" rev-parse "$tag^{commit}")" == "$head" ]] || fail "The tag $tag does not point at HEAD."
+  git -C "$ROOT_DIR" fetch --quiet origin main
+  [[ "$(git -C "$ROOT_DIR" rev-parse origin/main)" == "$head" ]] || fail "origin/main is not at HEAD; push first."
+  "$TOOLS_DIR/release_notes.sh" "$version" >/dev/null
+  ok "$APP_NAME $version, tag $tag at HEAD"
+  cmd_package
+  "$TOOLS_DIR/publish.sh"
+}
+
 cmd_apptest() {
   local filter="${1:-}" only=() tests=() test
   step "macOS app tests${filter:+ ($filter)}"
@@ -414,6 +437,7 @@ run_command() {
     release) timed release cmd_release ;;
     export) timed export cmd_export ;;
     package) timed package cmd_package ;;
+    publish) timed publish cmd_publish ;;
     apptest) timed apptest cmd_apptest "${2:-}" ;;
     clean) timed clean cmd_clean ;;
     quick) run_command check; run_command test ;;

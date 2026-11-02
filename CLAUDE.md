@@ -41,7 +41,9 @@ tools/build.sh run --kill-test FILE   # kills the app during a drag of its own w
 tools/build.sh run --settings-look FILE   # saves a picture of the settings; --settings-tab N picks a tab
 tools/build.sh release                # build the app, Release, and fail if test code is in it (ADR 0050)
 tools/build.sh export                 # archive and sign with the Developer ID, not notarized (ADR 0056)
-tools/build.sh package                # a release: signed, notarized, zip and disk image; the owner runs it (ADR 0056)
+tools/build.sh package                # a release: signed, notarized, zip and disk image; publishes nothing (ADR 0056)
+tools/build.sh publish                # package, then the release, feed and cask; only the owner runs it (ADR 0058)
+tools/publish.sh --dry-run            # signs the feed after package, and stops before anything leaves the Mac
 ```
 
 - Run `quick` after a step that only touches the package and `verify` after any app change; both must be green. `ci` adds the XCUITest smoke tests, which take over the screen: run it only when the owner says so, and ask for it before the owner pushes and at the end of a plan (ADR 0011).

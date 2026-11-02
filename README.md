@@ -49,6 +49,16 @@ tools/build.sh --help   # every command
 
 The rules for working in this repository are in [`CLAUDE.md`](CLAUDE.md).
 
+## Releasing
+
+The owner releases from their own Mac, which holds the Developer ID certificate, the notary profile `pairwise-notary` and the Sparkle key under the account `pairwise` ([ADR 0056](docs/decisions/0056-signing-and-notarization.md), [0057](docs/decisions/0057-updates-with-sparkle.md), [0058](docs/decisions/0058-publishing-a-release.md)).
+
+1. Set `MARKETING_VERSION`, add the version's section to `CHANGELOG.md`, and commit.
+2. Run `tools/build.sh ci`, then `git push`, then `git tag vX.Y.Z`.
+3. Run `tools/build.sh publish`. For a trial first: `tools/build.sh package`, then `tools/publish.sh --dry-run`.
+
+After the very first release, turn on GitHub Pages for the branch `gh-pages`.
+
 ## License
 
 [MIT](LICENSE). Updates come through [Sparkle](https://sparkle-project.org), whose licence is [in the app](Apps/PairwiseMac/Resources/Sparkle-LICENSE.txt). The sounds are from [Interface Sounds by Kenney](https://opengameart.org/content/interface-sounds), under CC0. See [`CONTRIBUTING.md`](CONTRIBUTING.md) on contributions.

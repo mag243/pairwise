@@ -63,3 +63,5 @@ Use `0000-template.md` as the basis.
 | 0055 | Sounds of our own | Accepted |
 | 0056 | Signing and notarization | Accepted |
 | 0057 | Updates with Sparkle | Accepted |
+| 0058 | Publishing a release | Accepted |
+| 0059 | A Homebrew cask | Accepted |
