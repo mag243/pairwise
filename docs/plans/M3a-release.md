@@ -61,7 +61,7 @@ These need the owner's keychain, accounts or judgment, so the agent prepares the
 - The real checks below are by hand: an update and Gatekeeper cannot be tested on a fake.
 
 ## Acceptance criteria
-- [ ] On a user account that has never run Pairwise, the disk image opens without a Gatekeeper warning beyond macOS's one-time question, and the app explains what it needs and works after the permissions are given.
+- [ ] On the owner's own account, the disk image downloaded from the release opens without a Gatekeeper warning beyond macOS's one-time question, and the app offers the move, explains what it needs and works after the permissions are given. No separate user account: the first-run state is made by resetting the permissions.
 - [ ] `brew install --cask mag243/tap/pairwise` installs it, and `brew uninstall --zap` leaves nothing behind.
 - [ ] An installed 0.1.0 updates itself to a test 0.1.1 with one click: permissions stay, pairs come back, no window is lost.
 - [ ] An update signed with another key is refused.
