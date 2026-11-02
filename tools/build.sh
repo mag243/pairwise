@@ -220,7 +220,7 @@ cmd_build() {
 test_code_in() {
   local text
   text="$(strings "$1")"
-  grep -E 'DragStressTest|AnimatedTestView|SCRecordingOutput|--record|--seam-look|--seam-test|--join-test|--drag-stress-test' \
+  grep -E 'DragStressTest|AnimatedTestView|SCRecordingOutput|--record|--seam-look|--seam-test|--join-test|--drag-stress-test|--dump-frames' \
     <<<"$text" | sort -u | head -n 5 || true
 }
 

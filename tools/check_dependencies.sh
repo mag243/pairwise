@@ -52,7 +52,7 @@ report "Only PairwiseWindowSystem may use the Accessibility API, event taps or S
 # Code that drives or records the screen stays out of a release build (ADR 0050).
 debug_only=""
 for file in "$SOURCES"/PairwiseWindowSystem/DragStressTest*.swift \
-  "$SOURCES/PairwiseWindowSystem/ScreenRecording.swift" "$ROOT_DIR/Apps/PairwiseMac/AnimatedTestView.swift"; do
+  "$SOURCES/PairwiseWindowSystem/ScreenRecording.swift" "$SOURCES/PairwiseWindowSystem/FrameDump.swift" "$ROOT_DIR/Apps/PairwiseMac/AnimatedTestView.swift"; do
   [[ "$(head -n 1 "$file")" == "#if DEBUG" ]] || debug_only+="${file#"$ROOT_DIR"/}"$'\n'
 done
 report "Test code must start with #if DEBUG (ADR 0050)" "$debug_only"

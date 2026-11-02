@@ -87,6 +87,9 @@ extension LiveStream: SCStreamOutput {
             CGRect(dictionaryRepresentation: $0 as CFDictionary)
         }
         let scale = info?[.scaleFactor] as? Double ?? 1
+        #if DEBUG
+        FrameDump.save(frame, stream: ObjectIdentifier(self))
+        #endif
         MainActor.assumeIsolated {
             picture.show(frame, centrePixel: pixel, contentRect: rect, scale: scale)
         }
