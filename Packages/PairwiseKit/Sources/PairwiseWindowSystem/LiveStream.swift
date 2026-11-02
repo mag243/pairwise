@@ -3,11 +3,15 @@ import CoreVideo
 import PairwiseCore
 import QuartzCore
 import ScreenCaptureKit
+import os
 
 /// Keeps a layer showing one window as it changes, while a drag lasts (ADR 0029). A failure
 /// leaves the last picture on the layer, as the drag does not depend on this.
 @MainActor
 final class LiveStream: NSObject {
+    private nonisolated static let logger = Logger(
+        subsystem: "me.m-domain.pairwise", category: "live")
+
     /// What shows the frames.
     let picture = LivePicture()
     /// How many frames showed a change.
@@ -32,10 +36,19 @@ final class LiveStream: NSObject {
     /// Starts the frames; they arrive on the main queue.
     func start() {
         let stream = SCStream(filter: filter, configuration: configuration, delegate: nil)
-        guard (try? stream.addStreamOutput(self, type: .screen, sampleHandlerQueue: .main)) != nil
-        else { return }
+        do {
+            try stream.addStreamOutput(self, type: .screen, sampleHandlerQueue: .main)
+        } catch {
+            Self.logger.info(
+                "the stream took no output: \(String(describing: error), privacy: .public)")
+            return
+        }
         self.stream = stream
-        stream.startCapture { _ in }
+        stream.startCapture { error in
+            guard let error else { return }
+            Self.logger.info(
+                "the stream did not start: \(String(describing: error), privacy: .public)")
+        }
     }
 
     /// Ends the frames.

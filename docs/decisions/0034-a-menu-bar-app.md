@@ -11,6 +11,7 @@ Pairwise runs in the background and is only noticed when two windows move togeth
 - The app has `LSUIElement` set, so it has no Dock icon, and a `MenuBarExtra` holds a switch for moving pairs, Settings… and Quit.
 - The window that exists now becomes the settings window. It opens at launch only when a permission is missing, as the app is of no use until then, or when asked for with `--show-settings`, which the UI test uses.
 - Moving pairs starts by itself at launch when both permissions are there.
+- The app does not quit when its last window closes. SwiftUI would quit it otherwise, and the panel of ADR 0024 is such a window at the end of every drag.
 - The menu bar icon is the shape of the app icon in one colour, as a template image, drawn by `tools/icon/make_icon.swift`.
 
 ## Alternatives

@@ -11,6 +11,7 @@ struct PairwiseMacApp: App {
     private static let showSettingsFlag = "--show-settings"
     private static let settingsWindow = "settings"
 
+    @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @State private var pairDrag: PairDragModel
 
     init() {
@@ -63,10 +64,18 @@ struct PairwiseMacApp: App {
             outputPath: arguments[flag + 1],
             pressOutcome: { model.lastPressOutcome },
             lastLiveFrames: { model.lastDrag?.liveFrames ?? [] },
-            join: { first, second in try? model.join(first, to: second, on: .left) },
+            join: { first, second in try model.join(first, to: second, on: .left) },
             leave: { model.leavePair(of: $0) })
         await test.run()
         model.stop()
         NSApplication.shared.terminate(nil)
+    }
+}
+
+/// Keeps the app running without windows. SwiftUI would otherwise quit it when the last one
+/// closes, which is also the panel at the end of every drag.
+private final class AppDelegate: NSObject, NSApplicationDelegate {
+    func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
+        false
     }
 }

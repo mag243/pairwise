@@ -14,7 +14,7 @@ public final class DragStressTest {
     private static let longDragSteps = 250
     private static let longDragDrift = 0.5
     private static let origin = ScreenPoint(x: 120, y: 120)
-    private static let size = CGSize(width: 520, height: 340)
+    static let size = CGSize(width: 520, height: 340)
     private static let partnerX = 700.0
     private static let titleBandY = 12.0
     private static let sideMargin = 140.0
@@ -27,16 +27,19 @@ public final class DragStressTest {
     private static let waitsAfterPress: [UInt64] = [0, 2, 10, 30, 80]
     private static let stepWait: UInt64 = 4
     private static let settleWait: UInt64 = 300
-    private static let windowWait: UInt64 = 100
-    private static let windowLookups = 50
+    static let windowWait: UInt64 = 100
+    static let windowLookups = 50
 
     private let outputPath: String
     private let pressOutcome: () -> String
     private let lastLiveFrames: () -> [Int]
-    private let join: (any MovableWindow, any MovableWindow) -> Void
+    private let join: (any MovableWindow, any MovableWindow) throws -> Void
     private let leave: (any MovableWindow) -> Void
-    private var lines: [String] = []
-    private var folders: [URL] = []
+    /// Written after each line, so a test that stops halfway shows how far it came.
+    private var lines: [String] = [] {
+        didSet { write() }
+    }
+    var folders: [URL] = []
 
     /// `pressOutcome` says what became of the last press, and `lastLiveFrames` how many
     /// live frames per window the last drag got. `join` makes a pair of two windows, with the
@@ -44,7 +47,7 @@ public final class DragStressTest {
     public init(
         outputPath: String, pressOutcome: @escaping () -> String,
         lastLiveFrames: @escaping () -> [Int],
-        join: @escaping (any MovableWindow, any MovableWindow) -> Void,
+        join: @escaping (any MovableWindow, any MovableWindow) throws -> Void,
         leave: @escaping (any MovableWindow) -> Void
     ) {
         self.outputPath = outputPath
@@ -58,6 +61,7 @@ public final class DragStressTest {
     /// Precondition: taking over drags has been started.
     public func run() async {
         let start = CGEvent(source: nil)?.location
+        lines.append("started, trusted \(AXIsProcessTrusted())")
         defer {
             if let start { post(.mouseMoved, at: start) }
             for folder in folders { try? FileManager.default.removeItem(at: folder) }
@@ -68,7 +72,7 @@ public final class DragStressTest {
             return
         }
         await place(dragged, at: Self.origin)
-        join(dragged, partner)
+        guard joined(dragged, partner) else { return }
         var counts: [String: Int] = [:]
         for index in 0..<Self.tries {
             let result = await oneTry(index, dragged: dragged, partner: partner)
@@ -115,6 +119,19 @@ public final class DragStressTest {
         return result
     }
 
+    /// Makes the pair, and writes down why when that fails, as nothing after it would count.
+    private func joined(_ first: AccessibilityWindow, _ second: AccessibilityWindow) -> Bool {
+        do {
+            try join(first, second)
+            return true
+        } catch {
+            lines.append(
+                "could not join \(String(describing: first.windowNumber)) and "
+                    + "\(String(describing: second.windowNumber)): \(error)")
+            return false
+        }
+    }
+
     /// The same drags with no pair, to tell what macOS does on its own: a drag this short may
     /// not move a window with or without Pairwise.
     private func controlTries(
@@ -135,7 +152,7 @@ public final class DragStressTest {
             return
         }
         defer { process.terminate() }
-        join(dragged, helper)
+        guard joined(dragged, helper) else { return }
         for index in 0..<Self.liveTries {
             await place(dragged, at: Self.origin)
             await place(helper, at: ScreenPoint(x: Self.partnerX, y: Self.origin.y))
@@ -144,7 +161,9 @@ public final class DragStressTest {
             await wait(Self.settleWait)
             await longDrag()
             await wait(Self.settleWait)
-            lines.append("live try \(index): frames per window \(lastLiveFrames())")
+            lines.append(
+                "live try \(index): frames per window \(lastLiveFrames()); press: \(pressOutcome())"
+            )
         }
         leave(dragged)
     }
@@ -162,23 +181,6 @@ public final class DragStressTest {
             await wait(Self.stepWait)
         }
         post(.leftMouseUp, at: point)
-    }
-
-    /// Starts a second copy of this app that shows only an animation (ADR 0029).
-    private func openAnimatedWindow() async -> (AccessibilityWindow, Process)? {
-        guard let path = Bundle.main.executablePath else { return nil }
-        let process = Process()
-        process.executableURL = URL(fileURLWithPath: path)
-        process.arguments = [Self.animatedWindowFlag]
-        guard (try? process.run()) != nil else { return nil }
-        let element = AXUIElementCreateApplication(process.processIdentifier)
-        for _ in 0..<Self.windowLookups {
-            await wait(Self.windowWait)
-            let windows = element.elements(of: kAXWindowsAttribute)
-            if let first = windows.first { return (AccessibilityWindow(element: first), process) }
-        }
-        process.terminate()
-        return nil
     }
 
     private func classify(dragged: AccessibilityWindow, partner: AccessibilityWindow) -> String {
@@ -200,64 +202,12 @@ public final class DragStressTest {
         }
     }
 
-    private func openWindows() async -> (AccessibilityWindow, AccessibilityWindow)? {
-        guard
-            let dragged = await openWindow(named: "PairwiseStressA-\(UUID().uuidString.prefix(8))")
-        else { return nil }
-        guard
-            let partner = await openWindow(named: "PairwiseStressB-\(UUID().uuidString.prefix(8))")
-        else {
-            close(dragged)
-            return nil
-        }
-        for window in [dragged, partner] {
-            var size = Self.size
-            if let value = AXValueCreate(.cgSize, &size) {
-                _ = window.element.setAttribute(kAXSizeAttribute, to: value)
-            }
-        }
-        return (dragged, partner)
-    }
-
-    /// Opens a new empty folder in Finder and finds its window as the one that was not
-    /// there before; Finder does not always title it after the folder at once.
-    private func openWindow(named name: String) async -> AccessibilityWindow? {
-        let folder = FileManager.default.temporaryDirectory.appendingPathComponent(name)
-        guard
-            (try? FileManager.default.createDirectory(
-                at: folder, withIntermediateDirectories: true)) != nil,
-            let finder = NSRunningApplication.runningApplications(
-                withBundleIdentifier: "com.apple.finder"
-            ).first
-        else { return nil }
-        folders.append(folder)
-        let element = AXUIElementCreateApplication(finder.processIdentifier)
-        let before = standardWindows(of: element)
-        NSWorkspace.shared.open(folder)
-        for _ in 0..<Self.windowLookups {
-            await wait(Self.windowWait)
-            let new = standardWindows(of: element).filter { window in
-                !before.contains { $0.isSame(as: window) }
-            }
-            // More than one could be a window of the user's, which must not be touched.
-            if new.count == 1 { return AccessibilityWindow(element: new[0]) }
-            if new.count > 1 { return nil }
-        }
-        return nil
-    }
-
-    private func standardWindows(of app: any AccessibilityElement) -> [any AccessibilityElement] {
-        app.elements(of: kAXWindowsAttribute).filter {
-            $0.attribute(kAXSubroleAttribute) as? String == kAXStandardWindowSubrole
-        }
-    }
-
     private func place(_ window: AccessibilityWindow, at origin: ScreenPoint) async {
         try? window.move(to: origin)
         await wait(Self.windowWait)
     }
 
-    private func close(_ window: AccessibilityWindow) {
+    func close(_ window: AccessibilityWindow) {
         if let button = window.element.elementAttribute(kAXCloseButtonAttribute) {
             _ = button.performAction(kAXPressAction)
         }
@@ -271,7 +221,7 @@ public final class DragStressTest {
         )?.post(tap: .cghidEventTap)
     }
 
-    private func wait(_ milliseconds: UInt64) async {
+    func wait(_ milliseconds: UInt64) async {
         try? await Task.sleep(for: .milliseconds(milliseconds))
     }
 
