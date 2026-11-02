@@ -89,4 +89,22 @@ import Testing
             ofProcess: 1, matching: frame, in: [description(number: 1, process: 1)])
         #expect(number == nil)
     }
+
+    @Test func aTitleBecomesAKeyThatIsNotTheTitle() throws {
+        let key = try #require(
+            WindowServer.titleKey(from: [kCGWindowName as String: "Private letter.doc"]))
+        #expect(!key.contains("Private"))
+        #expect(key.count == 64)
+    }
+
+    @Test func oneTitleAlwaysGivesOneKey() {
+        let description = [kCGWindowName as String: "Same"]
+        #expect(
+            WindowServer.titleKey(from: description) == WindowServer.titleKey(from: description))
+    }
+
+    @Test func noTitleGivesNoKey() {
+        #expect(WindowServer.titleKey(from: [:]) == nil)
+        #expect(WindowServer.titleKey(from: [kCGWindowName as String: ""]) == nil)
+    }
 }

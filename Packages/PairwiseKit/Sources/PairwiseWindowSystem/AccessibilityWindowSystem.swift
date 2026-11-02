@@ -25,7 +25,9 @@ public final class AccessibilityWindowSystem: WindowSystemProviding {
     private let capture: WindowCapture
     private let makeMark: () -> any ScreenMark
     private let makeLock: () -> any SeamLockMark
-    private let parkingRecordURL: URL
+    private let recordsFolder: URL
+    private let parkingRecordName = "parked-windows.json"
+    private let pairsRecordName = "pairs.json"
     private let makeHold: (@escaping @MainActor (PointerButtonEvent) -> Bool) -> any PointerHold
     private var joinGuide: (any ScreenMark)?
     private var seamLock: (any SeamLockMark)?
@@ -44,9 +46,9 @@ public final class AccessibilityWindowSystem: WindowSystemProviding {
         makeLock: @escaping () -> any SeamLockMark = { SeamLockPanel() },
         makeHold: @escaping (@escaping @MainActor (PointerButtonEvent) -> Bool) -> any PointerHold =
             { HoldingTap(decide: $0) },
-        parkingRecordURL: URL = AccessibilityWindowSystem.defaultParkingRecordURL
+        recordsFolder: URL = AccessibilityWindowSystem.defaultRecordsFolder
     ) {
-        self.parkingRecordURL = parkingRecordURL
+        self.recordsFolder = recordsFolder
         self.access = access
         self.makeMark = makeMark
         self.makeLock = makeLock
@@ -54,10 +56,9 @@ public final class AccessibilityWindowSystem: WindowSystemProviding {
         capture = WindowCapture(service: captureService)
     }
 
-    /// In the app's folder in Application Support, where a new run finds it (ADR 0053).
-    static let defaultParkingRecordURL = URL.applicationSupportDirectory
+    /// The app's folder in Application Support, where a new run finds its records.
+    static let defaultRecordsFolder = URL.applicationSupportDirectory
         .appending(path: "me.m-domain.pairwise", directoryHint: .isDirectory)
-        .appending(path: "parked-windows.json")
 
     public var isAccessibilityGranted: Bool { AXIsProcessTrusted() }
 
@@ -163,25 +164,53 @@ public final class AccessibilityWindowSystem: WindowSystemProviding {
     }
 
     public func saveParkingRecord(_ record: Data?) {
+        write(record, to: parkingRecordName)
+    }
+
+    public func loadParkingRecord() -> Data? {
+        try? Data(contentsOf: recordsFolder.appending(path: parkingRecordName))
+    }
+
+    public func savePairsRecord(_ record: Data?) {
+        write(record, to: pairsRecordName)
+    }
+
+    public func loadPairsRecord() -> Data? {
+        try? Data(contentsOf: recordsFolder.appending(path: pairsRecordName))
+    }
+
+    /// A failure to write is logged, and the app goes on without the record.
+    private func write(_ record: Data?, to name: String) {
+        let url = recordsFolder.appending(path: name)
         do {
             guard let record else {
-                if FileManager.default.fileExists(atPath: parkingRecordURL.path) {
-                    try FileManager.default.removeItem(at: parkingRecordURL)
+                if FileManager.default.fileExists(atPath: url.path) {
+                    try FileManager.default.removeItem(at: url)
                 }
                 return
             }
             try FileManager.default.createDirectory(
-                at: parkingRecordURL.deletingLastPathComponent(),
-                withIntermediateDirectories: true)
-            try record.write(to: parkingRecordURL, options: .atomic)
+                at: recordsFolder, withIntermediateDirectories: true)
+            try record.write(to: url, options: .atomic)
         } catch {
             Self.logger.info(
-                "the parking record failed: \(String(describing: error), privacy: .public)")
+                "writing \(name, privacy: .public) failed: \(String(describing: error), privacy: .public)"
+            )
         }
     }
 
-    public func loadParkingRecord() -> Data? {
-        try? Data(contentsOf: parkingRecordURL)
+    public func windowIdentities() -> [WindowIdentity] {
+        access.onScreenWindows().compactMap { description in
+            guard
+                let window = WindowServer.normalWindows(
+                    excludingProcess: access.ownProcess, in: [description]
+                ).first
+            else { return nil }
+            return WindowIdentity(
+                number: window.number, owner: window.processID,
+                app: access.appIdentifier(of: window.processID),
+                titleKey: WindowServer.titleKey(from: description), frame: window.frame)
+        }
     }
 
     public func play(_ sound: PairSound) {

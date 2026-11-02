@@ -44,6 +44,8 @@ protocol SystemAccess {
     func displays() -> [WindowFrame]
     /// Where the pointer is now, in global screen coordinates.
     var pointerLocation: ScreenPoint { get }
+    /// The identifier of the app of process `processID`, or `nil` when the system does not say.
+    func appIdentifier(of processID: pid_t) -> String?
     /// This app's own process.
     var ownProcess: pid_t { get }
 }

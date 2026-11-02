@@ -18,6 +18,7 @@ extension PairDragModel {
     /// Reads the window list, without asking any app, and asks an app only about a window of
     /// a pair that left the list.
     func lookAtPairs() {
+        keepPairsUpToDate()
         guard !book.pairs.isEmpty,
             system.uptime - togetherWatch.lastLook >= Self.togetherInterval
         else { return }

@@ -62,6 +62,16 @@ public protocol WindowSystemProviding: AnyObject {
     /// What `saveParkingRecord` kept, also from an earlier run of the app.
     func loadParkingRecord() -> Data?
 
+    /// Keeps `record` between runs of the app, or removes what is kept when it is `nil`
+    /// (ADR 0054).
+    func savePairsRecord(_ record: Data?)
+
+    /// What `savePairsRecord` kept, also from an earlier run of the app.
+    func loadPairsRecord() -> Data?
+
+    /// What can be known about the normal windows on screen, without asking their apps.
+    func windowIdentities() -> [WindowIdentity]
+
     /// Plays `sound`.
     func play(_ sound: PairSound)
 

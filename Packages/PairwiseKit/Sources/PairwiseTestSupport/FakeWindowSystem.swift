@@ -31,6 +31,8 @@ public final class FakeWindowSystem: WindowSystemProviding {
     public private(set) var sounds: [PairSound] = []
     /// What survives a crash, kept here as a test goes on with a new model.
     public var parkingRecord: Data?
+    /// What is kept between runs, here as a test goes on with a new model.
+    public var pairsRecord: Data?
     public private(set) var standInRequests = 0
     public private(set) var normalWindowsRequests = 0
     public var pointerLocation = ScreenPoint(x: 0, y: 0)
@@ -93,6 +95,24 @@ public final class FakeWindowSystem: WindowSystemProviding {
 
     public func loadParkingRecord() -> Data? {
         parkingRecord
+    }
+
+    public func savePairsRecord(_ record: Data?) {
+        pairsRecord = record
+    }
+
+    public func loadPairsRecord() -> Data? {
+        pairsRecord
+    }
+
+    public func windowIdentities() -> [WindowIdentity] {
+        knownWindows.compactMap { window in
+            window.windowNumber.map {
+                WindowIdentity(
+                    number: $0, owner: window.owner, app: window.appID,
+                    titleKey: window.titleKey, frame: window.currentFrame)
+            }
+        }
     }
 
     public func play(_ sound: PairSound) {

@@ -62,8 +62,9 @@ Done first because everything below adds code to this module.
 - [x] A test by killing the app during a drag, in the stress test, on its own windows: passed, both windows back in place.
 
 ### 9. Pairs that last
-- [ ] ADR: how a window is found again after a restart (app, title, size, place), since its number does not survive.
-- [ ] Pairs are saved, and restored at the start where both windows are found. A pair that cannot be found with confidence is dropped, and no window is moved.
+- [x] ADR 0054: how a window is found again after a restart (app, title, size, place), since its number does not survive.
+- [x] Pairs are saved, and restored at the start where both windows are found. A pair that cannot be found with confidence is dropped, and no window is moved.
+- [ ] Check by hand: a quit, a restart of an app, a restart of the Mac.
 
 ### 10. The app itself
 - [x] ADR 0034: a menu bar app (open decision 2 in `PLAN.md`, owner's choice 4). Done before step 4, at the owner's wish.

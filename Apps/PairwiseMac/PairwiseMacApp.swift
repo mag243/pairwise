@@ -89,6 +89,8 @@ extension PairwiseMacApp {
         _ model: PairDragModel, _ system: AccessibilityWindowSystem
     ) async -> Bool {
         let arguments = CommandLine.arguments
+        // Test runs join windows of their own, and leave the user's saved pairs alone.
+        model.keepsPairs = !arguments.contains { $0.hasPrefix("--") && $0 != recordFlag }
         if let flag = arguments.firstIndex(of: recordFlag), arguments.indices.contains(flag + 1) {
             model.start()
             await ScreenRecording(outputPath: arguments[flag + 1]).record(for: recordingTime)

@@ -59,3 +59,4 @@ Use `0000-template.md` as the basis.
 | 0051 | Raising and a sound at a join | Accepted |
 | 0052 | A pair comes forward and minimizes together | Accepted |
 | 0053 | Not losing windows | Accepted |
+| 0054 | Pairs that last | Accepted |

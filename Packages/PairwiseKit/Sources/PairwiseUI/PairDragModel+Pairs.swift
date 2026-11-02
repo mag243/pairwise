@@ -12,6 +12,7 @@ extension PairDragModel {
         try book.join(number, to: otherNumber, on: side)
         pairedWindows[number] = window
         pairedWindows[otherNumber] = other
+        lasting.needsSaving = true
         updatePointerWatching()
     }
 
@@ -32,6 +33,7 @@ extension PairDragModel {
             togetherWatch.minimized.remove(pair.left)
         }
         book.end(pairContaining: number)
+        lasting.needsSaving = true
         if let pair = lockWatch.lock?.pair, pair.left == number || pair.right == number {
             hideLock()
         }

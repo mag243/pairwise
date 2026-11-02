@@ -26,5 +26,9 @@ struct LiveSystemAccess: SystemAccess {
         ScreenPoint(CGEvent(source: nil)?.location ?? .zero)
     }
 
+    func appIdentifier(of processID: pid_t) -> String? {
+        NSRunningApplication(processIdentifier: processID)?.bundleIdentifier
+    }
+
     var ownProcess: pid_t { ProcessInfo.processInfo.processIdentifier }
 }

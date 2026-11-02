@@ -9,6 +9,10 @@ public final class FakeWindow: MovableWindow {
     public var owner: Int32 = 0
     public var isAvailable = true
     public var isMinimized = false
+    /// The identifier of the window's app.
+    public var appID: String?
+    /// The hash of the window's title.
+    public var titleKey: String?
     /// What the window was asked to become, in order.
     public private(set) var minimizeRequests: [Bool] = []
     /// What `serverFrame()` gives; without one the window server does not tell.

@@ -131,12 +131,11 @@ private final class FakeLockMark: SeamLockMark {
 @Suite struct ParkingRecordFileTests {
     private let folder = FileManager.default.temporaryDirectory
         .appending(path: "PairwiseTests-\(UUID().uuidString)", directoryHint: .isDirectory)
-    private var url: URL { folder.appending(path: "parked-windows.json") }
 
     private func system() -> AccessibilityWindowSystem {
         AccessibilityWindowSystem(
             access: FakeSystemAccess(), captureService: FakeCaptureService(),
-            parkingRecordURL: url)
+            recordsFolder: folder)
     }
 
     @Test func aRecordSurvivesInANewSystem() {
@@ -151,6 +150,14 @@ private final class FakeLockMark: SeamLockMark {
         system.saveParkingRecord(Data("record".utf8))
         system.saveParkingRecord(nil)
         #expect(system.loadParkingRecord() == nil)
+    }
+
+    @Test func aPairsRecordSurvivesInANewSystemApartFromTheParkingRecord() {
+        defer { try? FileManager.default.removeItem(at: folder) }
+        system().savePairsRecord(Data("pairs".utf8))
+        system().saveParkingRecord(Data("parked".utf8))
+        #expect(system().loadPairsRecord() == Data("pairs".utf8))
+        #expect(system().loadParkingRecord() == Data("parked".utf8))
     }
 
     @Test func noRecordGivesNone() {

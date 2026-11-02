@@ -55,6 +55,9 @@ public final class PairDragModel {
     @ObservationIgnored var togetherWatch = TogetherWatch()
     /// Whether a record of parked windows is kept (ADR 0053).
     @ObservationIgnored var isParkingRecorded = false
+    @ObservationIgnored var lasting = LastingPairs()
+    /// Whether pairs are kept between runs; test runs leave the user's alone (ADR 0054).
+    @ObservationIgnored public var keepsPairs = true
     @ObservationIgnored var hasSeenButtonDown = false
     @ObservationIgnored private var pressTime: TimeInterval = 0
     /// Tells a picture that arrives late from the one this press asked for.
@@ -84,6 +87,7 @@ public final class PairDragModel {
             problem = nil
             isRunning = true
             updatePointerWatching()
+            loadSavedPairs()
         } catch {
             problem = error
         }
@@ -93,6 +97,7 @@ public final class PairDragModel {
     public func stop() {
         putWindowsBack()
         endDrag()
+        if lasting.needsSaving { savePairs() }
         system.stopHoldingDrags()
         isRunning = false
         updatePointerWatching()
@@ -256,7 +261,10 @@ public final class PairDragModel {
         case .placing(let placing):
             place(placing)
         case .settling(_, let until):
-            if system.uptime >= until { endDrag() }
+            if system.uptime >= until {
+                endDrag()
+                lasting.needsSaving = true
+            }
         }
     }
 

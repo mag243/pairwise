@@ -1,4 +1,5 @@
 import CoreGraphics
+import CryptoKit
 import Foundation
 import PairwiseCore
 
@@ -48,6 +49,15 @@ enum WindowServer {
             else { return nil }
             return OnScreenWindow(number: number, processID: processID, frame: frame)
         }
+    }
+
+    /// The title in a window's description as a hash, or `nil` without a title. A title can
+    /// name a private document, and the hash is enough to tell whether it is the same (ADR 0054).
+    static func titleKey(from description: [String: Any]) -> String? {
+        guard let title = description[kCGWindowName as String] as? String, !title.isEmpty else {
+            return nil
+        }
+        return SHA256.hash(data: Data(title.utf8)).map { String(format: "%02x", $0) }.joined()
     }
 
     /// The window in a description of one window from the window server.

@@ -79,6 +79,11 @@ final class FakeSystemAccess: SystemAccess {
     var displayFrames: [WindowFrame] = []
     var ownProcess: pid_t = 99
     var pointerLocation = ScreenPoint(x: 0, y: 0)
+    var appIdentifiers: [pid_t: String] = [:]
+
+    func appIdentifier(of processID: pid_t) -> String? {
+        appIdentifiers[processID]
+    }
 
     func application(_ processID: pid_t) -> any AccessibilityElement {
         if let app = apps[processID] { return app }
