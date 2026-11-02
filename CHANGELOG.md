@@ -1,5 +1,9 @@
 # Changelog
 
+## [Unreleased]
+
+- No gap between two windows after dragging their seam, when a window such as Terminal rounds its width to whole characters.
+
 ## [0.2.0]
 
 - Pairwise needs only Accessibility now. While dragging you see an empty plane with each window's icon and title, and nothing is recorded.

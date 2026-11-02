@@ -83,6 +83,28 @@ import Testing
         #expect(panel.seams.last == 500)
     }
 
+    /// A terminal rounds its width to whole characters.
+    @Test func aPressedWindowThatRoundsLeavesNoGap() {
+        left.widthStep = 7
+        resize(through: [520, 530, 540])
+        release(atX: 540)
+        #expect(
+            right.currentFrame.origin.x == left.currentFrame.origin.x + left.currentFrame.size.width
+        )
+        #expect(left.currentFrame.origin.x == 100)
+        #expect(right.currentFrame.origin.x + right.currentFrame.size.width == 700)
+    }
+
+    @Test func twoWindowsThatRoundLeaveNoGap() {
+        left.widthStep = 7
+        right.widthStep = 11
+        resize(through: [520, 530, 540])
+        release(atX: 540)
+        #expect(
+            right.currentFrame.origin.x == left.currentFrame.origin.x + left.currentFrame.size.width
+        )
+    }
+
     @Test func aReleaseAtALimitLeavesTheWindowsAgainstEachOther() {
         right.minimumWidth = 150
         resize(through: [520, 590, 620, 640])

@@ -209,14 +209,37 @@ extension PairDragModel {
         }
     }
 
+    /// Each window keeps its far edge at the width it took, and the other meets it. Two windows
+    /// that both round may not fit that way, as a terminal takes only whole characters.
     private func meet(_ resizing: PairDrag.ResizingSeam, seamAsked seam: Double) {
+        guard let reachedHeld = try? resizing.window.frame() else { return }
+        let held = SeamFollow.frame(
+            start: resizing.heldStart, on: resizing.side.opposite,
+            withWidth: reachedHeld.size.width)
+        Self.apply(held, to: resizing.window, from: reachedHeld)
+        let heldSeam = SeamFollow.seam(of: held, partnerOn: resizing.side)
+        if heldSeam != seam {
+            Self.apply(resizing.partnerFrame(seamAt: heldSeam), to: resizing.partner, from: nil)
+        }
         guard let reached = try? resizing.partner.frame() else { return }
         let partner = SeamFollow.frame(
             start: resizing.partnerStart, on: resizing.side, withWidth: reached.size.width)
         Self.apply(partner, to: resizing.partner, from: reached)
         let met = SeamFollow.seam(of: partner, partnerOn: resizing.side.opposite)
-        guard met != seam, let held = try? resizing.window.frame() else { return }
+        guard met != heldSeam else { return }
         Self.apply(resizing.heldFrame(seamAt: met), to: resizing.window, from: held)
+        closeGap(resizing)
+    }
+
+    /// The last resort when the widths do not fit: no gap, with the partner's far edge a little
+    /// off, by less than the step of the window's rounding.
+    private func closeGap(_ resizing: PairDrag.ResizingSeam) {
+        guard let held = try? resizing.window.frame(), let partner = try? resizing.partner.frame()
+        else { return }
+        let seam = SeamFollow.seam(of: held, partnerOn: resizing.side)
+        let x = resizing.side == .right ? seam : seam - partner.size.width
+        guard x != partner.origin.x else { return }
+        try? resizing.partner.move(to: ScreenPoint(x: x, y: partner.origin.y))
     }
 
     /// Asks only for what changes, as each call takes the app time.
