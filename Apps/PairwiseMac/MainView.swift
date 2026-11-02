@@ -4,7 +4,8 @@ import SwiftUI
 
 /// The settings window: the permissions, the choices for joining, and how Pairwise works.
 struct MainView: View {
-    private static let width: CGFloat = 480
+    /// Wide enough for every tab in the bar in each language; narrower, the bar collapses.
+    private static let width: CGFloat = 600
     private static let height: CGFloat = 460
     #if DEBUG
     private static let millisecondsPerSecond = 1000.0
