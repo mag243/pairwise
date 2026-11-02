@@ -8,6 +8,7 @@ import PairwiseTestSupport
 struct FakeCapturable: CapturableWindow {
     let processID: pid_t?
     let frame: WindowFrame
+    var windowNumber: UInt32?
 }
 
 /// A window of neither the real system nor a capture list.
@@ -34,6 +35,7 @@ final class FakeCaptureService: CaptureService {
     var pictureError: (any Error)?
     private(set) var listRequests = 0
     private(set) var pictureFrames: [WindowFrame] = []
+    private(set) var picturedNumbers: [UInt32?] = []
     private(set) var standInFramesPerSecond: Int?
 
     func onScreenWindows() async throws -> [any CapturableWindow] {
@@ -47,6 +49,7 @@ final class FakeCaptureService: CaptureService {
     ) async throws -> StandInPanel.Picture {
         if let pictureError { throw pictureError }
         pictureFrames.append(frame)
+        picturedNumbers.append(window.windowNumber)
         return try StandInPanel.Picture(image: Self.image(), size: .zero)
     }
 

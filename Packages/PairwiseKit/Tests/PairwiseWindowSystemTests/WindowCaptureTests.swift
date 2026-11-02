@@ -54,6 +54,33 @@ import Testing
         #expect(service.listRequests == 2)
     }
 
+    /// A window that had another window's size in an older list, as after a resize at a seam.
+    @Test func aWindowWithANumberIsFoundByItAndNotByItsSize() async {
+        let numbered = AccessibilityWindow(
+            element: FakeElement.window(frame: Self.rect), serverWindowNumber: 7, access: access)
+        service.windows = [
+            FakeCapturable(processID: 1, frame: Self.frame, windowNumber: 8),
+            FakeCapturable(
+                processID: 1, frame: WindowFrame(x: 900, y: 20, width: 500, height: 200),
+                windowNumber: 7),
+        ]
+        await capture.prepare()
+        _ = await capture.standIn(of: [numbered], framesPerSecond: 30)
+        #expect(service.picturedNumbers == [7])
+    }
+
+    @Test func aWindowWithANumberNotOnTheListAsksForAFreshList() async {
+        let numbered = AccessibilityWindow(
+            element: FakeElement.window(frame: Self.rect), serverWindowNumber: 7, access: access)
+        service.windows = [FakeCapturable(processID: 1, frame: Self.frame, windowNumber: 8)]
+        await capture.prepare()
+        service.windows.append(
+            FakeCapturable(processID: 1, frame: Self.frame, windowNumber: 7))
+        _ = await capture.standIn(of: [numbered], framesPerSecond: 30)
+        #expect(service.listRequests == 2)
+        #expect(service.picturedNumbers == [7])
+    }
+
     @Test func aWindowOfAnotherAppIsNotPictured() async {
         service.windows = [FakeCapturable(processID: 2, frame: Self.frame)]
         let result = await capture.standIn(of: [window], framesPerSecond: 30)

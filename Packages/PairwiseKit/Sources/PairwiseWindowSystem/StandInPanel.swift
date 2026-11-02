@@ -11,22 +11,36 @@ final class StandInPanel: WindowStandIn {
         let size: CGSize
     }
 
-    /// What a picture's slot in the panel and its picture within the slot take up.
+    /// Where a picture goes for a seam: its slot in the panel, and within the slot its first
+    /// half, its second half and the room between. A narrower window loses its middle and a
+    /// wider one gains one, so that both edges stay whole, as with a real window (ADR 0048).
     struct SeamPlace: Equatable {
         let slot: CGRect
-        let image: CGRect
+        let head: CGRect
+        let fill: CGRect
+        let tail: CGRect
     }
 
-    /// How far from the seam the column that stretches is, in points, away from the window's
-    /// rounded corners and its edge.
-    private static let stretchInset: CGFloat = 12
+    /// The layers of one picture for a seam.
+    private struct SeamLayers {
+        let head = CALayer()
+        let fill = CALayer()
+        let tail = CALayer()
+    }
+
+    /// How many rows of a picture one row of its sample stands for.
+    private static let rowsPerSample = 4
 
     private let panel: NSPanel
     private let streams: [LiveStream]
     private let pictures: [Picture]
-    /// A layer per picture that cuts it off at the seam, and the layer with the picture.
+    /// A layer per picture that cuts it off at the seam, the layer with the whole picture, and
+    /// the layers that show its parts once a seam has been set.
     private var slots: [CALayer] = []
     private var images: [CALayer] = []
+    private var parts: [SeamLayers] = []
+    /// Where each picture divides, in points from its left, found at the first seam.
+    private var splits: [CGFloat] = []
 
     var liveFrames: [Int] { streams.map(\.frames) }
 
@@ -40,6 +54,8 @@ final class StandInPanel: WindowStandIn {
             contentRect: CGRect(origin: .zero, size: size),
             styleMask: [.borderless, .nonactivatingPanel], backing: .buffered, defer: false)
         panel.isReleasedWhenClosed = false
+        // A fade would show the old pictures over windows of another size.
+        panel.animationBehavior = .none
         panel.isOpaque = false
         panel.backgroundColor = .clear
         panel.hasShadow = true
@@ -78,47 +94,107 @@ final class StandInPanel: WindowStandIn {
         return (CGSize(width: left, height: height), frames)
     }
 
-    /// Where two pictures go with the seam at `seam` from the left. A narrower window's picture
-    /// is cut off at the seam, a wider one's fills its slot, and each keeps its far edge.
-    static func seamLayout(of sizes: [CGSize], seamAt seam: CGFloat) -> [SeamPlace] {
-        guard sizes.count == 2 else { return [] }
+    private static func seamLayers(
+        of picture: Picture, split: CGFloat, in slot: CALayer
+    ) -> SeamLayers {
+        let layers = SeamLayers()
+        let share = split / picture.size.width
+        let pieces = [
+            (layers.head, CGRect(x: 0, y: 0, width: share, height: 1)),
+            (layers.fill, fillColumn(ofPictureWidth: picture.size.width, atSplit: split)),
+            (layers.tail, CGRect(x: share, y: 0, width: 1 - share, height: 1)),
+        ]
+        for (layer, piece) in pieces {
+            layer.contents = picture.image
+            layer.contentsGravity = .resize
+            layer.contentsRect = piece
+            slot.addSublayer(layer)
+        }
+        return layers
+    }
+
+    /// Where two pictures go with the seam at `seam` from the left, each divided at its place
+    /// in `splits` and keeping both edges.
+    static func seamLayout(
+        of sizes: [CGSize], splits: [CGFloat], seamAt seam: CGFloat
+    ) -> [SeamPlace] {
+        guard sizes.count == 2, splits.count == 2 else { return [] }
         let (left, right) = (sizes[0], sizes[1])
         let height = max(left.height, right.height)
         let rightWidth = left.width + right.width - seam
-        let leftImage = max(left.width, seam)
-        let rightImage = max(right.width, rightWidth)
         return [
-            SeamPlace(
-                slot: CGRect(x: 0, y: height - left.height, width: seam, height: left.height),
-                image: CGRect(x: 0, y: 0, width: leftImage, height: left.height)),
-            SeamPlace(
-                slot: CGRect(
-                    x: seam, y: height - right.height, width: rightWidth, height: right.height),
-                image: CGRect(
-                    x: rightWidth - rightImage, y: 0, width: rightImage, height: right.height)),
+            place(
+                of: left, split: splits[0],
+                inSlot: CGRect(x: 0, y: height - left.height, width: seam, height: left.height)),
+            place(
+                of: right, split: splits[1],
+                inSlot: CGRect(
+                    x: seam, y: height - right.height, width: rightWidth, height: right.height)),
         ]
     }
 
-    /// The part of a picture that stretches when it fills a wider slot, as a share of the
-    /// picture: a thin column near the seam, which is mostly plain window.
-    static func stretchingColumn(ofPictureWidth width: CGFloat, isLeft: Bool) -> CGRect {
-        let columnWidth = 1 / width
-        let inset = stretchInset / width
-        return CGRect(x: isLeft ? 1 - inset : inset, y: 0, width: columnWidth, height: 1)
+    private static func place(
+        of size: CGSize, split: CGFloat, inSlot slot: CGRect
+    ) -> SeamPlace {
+        let tailWidth = size.width - split
+        return SeamPlace(
+            slot: slot,
+            head: CGRect(x: 0, y: 0, width: split, height: size.height),
+            fill: CGRect(
+                x: split, y: 0, width: max(slot.width - size.width, 0), height: size.height),
+            tail: CGRect(
+                x: slot.width - tailWidth, y: 0, width: tailWidth, height: size.height))
+    }
+
+    /// The part of a picture that fills the room in a wider window, as a share of the picture:
+    /// one column at its split, stretched.
+    static func fillColumn(ofPictureWidth width: CGFloat, atSplit split: CGFloat) -> CGRect {
+        CGRect(x: split / width, y: 0, width: 1 / width, height: 1)
+    }
+
+    /// Reads the picture once, at the first seam, as a press that only moves needs none of this.
+    private func prepareForSeam() {
+        guard parts.isEmpty else { return }
+        for (index, picture) in pictures.enumerated() {
+            let split = Self.quietSplit(of: picture)
+            splits.append(split)
+            parts.append(Self.seamLayers(of: picture, split: split, in: slots[index]))
+            images[index].isHidden = true
+        }
+    }
+
+    /// One value per point across, and fewer rows than that, which is enough to see text.
+    private static func quietSplit(of picture: Picture) -> CGFloat {
+        let width = Int(picture.size.width)
+        let height = max(Int(picture.size.height) / rowsPerSample, 1)
+        guard
+            width > 0,
+            let context = CGContext(
+                data: nil, width: width, height: height, bitsPerComponent: 8, bytesPerRow: width,
+                space: CGColorSpaceCreateDeviceGray(),
+                bitmapInfo: CGImageAlphaInfo.none.rawValue),
+            let data = context.data
+        else { return picture.size.width / 2 }
+        context.interpolationQuality = .none
+        context.draw(picture.image, in: CGRect(x: 0, y: 0, width: width, height: height))
+        let gray = Array(
+            UnsafeBufferPointer(
+                start: data.assumingMemoryBound(to: UInt8.self), count: width * height))
+        return CGFloat(QuietColumn.index(inGray: gray, width: width, height: height))
     }
 
     func setSeam(atOffset offset: Double) {
-        let places = Self.seamLayout(of: pictures.map(\.size), seamAt: offset)
         CATransaction.begin()
         CATransaction.setDisableActions(true)
+        prepareForSeam()
+        let places = Self.seamLayout(
+            of: pictures.map(\.size), splits: splits, seamAt: offset)
         for (index, place) in places.enumerated() {
-            let picture = pictures[index]
             slots[index].frame = place.slot
-            images[index].frame = place.image
-            // The parts that do not stretch keep the picture's own pixels per point.
-            images[index].contentsScale = CGFloat(picture.image.width) / picture.size.width
-            images[index].contentsCenter = Self.stretchingColumn(
-                ofPictureWidth: picture.size.width, isLeft: index == 0)
+            let layers = parts[index]
+            layers.head.frame = place.head
+            layers.fill.frame = place.fill
+            layers.tail.frame = place.tail
         }
         CATransaction.commit()
     }

@@ -8,6 +8,8 @@ protocol CapturableWindow {
     var processID: pid_t? { get }
     /// Its frame in global screen coordinates.
     var frame: WindowFrame { get }
+    /// The window server's number for it.
+    var windowNumber: UInt32? { get }
 }
 
 /// The calls to ScreenCaptureKit (ADR 0031).
@@ -33,6 +35,7 @@ struct LiveCaptureService: CaptureService {
     private struct Window: CapturableWindow {
         let window: SCWindow
         var processID: pid_t? { window.owningApplication?.processID }
+        var windowNumber: UInt32? { window.windowID }
         var frame: WindowFrame { WindowFrame(origin: window.frame.origin, size: window.frame.size) }
     }
 

@@ -10,6 +10,7 @@ struct PairwiseMacApp: App {
     private static let stressTestFlag = "--drag-stress-test"
     private static let joinTestFlag = "--join-test"
     private static let seamTestFlag = "--seam-test"
+    private static let seamLookFlag = "--seam-look"
     private static let showSettingsFlag = "--show-settings"
     private static let settingsWindow = "settings"
 
@@ -59,7 +60,7 @@ struct PairwiseMacApp: App {
     ) async {
         let arguments = CommandLine.arguments
         let flag = arguments.firstIndex {
-            $0 == stressTestFlag || $0 == joinTestFlag || $0 == seamTestFlag
+            [stressTestFlag, joinTestFlag, seamTestFlag, seamLookFlag].contains($0)
         }
         guard let flag, arguments.indices.contains(flag + 1) else {
             if model.isAccessibilityGranted, model.isScreenRecordingGranted { model.start() }
@@ -77,6 +78,8 @@ struct PairwiseMacApp: App {
             await test.runJoinTest(on: system)
         } else if arguments[flag] == seamTestFlag {
             await test.runSeamTest()
+        } else if arguments[flag] == seamLookFlag {
+            await test.runSeamLook()
         } else {
             await test.run()
         }

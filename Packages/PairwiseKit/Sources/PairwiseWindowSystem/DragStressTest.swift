@@ -128,7 +128,7 @@ public final class DragStressTest {
     }
 
     /// Makes the pair, and writes down why when that fails, as nothing after it would count.
-    private func joined(_ first: AccessibilityWindow, _ second: AccessibilityWindow) -> Bool {
+    func joined(_ first: AccessibilityWindow, _ second: AccessibilityWindow) -> Bool {
         do {
             try join(first, second)
             return true

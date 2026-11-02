@@ -1,7 +1,8 @@
 import PairwiseCore
 
-/// Takes pictures of other apps' windows (ADR 0024). Finds each window in the system's list
-/// by its app, its size and the closest origin, as the Accessibility API gives no number.
+/// Takes pictures of other apps' windows (ADR 0024). Finds each window in the system's list by
+/// its number, as a list can be older than a resize and hold another window at its size. A
+/// window with no number is found by its app, its size and the closest origin.
 @MainActor
 final class WindowCapture {
     private let service: any CaptureService
@@ -68,6 +69,9 @@ final class WindowCapture {
     private static func match(
         _ window: AccessibilityWindow, frame: WindowFrame, in list: [any CapturableWindow]
     ) -> (any CapturableWindow)? {
+        if let number = window.windowNumber {
+            return list.first { $0.windowNumber == number }
+        }
         let processID = window.element.processID
         let candidates = list.filter { $0.processID == processID }
         return WindowMatch.index(of: frame, among: candidates.map(\.frame)).map { candidates[$0] }
