@@ -55,3 +55,4 @@ Use `0000-template.md` as the basis.
 | 0047 | A reach that follows the speed | Deprecated |
 | 0048 | Pictures at the seam | Superseded by 0049 |
 | 0049 | Live pictures at the seam, with the windows parked | Accepted |
+| 0050 | Test code only in debug builds | Accepted |

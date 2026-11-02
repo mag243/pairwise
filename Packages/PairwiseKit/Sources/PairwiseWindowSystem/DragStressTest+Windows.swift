@@ -1,3 +1,5 @@
+#if DEBUG
+
 import AppKit
 import ApplicationServices
 import PairwiseCore
@@ -77,3 +79,5 @@ extension DragStressTest {
         return nil
     }
 }
+
+#endif

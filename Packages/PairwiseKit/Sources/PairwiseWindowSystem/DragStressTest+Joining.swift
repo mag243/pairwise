@@ -1,3 +1,5 @@
+#if DEBUG
+
 import AppKit
 import ImageIO
 import PairwiseCore
@@ -258,3 +260,5 @@ extension DragStressTest {
         CGImageDestinationFinalize(destination)
     }
 }
+
+#endif

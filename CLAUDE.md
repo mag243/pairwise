@@ -36,6 +36,8 @@ tools/build.sh run --drag-stress-test FILE   # the app tests dragging on its own
 tools/build.sh run --join-test FILE   # the same for joining and parting, with a picture of the guide (ADR 0027)
 tools/build.sh run --seam-test FILE   # measures how well a window follows a resize at a seam; takes over the pointer
 tools/build.sh run --seam-look FILE   # saves pictures of a resize at the seam next to FILE; takes over the pointer
+tools/build.sh run --record FILE      # the app as usual, recording the screen to FILE for 40 seconds, then it quits
+tools/build.sh release                # build the app, Release, and fail if test code is in it (ADR 0050)
 ```
 
 - Run `quick` after a step that only touches the package and `verify` after any app change; both must be green. `ci` adds the XCUITest smoke tests, which take over the screen: run it only when the owner says so, and ask for it before the owner pushes and at the end of a plan (ADR 0011).
@@ -66,6 +68,7 @@ Local package `Packages/PairwiseKit`, dependencies strictly one way: **App → U
 - The Accessibility API and event taps are used only in `PairwiseWindowSystem` (checked by `tools/check_dependencies.sh`). An event tap never swallows or changes an event it does not own, and always lets input through when Pairwise fails.
 - `PairwiseCore` must not import AppKit or SwiftUI.
 - No `@unchecked Sendable` without an ADR.
+- Test code that drives or records the screen goes inside `#if DEBUG`, flags included (ADR 0050).
 - Bugs: first a failing test that reproduces the bug, then the fix. The test stays.
 - Never disable, skip or weaken tests to complete a task. If it is unclear whether the test or the code is wrong, report it.
 - Test style: the test name describes behaviour (`rejectsPairOfWindowOnItself`), one behaviour per test, no waiting on real time, no dependency on test order, no global state.

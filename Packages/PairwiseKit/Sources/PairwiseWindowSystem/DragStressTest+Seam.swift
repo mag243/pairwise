@@ -1,3 +1,5 @@
+#if DEBUG
+
 import AppKit
 import PairwiseCore
 
@@ -220,3 +222,5 @@ private final class SeamFollower {
         String(format: "%.1f", value)
     }
 }
+
+#endif

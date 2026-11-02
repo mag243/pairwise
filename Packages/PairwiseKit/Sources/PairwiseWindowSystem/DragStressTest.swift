@@ -1,3 +1,5 @@
+#if DEBUG
+
 import AppKit
 import ApplicationServices
 import PairwiseCore
@@ -256,3 +258,5 @@ public final class DragStressTest {
         try? text.write(toFile: outputPath, atomically: true, encoding: .utf8)
     }
 }
+
+#endif

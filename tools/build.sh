@@ -10,6 +10,7 @@
 #   coverage    Package tests with code coverage; fails when a module is below its
 #               line-coverage target (Core 90 %, WindowSystem 75 %, UI 70 %; PLAN.md, Test plan).
 #   build       Build the macOS app with its tests (compiled, not run), Debug.
+#   release     Build the macOS app, Release, and fail if test code is in it (ADR 0050).
 #   apptest     The macOS app's tests, including the XCUITest smoke tests. Followed by
 #               a filter, only those tests, as Class or Class/testName, several
 #               separated by commas: tools/build.sh apptest LaunchTests/testShowsWindow
@@ -214,6 +215,18 @@ cmd_build() {
   ok "$MAC_SCHEME"
 }
 
+cmd_release() {
+  step "Release"
+  require_project
+  xcode build-release -scheme "$MAC_SCHEME" -destination "$MAC_DESTINATION" -configuration Release build
+  local binary="$DERIVED_DATA/Build/Products/Release/$APP_NAME.app/Contents/MacOS/$APP_NAME"
+  [[ -f "$binary" ]] || fail "No release app at ${binary#"$ROOT_DIR"/}"
+  if strings "$binary" | grep -qE 'DragStressTest|ScreenRecording|--record|--seam-look|--join-test'; then
+    fail "Test code is in the release build (ADR 0050)"
+  fi
+  ok "No test code in the release build"
+}
+
 cmd_apptest() {
   local filter="${1:-}" only=() tests=() test
   step "macOS app tests${filter:+ ($filter)}"
@@ -256,11 +269,12 @@ run_command() {
     test) timed test cmd_test "${2:-}" ;;
     coverage) timed coverage cmd_coverage ;;
     build) timed build cmd_build ;;
+    release) timed release cmd_release ;;
     apptest) timed apptest cmd_apptest "${2:-}" ;;
     clean) timed clean cmd_clean ;;
     quick) run_command check; run_command test ;;
     verify) run_command check; run_command test; run_command build ;;
-    ci) run_command verify; run_command apptest ;;
+    ci) run_command verify; run_command release; run_command apptest ;;
     -h|--help|help) usage; exit 0 ;;
     *) usage; fail "Unknown command: $1" ;;
   esac

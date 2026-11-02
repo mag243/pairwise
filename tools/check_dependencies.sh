@@ -4,6 +4,7 @@
 #   - PairwiseWindowSystem imports neither SwiftUI nor PairwiseUI.
 #   - The Accessibility API, event taps and ScreenCaptureKit appear only in PairwiseWindowSystem,
 #     the one place that touches another app's windows.
+#   - Test code that drives or records the screen is only in debug builds (ADR 0050).
 # Package.swift already enforces the dependency direction between the modules.
 set -euo pipefail
 # shellcheck source=tools/lib.sh
@@ -47,5 +48,13 @@ report "PairwiseWindowSystem may not import SwiftUI, UIKit or PairwiseUI" \
 outside="$(grep -rnE --include='*.swift' "$WINDOW_SYSTEM_ONLY" "$SOURCES" "$ROOT_DIR/Apps" 2>/dev/null |
   grep -v "$SOURCES/PairwiseWindowSystem/" | sed "s|^$ROOT_DIR/||" || true)"
 report "Only PairwiseWindowSystem may use the Accessibility API, event taps or ScreenCaptureKit" "$outside"
+
+# Code that drives or records the screen stays out of a release build (ADR 0050).
+debug_only=""
+for file in "$SOURCES"/PairwiseWindowSystem/DragStressTest*.swift \
+  "$SOURCES/PairwiseWindowSystem/ScreenRecording.swift" "$ROOT_DIR/Apps/PairwiseMac/AnimatedTestView.swift"; do
+  [[ "$(head -n 1 "$file")" == "#if DEBUG" ]] || debug_only+="${file#"$ROOT_DIR"/}"$'\n'
+done
+report "Test code must start with #if DEBUG (ADR 0050)" "$debug_only"
 
 ((found == 0)) || exit 1

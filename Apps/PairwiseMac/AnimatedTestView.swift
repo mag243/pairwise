@@ -1,3 +1,5 @@
+#if DEBUG
+
 import SwiftUI
 
 /// What a copy of the app shows for the stress test: something that changes all the time, to
@@ -18,3 +20,5 @@ struct AnimatedTestView: View {
         .frame(width: Self.width, height: Self.height)
     }
 }
+
+#endif

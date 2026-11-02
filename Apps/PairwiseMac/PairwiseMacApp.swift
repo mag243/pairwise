@@ -3,14 +3,10 @@ import PairwiseUI
 import PairwiseWindowSystem
 import SwiftUI
 
-/// The macOS app: a menu bar item, and a settings window (ADR 0034). With
-/// `--drag-stress-test <file>` it tests dragging itself and quits (ADR 0027).
+/// The macOS app: a menu bar item, and a settings window (ADR 0034). A debug build can also
+/// test itself on a flag, and quit (ADR 0027, 0050).
 @main
 struct PairwiseMacApp: App {
-    private static let stressTestFlag = "--drag-stress-test"
-    private static let joinTestFlag = "--join-test"
-    private static let seamTestFlag = "--seam-test"
-    private static let seamLookFlag = "--seam-look"
     private static let showSettingsFlag = "--show-settings"
     private static let settingsWindow = "settings"
 
@@ -33,18 +29,26 @@ struct PairwiseMacApp: App {
             Image("MenuBarIcon")
         }
         Window("Pairwise", id: Self.settingsWindow) {
+            #if DEBUG
             if Self.isAnimatedCopy {
                 AnimatedTestView()
             } else {
                 MainView(model: pairDrag)
             }
+            #else
+            MainView(model: pairDrag)
+            #endif
         }
         .defaultLaunchBehavior(showsWindowAtLaunch ? .presented : .suppressed)
     }
 
     /// A copy of the app started by the stress test, which shows only an animation.
     private static var isAnimatedCopy: Bool {
+        #if DEBUG
         CommandLine.arguments.contains(DragStressTest.animatedWindowFlag)
+        #else
+        false
+        #endif
     }
 
     /// The window opens by itself when the app is of no use without it.
@@ -58,14 +62,41 @@ struct PairwiseMacApp: App {
     private static func startWorking(
         _ model: PairDragModel, _ system: AccessibilityWindowSystem
     ) async {
+        #if DEBUG
+        if await runTestIfAsked(model, system) { return }
+        #endif
+        if model.isAccessibilityGranted, model.isScreenRecordingGranted { model.start() }
+    }
+}
+
+#if DEBUG
+
+/// The tests and tools a debug build can run on a flag (ADR 0027, 0050).
+extension PairwiseMacApp {
+    private static let stressTestFlag = "--drag-stress-test"
+    private static let joinTestFlag = "--join-test"
+    private static let seamTestFlag = "--seam-test"
+    private static let seamLookFlag = "--seam-look"
+    /// Pairwise works as usual meanwhile, and quits when the recording is finished.
+    private static let recordFlag = "--record"
+    private static let recordingTime = Duration.seconds(40)
+
+    /// Says whether a flag asked for a test, which has then run, and the app is quitting.
+    fileprivate static func runTestIfAsked(
+        _ model: PairDragModel, _ system: AccessibilityWindowSystem
+    ) async -> Bool {
         let arguments = CommandLine.arguments
+        if let flag = arguments.firstIndex(of: recordFlag), arguments.indices.contains(flag + 1) {
+            model.start()
+            await ScreenRecording(outputPath: arguments[flag + 1]).record(for: recordingTime)
+            model.stop()
+            NSApplication.shared.terminate(nil)
+            return true
+        }
         let flag = arguments.firstIndex {
             [stressTestFlag, joinTestFlag, seamTestFlag, seamLookFlag].contains($0)
         }
-        guard let flag, arguments.indices.contains(flag + 1) else {
-            if model.isAccessibilityGranted, model.isScreenRecordingGranted { model.start() }
-            return
-        }
+        guard let flag, arguments.indices.contains(flag + 1) else { return false }
         // The seam test measures windows alone, with no tap and no pair.
         if arguments[flag] != seamTestFlag { model.start() }
         let test = DragStressTest(
@@ -85,8 +116,11 @@ struct PairwiseMacApp: App {
         }
         model.stop()
         NSApplication.shared.terminate(nil)
+        return true
     }
 }
+
+#endif
 
 /// Keeps the app running without windows. SwiftUI would otherwise quit it when the last one
 /// closes, which is also the panel at the end of every drag.

@@ -1,3 +1,5 @@
+#if DEBUG
+
 import AppKit
 import ImageIO
 import PairwiseCore
@@ -118,3 +120,5 @@ extension DragStressTest {
         lines.append("picture \(name), took \(elapsed) ms")
     }
 }
+
+#endif
