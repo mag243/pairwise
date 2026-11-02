@@ -14,19 +14,27 @@ extension AccessibilityWindowSystem {
             NSApplication.shared.effectiveAppearance.bestMatch(
                 from: [.darkAqua, .aqua]) == .darkAqua
         var pictures: [StandInPanel.Picture] = []
+        var looks: [(title: String, icon: NSImage?)] = []
         for window in windows {
             guard let frame = try? window.frame() else { return .failure(.captureFailed) }
+            let title = window.title ?? ""
             let icon = window.element.processID.flatMap {
                 NSRunningApplication(processIdentifier: $0)?.icon
             }
             guard
                 let picture = PlaceholderPicture.make(
-                    title: window.title ?? "", icon: icon,
+                    title: title, icon: icon,
                     size: CGSize(width: frame.size.width, height: frame.size.height),
                     scale: scale, isDark: isDark)
             else { return .failure(.captureFailed) }
             pictures.append(picture)
+            looks.append((title, icon))
         }
-        return .success(StandInPanel(pictures: pictures, streams: []))
+        return .success(
+            StandInPanel(pictures: pictures, streams: []) { index, size in
+                PlaceholderPicture.make(
+                    title: looks[index].title, icon: looks[index].icon, size: size,
+                    scale: scale, isDark: isDark)?.image
+            })
     }
 }

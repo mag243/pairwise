@@ -96,6 +96,23 @@ import Testing
         #expect(middle == beside)
     }
 
+    @Test func aSeamDrawsThePicturesAnewAtTheirNewWidths() throws {
+        let first = try picture(isDark: true)
+        let second = try picture(isDark: true)
+        var drawn: [Int: CGSize] = [:]
+        let replacement = first.image
+        let panel = StandInPanel(pictures: [first, second], streams: []) { index, size in
+            drawn[index] = size
+            return replacement
+        }
+        panel.setSeam(atOffset: 200)
+        #expect(drawn[0] == CGSize(width: 200, height: 200))
+        #expect(drawn[1] == CGSize(width: 400, height: 200))
+        #expect(panel.parts.isEmpty)
+        #expect(panel.images[0].frame.width == 200)
+        panel.dismiss()
+    }
+
     @Test func aWindowWithoutSizeIsNoPicture() {
         #expect(
             PlaceholderPicture.make(
