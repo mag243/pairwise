@@ -11,6 +11,9 @@ struct PairwiseMacApp: App {
     private static let joinTestFlag = "--join-test"
     private static let seamTestFlag = "--seam-test"
     private static let seamLookFlag = "--seam-look"
+    /// Pairwise works as usual meanwhile, and quits when the recording is finished.
+    private static let recordFlag = "--record"
+    private static let recordingTime = Duration.seconds(40)
     private static let showSettingsFlag = "--show-settings"
     private static let settingsWindow = "settings"
 
@@ -59,6 +62,13 @@ struct PairwiseMacApp: App {
         _ model: PairDragModel, _ system: AccessibilityWindowSystem
     ) async {
         let arguments = CommandLine.arguments
+        if let flag = arguments.firstIndex(of: recordFlag), arguments.indices.contains(flag + 1) {
+            model.start()
+            await ScreenRecording(outputPath: arguments[flag + 1]).record(for: recordingTime)
+            model.stop()
+            NSApplication.shared.terminate(nil)
+            return
+        }
         let flag = arguments.firstIndex {
             [stressTestFlag, joinTestFlag, seamTestFlag, seamLookFlag].contains($0)
         }
