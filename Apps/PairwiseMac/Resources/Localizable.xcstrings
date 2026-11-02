@@ -104,6 +104,7 @@
       }
     },
     "For testing" : {
+      "comment" : "Section of settings only in a debug build",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -117,8 +118,24 @@
             "value" : "Om te testen"
           }
         }
+      }
+    },
+    "General" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allgemein"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Algemeen"
+          }
+        }
       },
-      "comment" : "Section of settings only in a debug build"
+      "comment" : "Tab of the settings window"
     },
     "Grant Access…" : {
       "comment" : "Button that opens the system's permission prompt",
@@ -172,6 +189,7 @@
       }
     },
     "How it works" : {
+      "comment" : "Section of settings: how to use the app",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -185,10 +203,10 @@
             "value" : "Zo werkt het"
           }
         }
-      },
-      "comment" : "Section of settings: how to use the app"
+      }
     },
     "Joining" : {
+      "comment" : "Section of settings",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -202,10 +220,10 @@
             "value" : "Koppelen"
           }
         }
-      },
-      "comment" : "Section of settings"
+      }
     },
     "Lets Pairwise move and resize the windows you join." : {
+      "comment" : "Text in the settings window",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -219,10 +237,10 @@
             "value" : "Hiermee kan Pairwise de vensters die je koppelt verplaatsen en van formaat veranderen."
           }
         }
-      },
-      "comment" : "Text in the settings window"
+      }
     },
     "Lets Pairwise show pictures of joined windows while you drag them. They are not saved or sent anywhere." : {
+      "comment" : "Text in the settings window",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -236,8 +254,7 @@
             "value" : "Hiermee kan Pairwise beelden van gekoppelde vensters tonen terwijl je ze sleept. Die worden niet bewaard en nergens heen gestuurd."
           }
         }
-      },
-      "comment" : "Text in the settings window"
+      }
     },
     "Live frames, window %lld" : {
       "comment" : "Measurement: live frames that arrived for one window",
@@ -448,6 +465,7 @@
       }
     },
     "Pairwise needs both to work." : {
+      "comment" : "Under the two permissions, when one is missing",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -461,8 +479,7 @@
             "value" : "Pairwise heeft beide nodig om te werken."
           }
         }
-      },
-      "comment" : "Under the two permissions, when one is missing"
+      }
     },
     "Panel appeared after (ms)" : {
       "comment" : "Measurement: time from the press until the picture of both windows showed",
@@ -482,6 +499,7 @@
       }
     },
     "Permissions" : {
+      "comment" : "Section of settings",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -495,8 +513,7 @@
             "value" : "Toestemmingen"
           }
         }
-      },
-      "comment" : "Section of settings"
+      }
     },
     "Quit Pairwise" : {
       "comment" : "Menu: quits the app",
@@ -652,6 +669,7 @@
       }
     },
     "To join, drag a window to another and press Command, or click the open lock on the seam of two windows side by side." : {
+      "comment" : "Text in the settings window",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -665,10 +683,10 @@
             "value" : "Sleep een venster naar een ander en druk op Command om ze te koppelen, of klik op het open slotje op de naad van twee vensters naast elkaar."
           }
         }
-      },
-      "comment" : "Text in the settings window"
+      }
     },
     "To move a pair, drag either window." : {
+      "comment" : "Text in the settings window",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -682,10 +700,10 @@
             "value" : "Sleep een van de vensters om een paar te verplaatsen."
           }
         }
-      },
-      "comment" : "Text in the settings window"
+      }
     },
     "To part them, click the closed lock on the seam, or press Command while dragging one." : {
+      "comment" : "Text in the settings window",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -699,10 +717,10 @@
             "value" : "Klik op het dichte slotje op de naad om ze los te koppelen, of druk op Command terwijl je er een sleept."
           }
         }
-      },
-      "comment" : "Text in the settings window"
+      }
     },
     "To resize both, drag the seam between them." : {
+      "comment" : "Text in the settings window",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -716,10 +734,10 @@
             "value" : "Sleep de naad ertussen om beide van formaat te veranderen."
           }
         }
-      },
-      "comment" : "Text in the settings window"
+      }
     },
     "While joining, add Shift for the same height, or Control for the other choice of windows." : {
+      "comment" : "Text in the settings window",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -733,8 +751,7 @@
             "value" : "Voeg tijdens het koppelen Shift toe voor dezelfde hoogte, of Control voor de andere keuze van vensters."
           }
         }
-      },
-      "comment" : "Text in the settings window"
+      }
     },
     "Windows of the same app" : {
       "comment" : "Setting value: Command joins only windows of the same app",

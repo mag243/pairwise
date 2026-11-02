@@ -4,7 +4,8 @@ import SwiftUI
 
 /// The settings window: the permissions, the choices for joining, and how Pairwise works.
 struct MainView: View {
-    private static let width: CGFloat = 460
+    private static let width: CGFloat = 480
+    private static let height: CGFloat = 420
     #if DEBUG
     private static let millisecondsPerSecond = 1000.0
     private static let fractionDigits = 1
@@ -26,22 +27,47 @@ struct MainView: View {
 
     let model: PairDragModel
 
+    @State private var tab = Self.firstTab
+
+    /// The first tab, or in a debug build one asked for, to look at each tab in a test.
+    private static var firstTab: Int {
+        #if DEBUG
+        let arguments = CommandLine.arguments
+        if let flag = arguments.firstIndex(of: "--settings-tab"),
+            arguments.indices.contains(flag + 1), let tab = Int(arguments[flag + 1])
+        {
+            return tab
+        }
+        #endif
+        return 0
+    }
+
+    /// One tab: a form in the app's usual style, which scrolls if its content needs that.
+    private func page<Content: View>(@ViewBuilder _ content: () -> Content) -> some View {
+        Form { content() }.formStyle(.grouped)
+    }
+
     var body: some View {
-        Form {
-            permissions
-            joining
-            howItWorks
-            if let problem = model.problem {
-                Text(problem.message).foregroundStyle(.red)
+        TabView(selection: $tab) {
+            page {
+                permissions
+                joining
+                if let problem = model.problem {
+                    Text(problem.message).foregroundStyle(.red)
+                }
             }
+            .tabItem { Label("General", systemImage: "gearshape") }
+            .tag(0)
+            page { howItWorks }
+                .tabItem { Label("How it works", systemImage: "questionmark.circle") }
+                .tag(1)
             #if DEBUG
-            testing
+            page { testing }
+                .tabItem { Label("For testing", systemImage: "hammer") }
+                .tag(2)
             #endif
         }
-        .formStyle(.grouped)
-        .scrollDisabled(true)
-        .frame(width: Self.width)
-        .fixedSize(horizontal: false, vertical: true)
+        .frame(width: Self.width, height: Self.height)
         .onReceive(
             NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)
         ) { _ in

@@ -81,6 +81,7 @@ extension PairwiseMacApp {
     private static let seamLookFlag = "--seam-look"
     private static let killTestFlag = "--kill-test"
     private static let killCheckFlag = "--kill-check"
+    private static let settingsLookFlag = "--settings-look"
     /// Pairwise works as usual meanwhile, and quits when the recording is finished.
     private static let recordFlag = "--record"
     private static let recordingTime = Duration.seconds(40)
@@ -100,34 +101,45 @@ extension PairwiseMacApp {
             return true
         }
         let flag = arguments.firstIndex {
-            [stressTestFlag, joinTestFlag, seamTestFlag, seamLookFlag, killTestFlag, killCheckFlag]
-                .contains($0)
+            [
+                stressTestFlag, joinTestFlag, seamTestFlag, seamLookFlag, killTestFlag,
+                killCheckFlag, settingsLookFlag,
+            ].contains($0)
         }
         guard let flag, arguments.indices.contains(flag + 1) else { return false }
         // The seam test measures windows alone, with no tap and no pair.
-        if arguments[flag] != seamTestFlag { model.start() }
+        if arguments[flag] != seamTestFlag, arguments[flag] != settingsLookFlag { model.start() }
         let test = DragStressTest(
             outputPath: arguments[flag + 1],
             pressOutcome: { model.lastPressOutcome },
             lastLiveFrames: { model.lastDrag?.liveFrames ?? [] },
             join: { first, second in try model.join(first, to: second, on: .left) },
             leave: { model.leavePair(of: $0) })
-        if arguments[flag] == joinTestFlag {
+        await run(test, for: arguments[flag], model, system)
+        model.stop()
+        NSApplication.shared.terminate(nil)
+        return true
+    }
+
+    private static func run(
+        _ test: DragStressTest, for flag: String, _ model: PairDragModel,
+        _ system: AccessibilityWindowSystem
+    ) async {
+        if flag == joinTestFlag {
             await test.runJoinTest(on: system)
-        } else if arguments[flag] == seamTestFlag {
+        } else if flag == seamTestFlag {
             await test.runSeamTest()
-        } else if arguments[flag] == seamLookFlag {
+        } else if flag == seamLookFlag {
             await test.runSeamLook()
-        } else if arguments[flag] == killTestFlag {
+        } else if flag == settingsLookFlag {
+            await test.savePicture(of: NSHostingView(rootView: MainView(model: model)))
+        } else if flag == killTestFlag {
             await test.runKillTest()
-        } else if arguments[flag] == killCheckFlag {
+        } else if flag == killCheckFlag {
             await test.runKillCheck(on: system)
         } else {
             await test.run()
         }
-        model.stop()
-        NSApplication.shared.terminate(nil)
-        return true
     }
 }
 
