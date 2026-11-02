@@ -14,6 +14,9 @@ public final class AccessibilityWindowSystem: WindowSystemProviding {
 
     public var liveFramesPerSecond = AccessibilityWindowSystem.defaultLiveFramesPerSecond
     private let access: any SystemAccess
+    /// The only windows that count as normal windows, for the join test, so that it cannot
+    /// join a window of the user's (ADR 0027).
+    var onlyNormalWindows: Set<UInt32>?
     private let capture: WindowCapture
     private var joinGuide: JoinMarkPanel?
     private var holdingTap: HoldingTap?
@@ -94,7 +97,9 @@ public final class AccessibilityWindowSystem: WindowSystemProviding {
     public func normalWindows() -> [ScreenWindow] {
         WindowServer.normalWindows(
             excludingProcess: access.ownProcess, in: access.onScreenWindows()
-        ).map { ScreenWindow(number: $0.number, frame: $0.frame) }
+        )
+        .filter { onlyNormalWindows?.contains($0.number) ?? true }
+        .map { ScreenWindow(number: $0.number, frame: $0.frame) }
     }
 
     public func window(number: UInt32) -> (any MovableWindow)? {

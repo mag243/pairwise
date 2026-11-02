@@ -21,5 +21,5 @@ Pairs exist as a model (ADR 0033), but nothing makes them. The owner chose a key
 
 ## Consequences
 - Positive: nothing joins by accident, and a window outside a pair costs nothing more unless Option is down.
-- Negative / risks: the clash with macOS's own use of Option is not known yet. An app may refuse the height, which leaves an uneven pair. The stress test cannot hold a key, so joining is covered by plain tests and by hand.
+- Negative / risks: the clash with macOS's own use of Option is not known yet. An app may refuse the height, which leaves an uneven pair. Joining is covered by plain tests, a test with posted events (ADR 0027), and by hand.
 - Changes now: a rule in `PairwiseCore`, the window system protocol and module, the model, the app's strings, the plan. This takes in step 5 of the plan.

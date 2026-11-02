@@ -10,6 +10,8 @@ The partner sometimes does not go along. It happens one time in a number of trie
 ## Decision
 `tools/build.sh run --drag-stress-test <file>` makes the app test itself and quit. It opens two Finder windows on empty temporary folders of its own, and pins them as the dragged window and the partner, so no other window can move. It posts real mouse events through the system, varying the place on the title bar and the waits before and after the press, and reads from the window server where both windows ended up. Each try is written to the file as both moved, only the held window moved, or nothing moved, with what became of the press. At the end it closes its windows, puts the pointer back and quits.
 
+`tools/build.sh run --join-test <file>` does the same for joining and parting (ADR 0035). It posts Option as a key press, may join only its own two windows, writes where the guide stood, and saves a picture of that part of the screen beside the file. Posted keys are not a finger on the key either.
+
 It takes over the pointer for as long as it runs, so it runs only when the owner has asked for it (as ADR 0011 for UI tests).
 
 ## Alternatives

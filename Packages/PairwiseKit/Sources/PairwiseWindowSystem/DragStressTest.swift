@@ -16,7 +16,7 @@ public final class DragStressTest {
     private static let origin = ScreenPoint(x: 120, y: 120)
     static let size = CGSize(width: 520, height: 340)
     private static let partnerX = 700.0
-    private static let titleBandY = 12.0
+    static let titleBandY = 12.0
     private static let sideMargin = 140.0
     private static let dragSteps = 12
     private static let dragStep = 6.0
@@ -25,21 +25,23 @@ public final class DragStressTest {
     /// from the press to the first drag event.
     private static let waitsBeforePress: [UInt64] = [0, 5, 20, 100, 300]
     private static let waitsAfterPress: [UInt64] = [0, 2, 10, 30, 80]
-    private static let stepWait: UInt64 = 4
-    private static let settleWait: UInt64 = 300
+    static let stepWait: UInt64 = 4
+    static let settleWait: UInt64 = 300
     static let windowWait: UInt64 = 100
     static let windowLookups = 50
 
-    private let outputPath: String
-    private let pressOutcome: () -> String
+    let outputPath: String
+    let pressOutcome: () -> String
     private let lastLiveFrames: () -> [Int]
     private let join: (any MovableWindow, any MovableWindow) throws -> Void
     private let leave: (any MovableWindow) -> Void
     /// Written after each line, so a test that stops halfway shows how far it came.
-    private var lines: [String] = [] {
+    var lines: [String] = [] {
         didSet { write() }
     }
     var folders: [URL] = []
+    /// Whether the mouse events posted carry Option, as the join test needs.
+    var isOptionDown = false
 
     /// `pressOutcome` says what became of the last press, and `lastLiveFrames` how many
     /// live frames per window the last drag got. `join` makes a pair of two windows, with the
@@ -202,7 +204,7 @@ public final class DragStressTest {
         }
     }
 
-    private func place(_ window: AccessibilityWindow, at origin: ScreenPoint) async {
+    func place(_ window: AccessibilityWindow, at origin: ScreenPoint) async {
         try? window.move(to: origin)
         await wait(Self.windowWait)
     }
@@ -213,12 +215,13 @@ public final class DragStressTest {
         }
     }
 
-    private func post(_ type: CGEventType, at point: CGPoint) {
+    func post(_ type: CGEventType, at point: CGPoint) {
         let source = CGEventSource(stateID: .hidSystemState)
-        CGEvent(
+        let event = CGEvent(
             mouseEventSource: source, mouseType: type, mouseCursorPosition: point,
-            mouseButton: .left
-        )?.post(tap: .cghidEventTap)
+            mouseButton: .left)
+        if isOptionDown { event?.flags = .maskAlternate }
+        event?.post(tap: .cghidEventTap)
     }
 
     func wait(_ milliseconds: UInt64) async {

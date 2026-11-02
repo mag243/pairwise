@@ -8,6 +8,7 @@ import SwiftUI
 @main
 struct PairwiseMacApp: App {
     private static let stressTestFlag = "--drag-stress-test"
+    private static let joinTestFlag = "--join-test"
     private static let showSettingsFlag = "--show-settings"
     private static let settingsWindow = "settings"
 
@@ -15,10 +16,11 @@ struct PairwiseMacApp: App {
     @State private var pairDrag: PairDragModel
 
     init() {
-        let model = PairDragModel(system: AccessibilityWindowSystem())
+        let system = AccessibilityWindowSystem()
+        let model = PairDragModel(system: system)
         _pairDrag = State(initialValue: model)
         guard !Self.isAnimatedCopy else { return }
-        Task { await Self.startWorking(model) }
+        Task { await Self.startWorking(model, system) }
     }
 
     var body: some Scene {
@@ -50,12 +52,12 @@ struct PairwiseMacApp: App {
             || !pairDrag.isScreenRecordingGranted
     }
 
-    private static func startWorking(_ model: PairDragModel) async {
+    private static func startWorking(
+        _ model: PairDragModel, _ system: AccessibilityWindowSystem
+    ) async {
         let arguments = CommandLine.arguments
-        guard
-            let flag = arguments.firstIndex(of: stressTestFlag),
-            arguments.indices.contains(flag + 1)
-        else {
+        let flag = arguments.firstIndex { $0 == stressTestFlag || $0 == joinTestFlag }
+        guard let flag, arguments.indices.contains(flag + 1) else {
             if model.isAccessibilityGranted, model.isScreenRecordingGranted { model.start() }
             return
         }
@@ -66,7 +68,11 @@ struct PairwiseMacApp: App {
             lastLiveFrames: { model.lastDrag?.liveFrames ?? [] },
             join: { first, second in try model.join(first, to: second, on: .left) },
             leave: { model.leavePair(of: $0) })
-        await test.run()
+        if arguments[flag] == joinTestFlag {
+            await test.runJoinTest(on: system)
+        } else {
+            await test.run()
+        }
         model.stop()
         NSApplication.shared.terminate(nil)
     }
