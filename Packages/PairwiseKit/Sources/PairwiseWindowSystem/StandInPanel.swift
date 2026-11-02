@@ -28,9 +28,6 @@ final class StandInPanel: WindowStandIn {
         let tail = CALayer()
     }
 
-    /// How long the still picture fades over the first live frame, in seconds.
-    private static let stillFadeTime: CFTimeInterval = 0.15
-
     private let panel: NSPanel
     private let streams: [LiveStream]
     private let pictures: [Picture]
@@ -42,6 +39,9 @@ final class StandInPanel: WindowStandIn {
     /// Where each picture divides, as a share of its width, found at the first seam.
     private var splitShares: [CGFloat] = []
     private var seam: CGFloat?
+    private var isPreparedForSeam = false
+    /// An opaque layer under each picture, added at the first seam.
+    private var backings: [CALayer] = []
     /// The amber line on the seam, added at the first seam.
     private let seamLineLayer = CALayer()
     private var totalWidth: CGFloat { pictures.map(\.size.width).reduce(0, +) }
@@ -117,12 +117,23 @@ final class StandInPanel: WindowStandIn {
         return layers
     }
 
-    /// Reads the picture once, at the first seam, as a press that only moves needs none of this.
+    /// Prepares once, at the first seam, as a press that only moves needs none of this. With
+    /// live frames to come, the picture is scaled as they are, so that it lies exactly under
+    /// the first of them. Only pictures that stay still are divided (ADR 0049).
     private func prepareForSeam() {
-        guard parts.isEmpty else { return }
+        guard !isPreparedForSeam else { return }
+        isPreparedForSeam = true
         seamLineLayer.backgroundColor = SeamColour.amber.cgColor
         seamLineLayer.cornerRadius = Self.seamLineWidth / 2
         panel.contentView?.layer?.addSublayer(seamLineLayer)
+        for (index, picture) in pictures.enumerated() {
+            let backing = CALayer()
+            backing.backgroundColor = Self.backingColour(of: picture.image)
+            backing.cornerRadius = Self.backingCornerRadius
+            slots[index].insertSublayer(backing, at: 0)
+            backings.append(backing)
+        }
+        guard streams.isEmpty else { return }
         for (index, picture) in pictures.enumerated() {
             let split = Self.quietSplit(of: picture)
             splitShares.append(split / picture.size.width)
@@ -143,18 +154,20 @@ final class StandInPanel: WindowStandIn {
     private func layOutSeam() {
         guard let seam else { return }
         let sizes = pictures.map(\.size)
+        let live = Self.liveLayout(of: sizes, totalWidth: totalWidth, seamAt: seam)
+        for (index, place) in live.enumerated() {
+            slots[index].frame = place.slot
+            images[index].frame = place.frame
+            backings[index].frame = place.frame
+        }
         let splits = zip(sizes, splitShares).map { $0.width * $1 }
         let places = Self.seamLayout(
             of: sizes, splits: splits, totalWidth: totalWidth, seamAt: seam)
-        for (index, place) in places.enumerated() {
-            slots[index].frame = place.slot
-            let layers = parts[index]
-            layers.head.frame = place.head
-            layers.fill.frame = place.fill
-            layers.tail.frame = place.tail
+        for (index, layers) in parts.enumerated() {
+            layers.head.frame = places[index].head
+            layers.fill.frame = places[index].fill
+            layers.tail.frame = places[index].tail
         }
-        let live = Self.liveLayout(of: sizes, totalWidth: totalWidth, seamAt: seam)
-        for (index, place) in live.enumerated() { images[index].frame = place.frame }
         seamLineLayer.frame = Self.seamLine(of: sizes, seamAt: seam)
     }
 
@@ -169,25 +182,12 @@ final class StandInPanel: WindowStandIn {
         slots[index].addSublayer(layer)
     }
 
-    /// The still picture fades over the first live frame, which lies under it. A frame looks
-    /// darker than a still picture, and at once that would show as a flash (ADR 0049).
-    private func fadeOutStill(at index: Int) {
-        let layers = parts[index]
-        guard layers.head.opacity > 0 else { return }
-        CATransaction.begin()
-        CATransaction.setAnimationDuration(Self.stillFadeTime)
-        for layer in [layers.head, layers.fill, layers.tail] { layer.opacity = 0 }
-        CATransaction.commit()
-    }
-
-    /// Shows a live frame in place of the picture and its parts.
+    /// Shows a live frame in place of the picture.
     private func show(_ surface: IOSurfaceRef, rect: CGRect, scale: Double, at index: Int) {
-        guard parts.indices.contains(index), rect.width > 0 else { return }
+        guard images.indices.contains(index), rect.width > 0 else { return }
         let size = CGSize(width: IOSurfaceGetWidth(surface), height: IOSurfaceGetHeight(surface))
-        fadeOutStill(at: index)
         CATransaction.begin()
         CATransaction.setDisableActions(true)
-        images[index].isHidden = false
         images[index].contents = surface
         images[index].contentsRect = Self.share(of: rect, scale: scale, inSurface: size)
         layOutSeam()

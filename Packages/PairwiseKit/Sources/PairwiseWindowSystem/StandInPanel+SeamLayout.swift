@@ -9,6 +9,13 @@ extension StandInPanel {
     /// The top left of a window, in points, that holds its close, minimize and zoom buttons.
     static let buttonsArea = CGSize(width: 92, height: 52)
 
+    /// How many values across and down the sample for a picture's average colour has.
+    static let backingSampleSide = 8
+
+    /// The corners of the layer under a picture, in points: rounder than a window's, so that
+    /// it does not show past them.
+    static let backingCornerRadius: CGFloat = 28
+
     /// How many rows of a picture one row of its sample stands for.
     static let rowsPerSample = 4
 
@@ -69,6 +76,29 @@ extension StandInPanel {
             UnsafeBufferPointer(
                 start: data.assumingMemoryBound(to: UInt8.self), count: width * height))
         return CGFloat(QuietColumn.index(inGray: gray, width: width, height: height))
+    }
+
+    /// A picture's average colour, opaque: what lies under it, as a captured window is partly
+    /// see-through (ADR 0049).
+    static func backingColour(of image: CGImage) -> CGColor {
+        let side = backingSampleSide
+        guard
+            let context = CGContext(
+                data: nil, width: side, height: side, bitsPerComponent: 8, bytesPerRow: side * 4,
+                space: CGColorSpaceCreateDeviceRGB(),
+                bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue),
+            let data = context.data
+        else { return CGColor(gray: 0, alpha: 1) }
+        context.draw(image, in: CGRect(x: 0, y: 0, width: side, height: side))
+        let bytes = UnsafeBufferPointer(
+            start: data.assumingMemoryBound(to: UInt8.self), count: side * side * 4)
+        var totals = [0, 0, 0, 0]
+        for (index, byte) in bytes.enumerated() { totals[index % 4] += Int(byte) }
+        // The channels are premultiplied, so dividing by the alpha gives the colour itself.
+        let alpha = CGFloat(max(totals[3], 1))
+        return CGColor(
+            srgbRed: CGFloat(totals[0]) / alpha, green: CGFloat(totals[1]) / alpha,
+            blue: CGFloat(totals[2]) / alpha, alpha: 1)
     }
 
     /// Where the amber line goes: on the seam, as long as the shorter window, tops level.

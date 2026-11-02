@@ -12,10 +12,11 @@ ADR 0048 showed still pictures at the seam, with the real windows under the pane
 - **Under the panel, each look only resizes.** The places do not matter while parked, so this is one call per window instead of two. The looks are 20 a second, as the live pictures show the windows' real width.
 - **While a seam moves, each picture shows the window's live frames,** at the frame rate of the setting. Set to still, the pictures stay still, as in ADR 0048.
 - **A stream at the seam has room for the pair's whole width,** and does not scale, so a window that grows needs no change of the stream. Each frame says which part of it holds the window. This is to be checked on real frames.
-- **A frame fills its picture's whole place, scaled to fit.** It differs little from that place, as the window follows the seam, so the scaling hardly shows. A still picture keeps its division until the first frame comes.
+- **A frame fills its picture's whole place, scaled to fit.** It differs little from that place, as the window follows the seam, so the scaling hardly shows. Pictures that stay still, with the setting at still, keep the division of ADR 0048.
 - **The still picture of a window's top left stays over its live frames,** as macOS shows a mark of its own in the frames of a window it streams, in place of the close, minimize and zoom buttons. A window with no such buttons there shows that corner still.
 - **An amber line of 6 points stands on the seam while it moves,** along the shorter window, at the owner's wish. It shows what is being dragged, in the colour of joining, and covers a small gap between the pictures.
-- **The still picture fades over the first live frame, in 0.15 seconds,** as a frame looks darker than a still picture, and by hand the change showed as a flash just after the start of a drag.
+- **Until the first frame, a still picture is scaled in the same way,** so that it lies exactly under that frame. Divided, it showed as a flash just after the start of a drag, and fading it over the frame showed everything double.
+- **An opaque layer in the window's average colour lies under each picture and frame,** with its corners rounded further than a window's, so that it does not show past them. Captured windows are partly see-through. Over the real window, before it is parked, that showed everything double, and after that the desktop showed through, which made the window look darker. A see-through window is not see-through during a resize at the seam.
 - The rest of ADR 0048 stands: the seam at the pointer, the limits, the release.
 
 ## Alternatives

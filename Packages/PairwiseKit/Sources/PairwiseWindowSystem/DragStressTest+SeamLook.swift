@@ -14,6 +14,7 @@ extension DragStressTest {
     private static let lookSteps = 40
     private static let lookFiles = 40
     private static let picturesAfterRelease = 6
+    private static let picturesAtTheStart = 8
 
     /// Runs the drags, and saves the pictures next to the output file.
     public func runSeamLook() async {
@@ -70,6 +71,7 @@ extension DragStressTest {
             point.x += distance / Double(Self.lookSteps)
             post(.leftMouseDragged, at: point)
             await wait(Self.stepWait)
+            if step <= Self.picturesAtTheStart { await look(named: "\(name)-0-start-\(step)") }
             if step == Self.lookSteps / 2 { await look(named: "\(name)-1-halfway") }
         }
         await wait(Self.windowWait)

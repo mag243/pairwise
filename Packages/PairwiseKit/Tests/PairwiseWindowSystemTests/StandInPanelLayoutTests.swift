@@ -80,6 +80,25 @@ import Testing
         #expect(line == CGRect(x: 87, y: 120, width: 6, height: 80))
     }
 
+    private func image(red: CGFloat, alpha: CGFloat) throws -> CGImage {
+        let context = try #require(
+            CGContext(
+                data: nil, width: 4, height: 4, bitsPerComponent: 8, bytesPerRow: 16,
+                space: CGColorSpaceCreateDeviceRGB(),
+                bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue))
+        context.setFillColor(CGColor(srgbRed: red, green: 0, blue: 0, alpha: alpha))
+        context.fill(CGRect(x: 0, y: 0, width: 4, height: 4))
+        return try #require(context.makeImage())
+    }
+
+    @Test func theBackingHasThePicturesColourAndIsOpaque() throws {
+        let colour = StandInPanel.backingColour(of: try image(red: 1, alpha: 0.5))
+        let parts = try #require(colour.components)
+        #expect(abs(parts[0] - 1) < 0.1)
+        #expect(parts[1] < 0.1)
+        #expect(colour.alpha == 1)
+    }
+
     @Test func theFillShowsOneColumnAtTheSplit() {
         let column = StandInPanel.fillColumn(ofPictureWidth: 100, atSplit: 30)
         #expect(column == CGRect(x: 0.3, y: 0, width: 0.01, height: 1))
