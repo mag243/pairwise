@@ -10,7 +10,7 @@ The window joined to could stay behind other windows until the pair was dragged,
 ## Decision
 - **At a join, both windows come forward,** the window joined to first, so that the one being dragged ends on top. With a lock, the window that was in front ends on top. Raising does not take focus from another app's window beyond what macOS does for it.
 - **A join and a parting by the user make a short sound:** with Command, or with the lock. A pair that ends because a window has gone, is minimized or goes full screen makes none, as the user did not ask for it.
-- **The sounds are two of the system's own,** so that nothing is added to the app, and they differ so that joining and parting can be told apart.
+- **The sounds differ,** so that joining and parting can be told apart. Which sounds they are is in ADR 0055.
 - **A setting turns them off.** They are on by default. It is stored by the app and given to the model at launch, as with ADR 0043.
 
 ## Alternatives

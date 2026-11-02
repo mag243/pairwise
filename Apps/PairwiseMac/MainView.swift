@@ -4,8 +4,7 @@ import SwiftUI
 
 /// The settings window: the permissions, the choices for joining, and how Pairwise works.
 struct MainView: View {
-    private static let minimumWidth: CGFloat = 360
-    private static let minimumHeight: CGFloat = 420
+    private static let width: CGFloat = 460
     #if DEBUG
     private static let millisecondsPerSecond = 1000.0
     private static let fractionDigits = 1
@@ -40,7 +39,9 @@ struct MainView: View {
             #endif
         }
         .formStyle(.grouped)
-        .frame(minWidth: Self.minimumWidth, minHeight: Self.minimumHeight)
+        .scrollDisabled(true)
+        .frame(width: Self.width)
+        .fixedSize(horizontal: false, vertical: true)
         .onReceive(
             NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)
         ) { _ in

@@ -40,6 +40,7 @@ struct PairwiseMacApp: App {
             MainView(model: pairDrag)
             #endif
         }
+        .windowResizability(.contentSize)
         .defaultLaunchBehavior(showsWindowAtLaunch ? .presented : .suppressed)
     }
 
