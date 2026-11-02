@@ -27,6 +27,11 @@ extension PairDragModel {
     }
 
     func release(at point: ScreenPoint) {
+        if case .resizingSeam(var resizing) = drag {
+            resizing.isReleased = true
+            drag = .resizingSeam(resizing)
+            return
+        }
         if case .joining(var joining) = drag {
             if joining.held != nil { joining.pointer = point }
             finish(joining)
@@ -101,6 +106,8 @@ extension PairDragModel {
             try? placing.window.move(to: placing.target)
             try? placing.partner.window.move(
                 to: place(of: placing.partner, beside: placing.target, placing.size))
+        case .resizingSeam(let resizing):
+            finishSeam(resizing)
         default:
             break
         }

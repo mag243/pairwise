@@ -158,3 +158,22 @@ With the window list kept and the pictures taken together, over 13 drags: the pi
 **The join test (ADR 0027) with Option:** the guide stood right, at x 380, y 120, 520 by 500, and at the release macOS tiled the window over half the screen. ADR 0036 moves to Command.
 
 **By hand, joining with a real Command key pressed during the drag (ADR 0039):** works. Command at the press missed most times when read from the system's key state, and on a window's title it opens a folder menu.
+
+## Following at a seam (M3, step 6)
+
+Measured on 2026-11-02 with `tools/build.sh run --seam-test FILE`: two Finder windows of 800 points each, side by side, one resized at the seam with posted events, the other following on each display frame from the window server's place. Slow is about 110 points a second and fast about 330. "Gap" is the distance between the two windows' edges on the screen at each frame.
+
+| Held window, direction | Speed | Follows | Mean call (ms) | Longest call (ms) | Mean gap (points) | Widest gap (points) |
+|---|---|---|---|---|---|---|
+| Left, wider | Slow | 100 | 13.1 | 30.9 | 1.9 | 4 |
+| Left, narrower | Slow | 99 | 16.5 | 33.6 | 1.9 | 4 |
+| Right, narrower | Slow | 110 | 7.6 | 22.8 | 2.1 | 4 |
+| Right, wider | Slow | 103 | 8.8 | 25.0 | 2.1 | 5 |
+| Left, wider | Fast | 105 | 15.3 | 35.3 | 5.5 | 15 |
+| Left, narrower | Fast | 96 | 12.3 | 31.5 | 5.5 | 15 |
+| Right, narrower | Fast | 91 | 7.8 | 23.0 | 6.8 | 18 |
+| Right, wider | Fast | 104 | 9.0 | 34.2 | 12.7 | 20 |
+
+**What the numbers show:** the window server tells of a resize in time, on every frame and without any notification, and macOS resizes from both sides. The gap stays near two frames' worth of pointer travel. The follow itself costs about a frame, as Finder lays out its window during the call. The last row ends at Finder's minimum of 520, where the held window went on over the partner.
+
+**What the numbers do not show:** how other apps do, and what the gap looks like. Terminal and an Electron app are for the eye.

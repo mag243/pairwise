@@ -6,7 +6,7 @@ import ScreenCaptureKit
 /// Joining and parting two windows of its own with posted events (ADR 0027, 0035).
 extension DragStressTest {
     private static let joinKey: CGKeyCode = 55
-    private static let joinSteps = 50
+    static let joinSteps = 50
     private static let joinKeyStep = 10
     private static let guideWait: UInt64 = 300
     private static let floatingLevel = 3
@@ -15,8 +15,8 @@ extension DragStressTest {
     /// How far below the other's top the first window goes before the lock joins them.
     private static let lockTopOffset = 30.0
     private static let pictureMargin = 60.0
-    private static let otherHeight = 500.0
-    private static let leftOrigin = ScreenPoint(x: 100, y: 120)
+    static let otherHeight = 500.0
+    static let leftOrigin = ScreenPoint(x: 100, y: 120)
     private static let otherOrigin = ScreenPoint(x: 900, y: 120)
     /// How far from the other window's edge the drag stops, within the snap distance.
     private static let snapGap = 10.0
@@ -56,6 +56,7 @@ extension DragStressTest {
         await part(window, other)
         await joinFromTheRight(window, other)
         await partWithTheLock(window, other)
+        await resizeAtTheSeam(window, other)
         close(window)
         close(other)
         lines.append("join test ended")
@@ -211,7 +212,7 @@ extension DragStressTest {
             .map(Self.text(of:))
     }
 
-    private func report(
+    func report(
         _ label: String, _ window: AccessibilityWindow, _ other: AccessibilityWindow
     ) {
         let first = window.serverFrame().map(Self.text(of:)) ?? "gone"

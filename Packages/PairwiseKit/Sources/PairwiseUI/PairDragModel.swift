@@ -196,7 +196,11 @@ public final class PairDragModel {
             let now = pressed.window.serverFrame() ?? (try? pressed.window.frame())
         else { return }
         if DragHoldRule.isResize(from: pressed.frame, to: now) {
-            letDragPass()
+            if SeamFollow.movesSeam(from: pressed.frame, to: now, partnerOn: pressed.partner.side) {
+                startFollowingSeam(pressed)
+            } else {
+                letDragPass()
+            }
         } else if DragHoldRule.isMove(from: pressed.frame, to: now) {
             var moved = pressed
             moved.hasWindowMoved = true
@@ -226,12 +230,10 @@ public final class PairDragModel {
             break
         case .closingLock(let lock):
             closeLock(lock)
+        case .resizingSeam(let resizing):
+            tick(resizing)
         case .pressed(let pressed):
-            if isButtonLetGo {
-                release(at: pressed.lastPointer)
-            } else {
-                watch(pressed)
-            }
+            tick(pressed)
         case .moving(let moving):
             tick(moving)
         case .joining(let joining):
@@ -247,6 +249,14 @@ public final class PairDragModel {
         }
     }
 
+    private func tick(_ pressed: PairDrag.Pressed) {
+        if isButtonLetGo {
+            release(at: pressed.lastPointer)
+        } else {
+            watch(pressed)
+        }
+    }
+
     private func tick(_ moving: PairDrag.Moving) {
         if isButtonLetGo {
             release(at: moving.lastPointer)
@@ -259,7 +269,7 @@ public final class PairDragModel {
 
     /// A release the tap missed. The tap sees a press before the system counts the button
     /// as down, so up means let go only once it has been down, or after some time.
-    private var isButtonLetGo: Bool {
+    var isButtonLetGo: Bool {
         if system.isPrimaryButtonDown {
             hasSeenButtonDown = true
             return false

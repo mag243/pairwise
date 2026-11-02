@@ -34,6 +34,7 @@ tools/build.sh coverage               # package tests with line coverage, per-mo
 tools/build.sh run                    # build and start the macOS app
 tools/build.sh run --drag-stress-test FILE   # the app tests dragging on its own windows; takes over the pointer (ADR 0027)
 tools/build.sh run --join-test FILE   # the same for joining and parting, with a picture of the guide (ADR 0027)
+tools/build.sh run --seam-test FILE   # measures how well a window follows a resize at a seam; takes over the pointer
 ```
 
 - Run `quick` after a step that only touches the package and `verify` after any app change; both must be green. `ci` adds the XCUITest smoke tests, which take over the screen: run it only when the owner says so, and ask for it before the owner pushes and at the end of a plan (ADR 0011).

@@ -9,7 +9,7 @@ extension PairDragModel {
         case .none:
             if isJoinKeyDown { startJoiningFreeWindow(at: point) }
             return false
-        case .passing, .placing, .settling, .closingLock:
+        case .passing, .placing, .settling, .closingLock, .resizingSeam:
             return false
         case .clickingLock:
             return true

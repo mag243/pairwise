@@ -9,6 +9,7 @@ import SwiftUI
 struct PairwiseMacApp: App {
     private static let stressTestFlag = "--drag-stress-test"
     private static let joinTestFlag = "--join-test"
+    private static let seamTestFlag = "--seam-test"
     private static let showSettingsFlag = "--show-settings"
     private static let settingsWindow = "settings"
 
@@ -57,12 +58,15 @@ struct PairwiseMacApp: App {
         _ model: PairDragModel, _ system: AccessibilityWindowSystem
     ) async {
         let arguments = CommandLine.arguments
-        let flag = arguments.firstIndex { $0 == stressTestFlag || $0 == joinTestFlag }
+        let flag = arguments.firstIndex {
+            $0 == stressTestFlag || $0 == joinTestFlag || $0 == seamTestFlag
+        }
         guard let flag, arguments.indices.contains(flag + 1) else {
             if model.isAccessibilityGranted, model.isScreenRecordingGranted { model.start() }
             return
         }
-        model.start()
+        // The seam test measures windows alone, with no tap and no pair.
+        if arguments[flag] != seamTestFlag { model.start() }
         let test = DragStressTest(
             outputPath: arguments[flag + 1],
             pressOutcome: { model.lastPressOutcome },
@@ -71,6 +75,8 @@ struct PairwiseMacApp: App {
             leave: { model.leavePair(of: $0) })
         if arguments[flag] == joinTestFlag {
             await test.runJoinTest(on: system)
+        } else if arguments[flag] == seamTestFlag {
+            await test.runSeamTest()
         } else {
             await test.run()
         }

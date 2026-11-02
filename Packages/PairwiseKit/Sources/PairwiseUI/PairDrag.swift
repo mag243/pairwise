@@ -18,6 +18,20 @@ enum PairDrag {
     case clickingLock(SeamLock)
     /// An open lock was clicked: the next tick joins its windows, as that calls their apps.
     case closingLock(SeamLock)
+    /// macOS is resizing the window at the seam, and its partner follows (ADR 0045).
+    case resizingSeam(ResizingSeam)
+
+    @MainActor
+    struct ResizingSeam {
+        let window: any MovableWindow
+        let partner: any MovableWindow
+        /// The partner's frame at the press, which holds its far edge.
+        let partnerStart: WindowFrame
+        let side: PairSide
+        var lastPartnerFrame: WindowFrame?
+        /// Set by the release, so that the next tick and not the event calls the apps.
+        var isReleased = false
+    }
 
     @MainActor
     struct Pressed {

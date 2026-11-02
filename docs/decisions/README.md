@@ -50,3 +50,4 @@ Use `0000-template.md` as the basis.
 | 0042 | A lock on the seam | Superseded by 0044 |
 | 0043 | Joining within one app | Accepted |
 | 0044 | A lock that joins and parts | Accepted |
+| 0045 | Following at the seam | Accepted |
