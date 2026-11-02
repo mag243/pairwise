@@ -31,8 +31,8 @@ final class StandInPanel: WindowStandIn {
     private let panel: NSPanel
     private let streams: [LiveStream]
     private let pictures: [Picture]
-    /// Draws picture `index` anew at a size, for a picture with no content to keep whole.
-    private let redraw: (@MainActor (_ index: Int, _ size: CGSize) -> CGImage?)?
+    /// What shows each picture at a seam, for pictures with no content to keep whole.
+    private let placeholders: [PlaceholderLayers]
     /// A layer per picture that cuts it off at the seam, the layer with the whole picture, and
     /// the layers that show its parts once a seam has been set.
     private(set) var slots: [CALayer] = []
@@ -51,14 +51,13 @@ final class StandInPanel: WindowStandIn {
     var liveFrames: [Int] { streams.map(\.frames) }
 
     /// Each stream, if any, updates the picture at the same place in `pictures`.
-    /// With `redraw`, a seam draws the pictures anew at their new widths.
+    /// With `placeholders`, one per picture, these take over from the pictures at a seam.
     init(
-        pictures: [Picture], streams: [LiveStream],
-        redraw: (@MainActor (_ index: Int, _ size: CGSize) -> CGImage?)? = nil
+        pictures: [Picture], streams: [LiveStream], placeholders: [PlaceholderLayers] = []
     ) {
         self.streams = streams
         self.pictures = pictures
-        self.redraw = redraw
+        self.placeholders = placeholders
         let layout = Self.layout(of: pictures.map(\.size))
         let size = layout.size
         panel = NSPanel(
@@ -140,7 +139,11 @@ final class StandInPanel: WindowStandIn {
             slots[index].insertSublayer(backing, at: 0)
             backings.append(backing)
         }
-        guard streams.isEmpty, redraw == nil else { return }
+        for (index, placeholder) in placeholders.enumerated() {
+            slots[index].addSublayer(placeholder.root)
+            images[index].isHidden = true
+        }
+        guard streams.isEmpty, placeholders.isEmpty else { return }
         for (index, picture) in pictures.enumerated() {
             let split = Self.quietSplit(of: picture)
             splitShares.append(split / picture.size.width)
@@ -166,7 +169,9 @@ final class StandInPanel: WindowStandIn {
             slots[index].frame = place.slot
             images[index].frame = place.frame
             backings[index].frame = place.frame
-            if let image = redraw?(index, place.frame.size) { images[index].contents = image }
+            if placeholders.indices.contains(index) {
+                placeholders[index].layOut(size: place.frame.size)
+            }
         }
         let splits = zip(sizes, splitShares).map { $0.width * $1 }
         let places = Self.seamLayout(

@@ -14,7 +14,7 @@ extension AccessibilityWindowSystem {
             NSApplication.shared.effectiveAppearance.bestMatch(
                 from: [.darkAqua, .aqua]) == .darkAqua
         var pictures: [StandInPanel.Picture] = []
-        var looks: [(title: String, icon: NSImage?)] = []
+        var placeholders: [PlaceholderLayers] = []
         for window in windows {
             guard let frame = try? window.frame() else { return .failure(.captureFailed) }
             let title = window.title ?? ""
@@ -28,13 +28,10 @@ extension AccessibilityWindowSystem {
                     scale: scale, isDark: isDark)
             else { return .failure(.captureFailed) }
             pictures.append(picture)
-            looks.append((title, icon))
+            placeholders.append(
+                PlaceholderLayers(title: title, icon: icon, scale: scale, isDark: isDark))
         }
         return .success(
-            StandInPanel(pictures: pictures, streams: []) { index, size in
-                PlaceholderPicture.make(
-                    title: looks[index].title, icon: looks[index].icon, size: size,
-                    scale: scale, isDark: isDark)?.image
-            })
+            StandInPanel(pictures: pictures, streams: [], placeholders: placeholders))
     }
 }

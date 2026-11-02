@@ -96,21 +96,26 @@ import Testing
         #expect(middle == beside)
     }
 
-    @Test func aSeamDrawsThePicturesAnewAtTheirNewWidths() throws {
+    @Test func atASeamLayersTakeOverAtTheNewWidths() throws {
         let first = try picture(isDark: true)
         let second = try picture(isDark: true)
-        var drawn: [Int: CGSize] = [:]
-        let replacement = first.image
-        let panel = StandInPanel(pictures: [first, second], streams: []) { index, size in
-            drawn[index] = size
-            return replacement
+        let layers = [first, second].map { _ in
+            PlaceholderLayers(title: "A window", icon: nil, scale: Self.scale, isDark: true)
         }
+        let panel = StandInPanel(pictures: [first, second], streams: [], placeholders: layers)
         panel.setSeam(atOffset: 200)
-        #expect(drawn[0] == CGSize(width: 200, height: 200))
-        #expect(drawn[1] == CGSize(width: 400, height: 200))
+        #expect(layers[0].root.frame.size == CGSize(width: 200, height: 200))
+        #expect(layers[1].root.frame.size == CGSize(width: 400, height: 200))
+        #expect(panel.images[0].isHidden)
         #expect(panel.parts.isEmpty)
-        #expect(panel.images[0].frame.width == 200)
         panel.dismiss()
+    }
+
+    @Test func aNarrowWindowKeepsItsButtonsAndLosesItsTitlesRoom() {
+        let places = PlaceholderPicture.places(for: CGSize(width: 90, height: 200))
+        #expect(places.title.width == 0)
+        #expect(places.buttons.count == 3)
+        #expect(places.bodyIcon == nil)
     }
 
     @Test func aWindowWithoutSizeIsNoPicture() {
