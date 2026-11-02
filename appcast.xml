@@ -1,0 +1,21 @@
+<?xml version="1.0" standalone="yes"?>
+<rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
+    <channel>
+        <title>Pairwise</title>
+        <item>
+            <title>0.1.0</title>
+            <pubDate>Mon, 02 Nov 2026 17:38:14 +0100</pubDate>
+            <sparkle:version>2026.1102.173601</sparkle:version>
+            <sparkle:shortVersionString>0.1.0</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+            <description sparkle:format="markdown"><![CDATA[The first release.
+
+- Join two windows of any app: drag one to the other and press Command, or click the open lock on the seam of two windows side by side.
+- A pair moves together, shares its seam and comes to the front together.
+- Part them with the closed lock, or by pressing Command while dragging one.
+- Pairs last through a quit and a restart.
+]]></description>
+            <enclosure url="https://github.com/mag243/pairwise/releases/download/v0.1.0/Pairwise-0.1.0-2026.1102.173601.zip" length="1622573" type="application/octet-stream" sparkle:edSignature="SOAW4OGN1TcD6sykhOSzWyF1ex5tiVZKITylL2zbvickdSl55CnUvTXXn5QcCwhWSoIjclOlQnhQ/K7ykfIZAA=="/>
+        </item>
+    </channel>
+</rss>
