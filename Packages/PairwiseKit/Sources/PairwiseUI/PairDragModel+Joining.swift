@@ -1,6 +1,6 @@
 import PairwiseCore
 
-/// Joining two windows and parting them, with Option held from the press (ADR 0035).
+/// Joining two windows and parting them, with Command held from the press (ADR 0035, 0036).
 extension PairDragModel {
     /// Parts a window in a pair, and watches where it goes. macOS drags it alone.
     func startJoining(_ number: UInt32) -> String {

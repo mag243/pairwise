@@ -9,7 +9,7 @@ enum PairDrag {
     case passing
     case pressed(Pressed)
     case moving(Moving)
-    /// Option is down: macOS drags the window alone, and it may join another at the release.
+    /// The join key is down: macOS drags the window alone, and it may join another at the release.
     case joining(Joining)
     case placing(Placing)
     /// Both windows are placed; the panel stays until they have had time to draw.

@@ -34,7 +34,7 @@ public protocol WindowSystemProviding: AnyObject {
         completion: @escaping @MainActor (Result<any WindowStandIn, WindowSystemError>) -> Void
     )
 
-    /// Whether the key that joins and parts windows is down now (ADR 0035).
+    /// Whether the key that joins and parts windows is down now (ADR 0036).
     var isJoinKeyDown: Bool { get }
 
     /// The normal windows on screen of other apps, frontmost first.

@@ -1,6 +1,6 @@
 # 0035. Joining and coming apart with Option
 
-- **Status:** Accepted
+- **Status:** Accepted; the key is changed by 0036
 - **Date:** 2026-11-02
 - **Milestone:** M3
 

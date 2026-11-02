@@ -64,7 +64,7 @@ struct MainView: View {
             }
             .disabled(!model.isAccessibilityGranted || !model.isScreenRecordingGranted)
             Text(
-                "Hold Option and drag a window to another's edge to join them, and away to part them."
+                "Hold Command and drag a window to another's edge to join them, and away to part them."
             )
             .foregroundStyle(.secondary)
             if let problem = model.problem {

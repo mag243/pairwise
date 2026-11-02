@@ -25,14 +25,14 @@ Done first because everything below adds code to this module.
 - [x] The panel holds the pair in its own order, with the partner on either side.
 
 ### 4. Joining
-- [x] ADR 0035: Option held while dragging.
+- [x] ADR 0035 and 0036: Command held while dragging.
 - [x] `PairwiseCore`, test-first: when a dragged window is close enough to another window's edge to join. The snap distance is a named constant.
 - [x] A guide shows where the window will land, and at the release the two click together, with the seam lighting up briefly (the design notes in `PLAN.md`).
 - [x] The dragged window takes the other's height and top (owner's choice 2).
-- [ ] Check by hand, and whether Option clashes with tiling.
+- [ ] Check by hand; the join test covers the rest. Option clashed with tiling (ADR 0036).
 
 ### 5. Coming apart
-- [x] Option at a press on a window in a pair ends the pair, and only that window moves (ADR 0035).
+- [x] Command at a press on a window in a pair ends the pair (ADR 0036), and only that window moves (ADR 0035).
 - [ ] Check by hand.
 
 ### 6. The shared seam

@@ -41,7 +41,7 @@ public final class AccessibilityWindowSystem: WindowSystemProviding {
     }
 
     public var isJoinKeyDown: Bool {
-        CGEventSource.flagsState(.combinedSessionState).contains(.maskAlternate)
+        CGEventSource.flagsState(.combinedSessionState).contains(.maskCommand)
     }
 
     public var isPrimaryButtonDown: Bool {

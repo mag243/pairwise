@@ -5,7 +5,7 @@ import ScreenCaptureKit
 
 /// Joining and parting two windows of its own with posted events (ADR 0027, 0035).
 extension DragStressTest {
-    private static let optionKey: CGKeyCode = 58
+    private static let joinKey: CGKeyCode = 55
     private static let joinSteps = 50
     private static let guideWait: UInt64 = 300
     private static let floatingLevel = 3
@@ -22,7 +22,7 @@ extension DragStressTest {
         let start = CGEvent(source: nil)?.location
         lines.append("join test started")
         defer {
-            pressOption(false)
+            pressJoinKey(false)
             system.onlyNormalWindows = nil
             if let start { post(.mouseMoved, at: start) }
             for folder in folders { try? FileManager.default.removeItem(at: folder) }
@@ -51,40 +51,43 @@ extension DragStressTest {
     {
         let distance =
             Self.otherOrigin.x - Double(Self.size.width) + Self.snapGap - Self.leftOrigin.x
-        await drag(window, byX: distance, byY: 30, withOption: true, picture: "left")
+        await drag(window, byX: distance, byY: 30, withJoinKey: true, picture: "left")
         lines.append("expect the window at x 380, y 120, height 500, tight against the other")
         report("joined on the left", window, other)
     }
 
     private func dragTogether(_ window: AccessibilityWindow, _ other: AccessibilityWindow) async {
-        await drag(window, byX: -100, byY: 60, withOption: false, picture: nil)
+        await drag(window, byX: -100, byY: 60, withJoinKey: false, picture: nil)
         lines.append("expect both moved by -100, 60: x 280 and x 800, y 180")
         report("dragged together", window, other)
     }
 
     private func part(_ window: AccessibilityWindow, _ other: AccessibilityWindow) async {
-        await drag(window, byX: -150, byY: 0, withOption: true, picture: nil)
+        await drag(window, byX: -150, byY: 0, withJoinKey: true, picture: nil)
         report("parted: only the first moved, by -150", window, other)
-        await drag(window, byX: -20, byY: 0, withOption: false, picture: nil)
+        await drag(window, byX: -20, byY: 0, withJoinKey: false, picture: nil)
         report("a plain drag after parting: only the first moved, by -20", window, other)
     }
 
     private func joinFromTheRight(_ window: AccessibilityWindow, _ other: AccessibilityWindow) async
     {
+        // Far enough left that the window's title bar stays on the screen beside the other.
+        await place(other, at: Self.leftOrigin)
+        await wait(Self.settleWait)
         guard let otherFrame = other.serverFrame() else { return }
         await place(window, at: ScreenPoint(x: otherFrame.maxX + 200, y: otherFrame.origin.y))
         await wait(Self.settleWait)
-        await drag(window, byX: -(200 - Self.snapGap), byY: 20, withOption: true, picture: "right")
+        await drag(window, byX: -(200 - Self.snapGap), byY: 20, withJoinKey: true, picture: "right")
         lines.append("expect the first against the other's right edge, with its height")
         report("joined on the right", window, other)
-        await drag(other, byX: -60, byY: 0, withOption: false, picture: nil)
+        await drag(other, byX: -60, byY: 0, withJoinKey: false, picture: nil)
         report("dragged by the left window: both moved by -60", window, other)
-        await drag(window, byX: 40, byY: 0, withOption: false, picture: nil)
+        await drag(window, byX: 40, byY: 0, withJoinKey: false, picture: nil)
         report("dragged by the right window: both moved by 40", window, other)
     }
 
     private func drag(
-        _ window: AccessibilityWindow, byX: Double, byY: Double, withOption: Bool, picture: String?
+        _ window: AccessibilityWindow, byX: Double, byY: Double, withJoinKey: Bool, picture: String?
     ) async {
         guard let frame = window.serverFrame() else {
             lines.append("the window has no frame")
@@ -94,10 +97,14 @@ extension DragStressTest {
         await wait(Self.settleWait)
         var point = CGPoint(
             x: frame.origin.x + frame.size.width / 2, y: frame.origin.y + Self.titleBandY)
+        guard isOwnWindowOnTop(window, at: point) else {
+            lines.append("drag skipped, another window is on top at the press")
+            return
+        }
         post(.mouseMoved, at: point)
         await wait(Self.windowWait)
-        if withOption {
-            pressOption(true)
+        if withJoinKey {
+            pressJoinKey(true)
             await wait(Self.windowWait)
         }
         post(.leftMouseDown, at: point)
@@ -112,17 +119,17 @@ extension DragStressTest {
         lines.append("press: \(pressOutcome()); guide: \(guideFrames())")
         if let picture { await savePicture(named: picture, around: window) }
         post(.leftMouseUp, at: point)
-        if withOption { pressOption(false) }
+        if withJoinKey { pressJoinKey(false) }
         await wait(Self.settleWait)
     }
 
-    private func pressOption(_ isDown: Bool) {
-        guard isOptionDown != isDown else { return }
-        isOptionDown = isDown
+    private func pressJoinKey(_ isDown: Bool) {
+        guard isJoinKeyDown != isDown else { return }
+        isJoinKeyDown = isDown
         let source = CGEventSource(stateID: .hidSystemState)
         let event = CGEvent(
-            keyboardEventSource: source, virtualKey: Self.optionKey, keyDown: isDown)
-        event?.flags = isDown ? .maskAlternate : []
+            keyboardEventSource: source, virtualKey: Self.joinKey, keyDown: isDown)
+        event?.flags = isDown ? .maskCommand : []
         event?.post(tap: .cghidEventTap)
     }
 

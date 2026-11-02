@@ -40,4 +40,5 @@ Use `0000-template.md` as the basis.
 | 0032 | Taking over once the window has moved | Accepted |
 | 0033 | Pairs as a model | Accepted |
 | 0034 | A menu bar app | Accepted |
-| 0035 | Joining and coming apart with Option | Accepted |
+| 0035 | Joining and coming apart with Option | Accepted, the key changed by 0036 |
+| 0036 | Joining with Command | Accepted |

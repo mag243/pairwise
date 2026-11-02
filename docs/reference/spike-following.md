@@ -154,3 +154,5 @@ With the window list kept and the pictures taken together, over 13 drags: the pi
 **By hand, after the panel waits at the release:** the flash is gone.
 
 **Verdict:** moving as one window works well. It stays, and the other ways of following go (ADR 0028).
+
+**The join test (ADR 0027) with Option:** the guide stood right, at x 380, y 120, 520 by 500, and at the release macOS tiled the window over half the screen. ADR 0036 moves to Command.

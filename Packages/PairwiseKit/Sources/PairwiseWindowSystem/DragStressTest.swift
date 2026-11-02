@@ -40,8 +40,8 @@ public final class DragStressTest {
         didSet { write() }
     }
     var folders: [URL] = []
-    /// Whether the mouse events posted carry Option, as the join test needs.
-    var isOptionDown = false
+    /// Whether the mouse events posted carry the join key, as the join test needs.
+    var isJoinKeyDown = false
 
     /// `pressOutcome` says what became of the last press, and `lastLiveFrames` how many
     /// live frames per window the last drag got. `join` makes a pair of two windows, with the
@@ -101,6 +101,10 @@ public final class DragStressTest {
         let before = Self.waitsBeforePress[index % Self.waitsBeforePress.count]
         let after = Self.waitsAfterPress[
             (index / Self.waitsBeforePress.count) % Self.waitsAfterPress.count]
+        guard isOwnWindowOnTop(dragged, at: press) else {
+            lines.append("try \(index): skipped, another window is on top at the press")
+            return "skipped"
+        }
         post(.mouseMoved, at: press)
         await wait(before)
         post(.leftMouseDown, at: press)
@@ -161,7 +165,7 @@ public final class DragStressTest {
             try? helper.raise()
             try? dragged.raise()
             await wait(Self.settleWait)
-            await longDrag()
+            await longDrag(of: dragged)
             await wait(Self.settleWait)
             lines.append(
                 "live try \(index): frames per window \(lastLiveFrames()); press: \(pressOutcome())"
@@ -170,9 +174,13 @@ public final class DragStressTest {
         leave(dragged)
     }
 
-    private func longDrag() async {
+    private func longDrag(of window: AccessibilityWindow) async {
         let press = CGPoint(
             x: Self.origin.x + Double(Self.size.width) / 2, y: Self.origin.y + Self.titleBandY)
+        guard isOwnWindowOnTop(window, at: press) else {
+            lines.append("long drag skipped, another window is on top at the press")
+            return
+        }
         post(.mouseMoved, at: press)
         post(.leftMouseDown, at: press)
         var point = press
@@ -220,8 +228,18 @@ public final class DragStressTest {
         let event = CGEvent(
             mouseEventSource: source, mouseType: type, mouseCursorPosition: point,
             mouseButton: .left)
-        if isOptionDown { event?.flags = .maskAlternate }
+        if isJoinKeyDown { event?.flags = .maskCommand }
         event?.post(tap: .cghidEventTap)
+    }
+
+    /// Whether `window` is on top at `point`. A press lands on whatever is there, and in
+    /// Finder a drag from a file list copies files, so the test presses only its own window.
+    func isOwnWindowOnTop(_ window: AccessibilityWindow, at point: CGPoint) -> Bool {
+        let access = LiveSystemAccess()
+        let top = WindowServer.topWindow(
+            at: ScreenPoint(point), excludingProcess: access.ownProcess,
+            in: access.onScreenWindows())
+        return top != nil && top?.number == window.windowNumber
     }
 
     func wait(_ milliseconds: UInt64) async {
