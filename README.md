@@ -14,7 +14,7 @@ brew install --cask mag243/tap/pairwise
 
 Or download the disk image from the [latest release](https://github.com/mag243/pairwise/releases/latest) and drag Pairwise to Applications. Pairwise updates itself either way, after asking.
 
-To remove it: `brew uninstall --zap pairwise`, or quit it and move it to the Trash. Then also remove it under Privacy & Security in System Settings, where macOS keeps the permissions.
+To remove it: `brew uninstall --zap --cask pairwise`, or quit it and move it to the Trash. Then also remove it under Privacy & Security in System Settings, where macOS keeps the permissions.
 
 If a permission shows as on but Pairwise says it is missing, turn it off and on again, or remove Pairwise from the list and add it again. macOS ties a permission to the app's signature, so this can happen after running a copy signed differently, such as your own build.
 
@@ -31,12 +31,12 @@ Pairwise lives in the menu bar and needs one permission: Accessibility, to move 
 
 By default Pairwise records nothing: while you drag a pair, you see an empty plane with each window's icon and title. Two settings show more, and take the Screen Recording permission: Still shows one picture at the start of the drag, and Live keeps video playing and the seam sharp, with macOS's purple recording icon during the drag. They capture only those two windows, and the pictures stay in memory: they are not saved or sent anywhere. Once a day, and when you ask, Pairwise fetches its update feed from GitHub, which sends nothing more than any web request does. You can turn that off in the settings.
 
-## Requirements
+## Building it
+
+To build Pairwise yourself you need:
 
 - macOS with Xcode 27.2 (the exact version is pinned in [`tools/versions.env`](tools/versions.env))
 - [Homebrew](https://brew.sh)
-
-## Getting started
 
 ```sh
 tools/setup.sh          # checks Xcode; installs SwiftLint, shellcheck, xcbeautify, bash,
@@ -59,7 +59,7 @@ tools/build.sh --help   # every command
 | `docs/plans` | The master plan and one plan per milestone |
 | `docs/decisions` | Architecture decision records |
 | `docs/reference` | Reference material |
-| `tools` | Setup, build, git hooks and pinned versions |
+| `tools` | Setup, build, release, git hooks and pinned versions; `tools/site` is the [website](https://mag243.github.io/pairwise/) |
 
 The rules for working in this repository are in [`CLAUDE.md`](CLAUDE.md).
 
@@ -69,9 +69,7 @@ The owner releases from their own Mac, which holds the Developer ID certificate,
 
 1. Set `MARKETING_VERSION`, add the version's section to `CHANGELOG.md`, and commit.
 2. Run `tools/build.sh ci`, then `git push`, then `git tag vX.Y.Z`.
-3. Run `tools/build.sh publish`. For a trial first: `tools/build.sh package`, then `tools/publish.sh --dry-run`.
-
-After the very first release, turn on GitHub Pages for the branch `gh-pages`.
+3. Run `tools/build.sh publish`, which also puts `tools/site` on the website. For a trial first: `tools/build.sh package`, then `tools/publish.sh --dry-run`.
 
 ## License
 
