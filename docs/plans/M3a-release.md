@@ -58,7 +58,7 @@ These need the owner's keychain, accounts or judgment, so the agent prepares the
 ### 8. Pictures without any capture, on trial
 A third choice beside Still and Live, for dragging with no Screen Recording permission at all. First a trial in the debug build; what follows depends on how it looks by hand.
 
-- [ ] By hand: Still and Live as they are, and Settings coming to the front from the menu, also from another desktop.
+- [x] By hand: Still and Live as they are, and Settings coming to the front from the menu, also from another desktop.
 - [ ] Trial, in the debug setting: during a drag and at a seam, each window shows as an empty plane that follows light or dark mode, with a title bar holding the app's icon and the window's title, read through the Accessibility API. Nothing is captured.
 - [ ] By hand: does it move and resize cleanly, and how does the jump to the real content at the release feel?
 - [ ] Decide with the owner whether it stays, and whether it is the default. If it stays: an ADR first, then Pairwise works with Accessibility alone, the permission is asked only for Still or Live, and the first start, the settings' texts, the page, the README and the translations follow.
