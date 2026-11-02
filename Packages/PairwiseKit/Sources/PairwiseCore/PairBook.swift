@@ -9,6 +9,13 @@ public enum PairSide: Equatable, Sendable {
 public struct WindowPair: Equatable, Sendable {
     public let left: UInt32
     public let right: UInt32
+
+    /// Precondition: `left` and `right` differ.
+    public init(left: UInt32, right: UInt32) {
+        precondition(left != right, "left and right differ")
+        self.left = left
+        self.right = right
+    }
 }
 
 /// Why two windows cannot become a pair.
