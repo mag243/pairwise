@@ -4,7 +4,7 @@
 **Subtitle:** *Snap groups for your Mac.*
 
 ## Why
-An earlier project tried magnetic windows and dropped them: joining windows does not belong in a file manager. Joining *any* two windows, like Snap Groups in Windows 11, belongs in an app of its own. Pairwise fits the an earlier project family by name.
+An earlier project tried magnetic windows and dropped them: joining windows did not belong in that app. Joining *any* two windows, like Snap Groups in Windows 11, belongs in an app of its own. Pairwise fits the an earlier project family by name.
 
 ## What it does
 - Two windows of any app, brought together side by side, join: they move together, share their seam (resizing one resizes the other), and come apart again easily.
