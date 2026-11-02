@@ -62,8 +62,8 @@ These need the owner's keychain, accounts or judgment, so the agent prepares the
 
 ## Acceptance criteria
 - [x] On the owner's own account, the disk image downloaded from the release opens without a Gatekeeper warning beyond macOS's one-time question, and the app offers the move, explains what it needs and works after the permissions are given. No separate user account: the first-run state is made by resetting the permissions.
-- [ ] `brew install --cask mag243/tap/pairwise` installs it, and `brew uninstall --zap` leaves nothing behind.
-- [ ] An installed 0.1.0 updates itself to a test 0.1.1 with one click: permissions stay, pairs come back, no window is lost.
+- [x] `brew install --cask mag243/tap/pairwise` installs it, and `brew uninstall --zap` leaves nothing behind but what macOS keeps of the permissions. Quitting a running Pairwise on uninstall is not yet seen.
+- [x] An installed 0.1.0 updates itself to a test 0.1.1 with one click: permissions stay, pairs come back, no window is lost.
 - [x] An update with a wrong signature is refused: a test feed with one byte of the signature changed gave "The update is improperly signed and could not be validated".
 - [ ] Starting at login works after a restart of the Mac, and can be turned off.
 - [ ] `tools/build.sh ci` is green (when the owner says so, ADR 0011).
