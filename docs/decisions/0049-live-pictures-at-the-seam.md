@@ -15,6 +15,7 @@ ADR 0048 showed still pictures at the seam, with the real windows under the pane
 - **A frame fills its picture's whole place, scaled to fit.** It differs little from that place, as the window follows the seam, so the scaling hardly shows. A still picture keeps its division until the first frame comes.
 - **The still picture of a window's top left stays over its live frames,** as macOS shows a mark of its own in the frames of a window it streams, in place of the close, minimize and zoom buttons. A window with no such buttons there shows that corner still.
 - **An amber line of 6 points stands on the seam while it moves,** along the shorter window, at the owner's wish. It shows what is being dragged, in the colour of joining, and covers a small gap between the pictures.
+- **The still picture fades over the first live frame, in 0.15 seconds,** as a frame looks darker than a still picture, and by hand the change showed as a flash just after the start of a drag.
 - The rest of ADR 0048 stands: the seam at the pointer, the limits, the release.
 
 ## Alternatives

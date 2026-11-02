@@ -28,6 +28,9 @@ final class StandInPanel: WindowStandIn {
         let tail = CALayer()
     }
 
+    /// How long the still picture fades over the first live frame, in seconds.
+    private static let stillFadeTime: CFTimeInterval = 0.15
+
     private let panel: NSPanel
     private let streams: [LiveStream]
     private let pictures: [Picture]
@@ -166,14 +169,24 @@ final class StandInPanel: WindowStandIn {
         slots[index].addSublayer(layer)
     }
 
+    /// The still picture fades over the first live frame, which lies under it. A frame looks
+    /// darker than a still picture, and at once that would show as a flash (ADR 0049).
+    private func fadeOutStill(at index: Int) {
+        let layers = parts[index]
+        guard layers.head.opacity > 0 else { return }
+        CATransaction.begin()
+        CATransaction.setAnimationDuration(Self.stillFadeTime)
+        for layer in [layers.head, layers.fill, layers.tail] { layer.opacity = 0 }
+        CATransaction.commit()
+    }
+
     /// Shows a live frame in place of the picture and its parts.
     private func show(_ surface: IOSurfaceRef, rect: CGRect, scale: Double, at index: Int) {
         guard parts.indices.contains(index), rect.width > 0 else { return }
         let size = CGSize(width: IOSurfaceGetWidth(surface), height: IOSurfaceGetHeight(surface))
-        let layers = parts[index]
+        fadeOutStill(at: index)
         CATransaction.begin()
         CATransaction.setDisableActions(true)
-        for layer in [layers.head, layers.fill, layers.tail] { layer.isHidden = true }
         images[index].isHidden = false
         images[index].contents = surface
         images[index].contentsRect = Self.share(of: rect, scale: scale, inSurface: size)
