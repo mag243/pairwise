@@ -12,6 +12,11 @@
 #               line-coverage target (Core 90 %, WindowSystem 75 %, UI 70 %; PLAN.md, Test plan).
 #   build       Build the macOS app with its tests (compiled, not run), Debug.
 #   release     Build the macOS app, Release, and fail if test code is in it (ADR 0050).
+#   export      Archive the macOS app and export it with the Developer ID to build/PairwiseMac/;
+#               not notarized (ADR 0056).
+#   package     A release: export, notarize with the keychain profile pairwise-notary, staple
+#               and check, then build/release/Pairwise-<version>-<build>.zip and a notarized
+#               .dmg beside it (ADR 0056). Needs the owner's certificate and profile.
 #   apptest     The macOS app's tests, including the XCUITest smoke tests. Followed by
 #               a filter, only those tests, as Class or Class/testName, several
 #               separated by commas: tools/build.sh apptest LaunchTests/testShowsWindow
@@ -49,10 +54,14 @@ DERIVED_DATA="$BUILD_DIR/DerivedData"
 LOG_DIR="$BUILD_DIR/logs"
 REPORT_DIR="$BUILD_DIR/reports"
 MAC_DESTINATION="platform=macOS,arch=$(uname -m)"
+EXPORT_OPTIONS="$TOOLS_DIR/ExportOptions-mac.plist"
+# The certificate that signs a release, and the notary keychain profile (ADR 0056).
+SIGNING_CERTIFICATE="Developer ID Application"
+NOTARY_PROFILE="pairwise-notary"
 # CI has no certificate and nothing there needs the Accessibility permission (ADR 0012).
 CI_SIGNING=()
 [[ "${CI:-}" == true ]] && CI_SIGNING=(CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual DEVELOPMENT_TEAM=)
-COMMANDS=" check format test coverage build apptest run quick verify ci clean help "
+COMMANDS=" check format test coverage build release export package apptest run quick verify ci clean help "
 declare -a SUMMARY=()
 
 usage() { sed -n '2,/^$/p' "$0" | sed 's/^# \{0,1\}//'; }
@@ -239,6 +248,127 @@ cmd_release() {
   ok "No test code in the release build"
 }
 
+require_signing() {
+  security find-identity -v -p codesigning | grep -q "\"$SIGNING_CERTIFICATE: " \
+    || fail "No \"$SIGNING_CERTIFICATE\" certificate in the keychain (ADR 0056)."
+}
+
+require_notary_profile() {
+  xcrun notarytool history --keychain-profile "$NOTARY_PROFILE" >/dev/null 2>&1 \
+    || fail "No notary profile. Make it once: xcrun notarytool store-credentials $NOTARY_PROFILE"
+}
+
+# Archives the app in Release and exports it signed with the Developer ID into [1].
+export_mac() {
+  local out="$1" archive="$BUILD_DIR/archives/$MAC_SCHEME.xcarchive"
+  rm -rf "$out" "$archive"
+  xcode archive -scheme "$MAC_SCHEME" -configuration Release -destination "generic/platform=macOS" \
+    -archivePath "$archive" archive
+  xcodebuild -exportArchive -archivePath "$archive" -exportPath "$out" \
+    -exportOptionsPlist "$EXPORT_OPTIONS" >"$LOG_DIR/export.log" 2>&1 \
+    || { tail -n 30 "$LOG_DIR/export.log" >&2; fail "Export failed; log: build/logs/export.log"; }
+  [[ -d "$out/$APP_NAME.app" ]] || fail "No $APP_NAME.app in ${out#"$ROOT_DIR"/}"
+}
+
+# Fails unless the app's signature holds, it has the hardened runtime and it holds no test code.
+# The app need not be notarized yet.
+verify_signature() {
+  local app="$1" found details
+  codesign --verify --deep --strict "$app" 2>"$LOG_DIR/codesign.log" \
+    || fail "The signature does not verify; log: build/logs/codesign.log"
+  details="$(codesign --display --verbose=2 "$app" 2>&1)"
+  grep -q "^Authority=$SIGNING_CERTIFICATE: " <<<"$details" || fail "Not signed with the Developer ID"
+  grep -q "flags=.*runtime" <<<"$details" || fail "The hardened runtime is off"
+  found="$(test_code_in "$app/Contents/MacOS/$APP_NAME")"
+  [[ -z "$found" ]] || fail "Test code is in the release build (ADR 0050): $found"
+  ok "Signed with the Developer ID, hardened, no test code"
+}
+
+cmd_export() {
+  step "Export"
+  require_project
+  require_signing
+  mkdir -p "$LOG_DIR"
+  export_mac "$BUILD_DIR/$MAC_SCHEME"
+  verify_signature "$BUILD_DIR/$MAC_SCHEME/$APP_NAME.app"
+  ok "$MAC_SCHEME -> build/$MAC_SCHEME"
+}
+
+# Sends a zip or disk image to Apple's notary service and waits for its verdict;
+# a rejection saves the service's log.
+notarize_file() {
+  local file="$1" name status id result
+  name="$(basename "$file")"
+  result="$LOG_DIR/notarize-$name.json"
+  info "Waiting for Apple's notary service ($name)"
+  xcrun notarytool submit "$file" --keychain-profile "$NOTARY_PROFILE" --wait --output-format json >"$result" \
+    || { cat "$result" >&2; fail "Could not submit $name for notarization."; }
+  status="$(plutil -extract status raw "$result")"
+  id="$(plutil -extract id raw "$result")"
+  if [[ "$status" != Accepted ]]; then
+    xcrun notarytool log "$id" --keychain-profile "$NOTARY_PROFILE" "$LOG_DIR/notarize-$name-log.json" \
+      >/dev/null 2>&1 || true
+    fail "Notarization of $name: $status; log: build/logs/notarize-$name-log.json"
+  fi
+  ok "Notarized $name"
+}
+
+# Staples the notary's ticket to an app or a disk image, so it opens offline too.
+staple() {
+  xcrun stapler staple "$1" >"$LOG_DIR/staple.log" 2>&1 \
+    || fail "Could not staple the ticket to $(basename "$1"); log: build/logs/staple.log"
+}
+
+# Builds the disk image people install from: the stapled app and a link to
+# Applications on the rendered background, signed with the Developer ID.
+make_disk_image() {
+  local app="$1" out="$2" work="$BUILD_DIR/dmg" scale
+  rm -rf "$work"
+  mkdir -p "$work"
+  ensure_dmgbuild
+  for scale in 1 2; do
+    swift "$TOOLS_DIR/dmg/render.swift" "$TOOLS_DIR/dmg/background.svg" "$work/background@${scale}x.png" "$scale" \
+      || fail "Could not render the disk image background"
+  done
+  tiffutil -cathidpicheck "$work/background@1x.png" "$work/background@2x.png" -out "$work/background.tiff" \
+    >/dev/null 2>&1 || fail "Could not combine the background images"
+  "$DMGBUILD" -s "$TOOLS_DIR/dmg/settings.py" -D app="$app" -D background="$work/background.tiff" \
+    "$APP_NAME" "$out" >"$LOG_DIR/dmgbuild.log" 2>&1 \
+    || fail "dmgbuild failed; log: build/logs/dmgbuild.log"
+  codesign --sign "$SIGNING_CERTIFICATE" --timestamp "$out" 2>"$LOG_DIR/codesign-dmg.log" \
+    || fail "Could not sign the disk image; log: build/logs/codesign-dmg.log"
+}
+
+cmd_package() {
+  step "Package"
+  require_project
+  require_signing
+  require_notary_profile
+  local exported="$BUILD_DIR/$MAC_SCHEME" app="$BUILD_DIR/$MAC_SCHEME/$APP_NAME.app"
+  local upload="$BUILD_DIR/release/$APP_NAME-notarize.zip" version build base
+  rm -rf "$BUILD_DIR/release"
+  mkdir -p "$BUILD_DIR/release" "$LOG_DIR"
+  export_mac "$exported"
+  verify_signature "$app"
+  ditto -c -k --keepParent "$app" "$upload"
+  notarize_file "$upload"
+  rm -f "$upload"
+  staple "$app"
+  spctl --assess --type exec "$app" 2>"$LOG_DIR/spctl.log" \
+    || fail "Gatekeeper rejects the app; log: build/logs/spctl.log"
+  ok "Gatekeeper accepts $APP_NAME.app"
+  version="$(defaults read "$app/Contents/Info" CFBundleShortVersionString)"
+  build="$(defaults read "$app/Contents/Info" CFBundleVersion)"
+  base="$BUILD_DIR/release/$APP_NAME-$version-$build"
+  ditto -c -k --keepParent "$app" "$base.zip"
+  make_disk_image "$app" "$base.dmg"
+  notarize_file "$base.dmg"
+  staple "$base.dmg"
+  spctl --assess --type open --context context:primary-signature "$base.dmg" 2>"$LOG_DIR/spctl-dmg.log" \
+    || fail "Gatekeeper rejects the disk image; log: build/logs/spctl-dmg.log"
+  ok "$APP_NAME $version ($build) -> ${base#"$ROOT_DIR"/}.zip and .dmg"
+}
+
 cmd_apptest() {
   local filter="${1:-}" only=() tests=() test
   step "macOS app tests${filter:+ ($filter)}"
@@ -282,6 +412,8 @@ run_command() {
     coverage) timed coverage cmd_coverage ;;
     build) timed build cmd_build ;;
     release) timed release cmd_release ;;
+    export) timed export cmd_export ;;
+    package) timed package cmd_package ;;
     apptest) timed apptest cmd_apptest "${2:-}" ;;
     clean) timed clean cmd_clean ;;
     quick) run_command check; run_command test ;;

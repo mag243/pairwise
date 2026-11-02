@@ -61,3 +61,4 @@ Use `0000-template.md` as the basis.
 | 0053 | Not losing windows | Accepted |
 | 0054 | Pairs that last | Accepted |
 | 0055 | Sounds of our own | Accepted |
+| 0056 | Signing and notarization | Accepted |

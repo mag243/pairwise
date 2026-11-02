@@ -46,3 +46,20 @@ version_at_least() {
 xcode_version() {
   xcodebuild -version 2>/dev/null | sed -n 's/^Xcode \([0-9][0-9.]*\).*/\1/p' | head -n 1
 }
+
+# The virtual environment that holds dmgbuild (ADR 0056); Homebrew's Python
+# refuses packages installed system-wide.
+DMGBUILD_ENV="$BUILD_DIR/tools/dmgbuild"
+DMGBUILD="$DMGBUILD_ENV/bin/dmgbuild"
+
+# Installs dmgbuild at the pinned version when it is missing or another version.
+ensure_dmgbuild() {
+  if [[ -x "$DMGBUILD" ]] \
+    && [[ "$("$DMGBUILD_ENV/bin/python" -m pip show dmgbuild 2>/dev/null | sed -n 's/^Version: //p')" == "$DMGBUILD_VERSION" ]]; then
+    return
+  fi
+  rm -rf "$DMGBUILD_ENV"
+  python3 -m venv "$DMGBUILD_ENV" || fail "Could not make a Python environment in ${DMGBUILD_ENV#"$ROOT_DIR"/}"
+  "$DMGBUILD_ENV/bin/python" -m pip install --quiet --disable-pip-version-check "dmgbuild==$DMGBUILD_VERSION" \
+    || fail "Could not install dmgbuild $DMGBUILD_VERSION"
+}

@@ -9,14 +9,13 @@ Not in this milestone: the plug-in (M4), the Mac App Store, automatic installs w
 These need the owner's keychain, accounts or judgment, so the agent prepares them and says when:
 - Search `Pairwise` in class 9 at TMview and USPTO, before the first release.
 - Make the notary profile once: `xcrun notarytool store-credentials pairwise-notary`.
-- Make Pairwise's own Sparkle key once, under an account of its own, and keep the private key in a password manager.
 - Run the release itself, which pushes, publishes and updates the tap.
 - Turn on GitHub Pages for the feed.
 
 ## Tasks
 
 ### 1. A signed, notarized app
-- [ ] ADR: Developer ID, hardened runtime, notarization with a keychain profile of its own, no unsigned fallback. Releases are made on the owner's Mac; the workflow in CI stays by hand (ADR 0006).
+- [x] ADR 0056: Developer ID, hardened runtime, notarization with a keychain profile of its own, no unsigned fallback. Releases are made on the owner's Mac; the workflow in CI stays by hand (ADR 0006).
 - [ ] Confirm the bundle identifier `me.m-domain.pairwise` (ADR 0007) and the name: both are permanent from the first release, and macOS ties the permissions to them.
 - [ ] `tools/build.sh package`: archive, export, notarize, staple, check with `codesign` and `spctl`, and zip. It stops with a message when something is missing. The check for test code (ADR 0050) runs on this build as well.
 - [ ] `tools/build.sh package` writes a disk image beside the zip, also notarized, with a window to drag Pairwise into Applications.
@@ -30,7 +29,7 @@ These need the owner's keychain, accounts or judgment, so the agent prepares the
 
 ### 3. Updates with Sparkle
 - [ ] ADR: Sparkle as a package of the app target only, pinned to an exact version (`PairwiseKit` never imports it), the key, the feed, how often it checks, what is sent.
-- [ ] The key is made with `generate_keys --account pairwise`: without an account of its own, Sparkle's tools take the key already in the keychain, which belongs to another app. Every signing step names the same account.
+- [x] The key is made with `generate_keys --account pairwise`, and the private key is in the owner's password manager. Its public key: `KW1bHieAwaAFKS5d6Hyq6vQBB0iksihCVTB+cy1hLqs=`. Without an account of its own, Sparkle's tools take the key already in the keychain, which belongs to another app, so every signing step names this account.
 - [ ] A partial `Info.plist` outside the app's synchronized folder: `SUFeedURL`, `SUPublicEDKey`, `SUEnableAutomaticChecks`.
 - [ ] The updater starts only in a Release build; a debug build and a test run never offer to replace themselves.
 - [ ] "Check for Updates…" in the menu bar menu, and a setting for checking automatically, in en, nl and de.
