@@ -4,7 +4,7 @@ import PairwiseCore
 /// A coloured area above other windows, in the amber of the app's seam: the guide of where a
 /// window will land, and a seam that lights up (ADR 0035). It takes neither focus nor clicks.
 @MainActor
-final class JoinMarkPanel {
+final class JoinMarkPanel: ScreenMark {
     private static let colour = NSColor(srgbRed: 0.96, green: 0.65, blue: 0.14, alpha: 1)
     private static let fillOpacity = 0.3
 

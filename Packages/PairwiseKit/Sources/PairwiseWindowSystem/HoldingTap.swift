@@ -6,7 +6,7 @@ import os
 /// an event (ADR 0024). When this tap fails or is too slow, the system turns it off and
 /// input passes.
 @MainActor
-final class HoldingTap {
+final class HoldingTap: PointerHold {
     private static let logger = Logger(subsystem: "me.m-domain.pairwise", category: "pair-drag")
 
     private let decide: @MainActor (PointerButtonEvent) -> Bool

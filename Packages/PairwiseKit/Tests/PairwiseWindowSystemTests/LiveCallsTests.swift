@@ -65,16 +65,6 @@ import Testing
         #expect(system.uptime > 0)
     }
 
-    @Test func holdingStartsAndStopsOrSaysWhyNot() {
-        let system = AccessibilityWindowSystem()
-        do {
-            try system.startHoldingDrags { _ in true }
-        } catch {
-            #expect(error == .eventTapUnavailable)
-        }
-        system.stopHoldingDrags()
-    }
-
     @Test func aMarkCanBeMadeAndHiddenUnseen() {
         JoinMarkPanel().hide()
     }

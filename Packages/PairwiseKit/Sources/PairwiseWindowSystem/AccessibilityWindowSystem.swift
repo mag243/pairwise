@@ -18,8 +18,10 @@ public final class AccessibilityWindowSystem: WindowSystemProviding {
     /// join a window of the user's (ADR 0027).
     var onlyNormalWindows: Set<UInt32>?
     private let capture: WindowCapture
-    private var joinGuide: JoinMarkPanel?
-    private var holdingTap: HoldingTap?
+    private let makeMark: () -> any ScreenMark
+    private let makeHold: (@escaping @MainActor (PointerButtonEvent) -> Bool) -> any PointerHold
+    private var joinGuide: (any ScreenMark)?
+    private var holdingTap: (any PointerHold)?
     private var ticker: DisplayTicker?
     private var timer: Timer?
 
@@ -27,8 +29,15 @@ public final class AccessibilityWindowSystem: WindowSystemProviding {
         self.init(access: LiveSystemAccess(), captureService: LiveCaptureService())
     }
 
-    init(access: any SystemAccess, captureService: any CaptureService) {
+    init(
+        access: any SystemAccess, captureService: any CaptureService,
+        makeMark: @escaping () -> any ScreenMark = { JoinMarkPanel() },
+        makeHold: @escaping (@escaping @MainActor (PointerButtonEvent) -> Bool) -> any PointerHold =
+            { HoldingTap(decide: $0) }
+    ) {
         self.access = access
+        self.makeMark = makeMark
+        self.makeHold = makeHold
         capture = WindowCapture(service: captureService)
     }
 
@@ -127,7 +136,7 @@ public final class AccessibilityWindowSystem: WindowSystemProviding {
     }
 
     public func showJoinGuide(at frame: WindowFrame) {
-        let guide = joinGuide ?? JoinMarkPanel()
+        let guide = joinGuide ?? makeMark()
         joinGuide = guide
         guide.show(at: frame)
     }
@@ -138,7 +147,7 @@ public final class AccessibilityWindowSystem: WindowSystemProviding {
     }
 
     public func flashSeam(at frame: WindowFrame) {
-        let mark = JoinMarkPanel()
+        let mark = makeMark()
         mark.show(at: frame)
         Task {
             try? await Task.sleep(for: Self.seamFlashTime)
@@ -150,7 +159,7 @@ public final class AccessibilityWindowSystem: WindowSystemProviding {
         _ decide: @escaping @MainActor (PointerButtonEvent) -> Bool
     ) throws(WindowSystemError) {
         stopHoldingDrags()
-        let tap = HoldingTap(decide: decide)
+        let tap = makeHold(decide)
         try tap.start()
         holdingTap = tap
         Task { await capture.prepare() }

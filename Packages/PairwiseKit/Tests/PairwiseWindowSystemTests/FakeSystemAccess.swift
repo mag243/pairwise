@@ -108,3 +108,35 @@ final class FakeSystemAccess: SystemAccess {
         ]
     }
 }
+
+/// A hold in memory, which touches no input.
+@MainActor
+final class FakeHold: PointerHold {
+    var startError: WindowSystemError?
+    private(set) var starts = 0
+    private(set) var stops = 0
+
+    func start() throws(WindowSystemError) {
+        if let startError { throw startError }
+        starts += 1
+    }
+
+    func stop() {
+        stops += 1
+    }
+}
+
+/// A mark in memory, which shows nothing.
+@MainActor
+final class FakeMark: ScreenMark {
+    private(set) var frames: [WindowFrame] = []
+    private(set) var isHidden = false
+
+    func show(at frame: WindowFrame) {
+        frames.append(frame)
+    }
+
+    func hide() {
+        isHidden = true
+    }
+}

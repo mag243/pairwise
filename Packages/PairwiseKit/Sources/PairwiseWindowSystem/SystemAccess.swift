@@ -43,3 +43,21 @@ protocol SystemAccess {
     /// This app's own process.
     var ownProcess: pid_t { get }
 }
+
+/// A tap that decides on the left mouse button's events (ADR 0031).
+@MainActor
+protocol PointerHold: AnyObject {
+    /// Installs the tap.
+    func start() throws(WindowSystemError)
+    /// Removes the tap.
+    func stop()
+}
+
+/// A coloured area above other windows (ADR 0031).
+@MainActor
+protocol ScreenMark: AnyObject {
+    /// Shows the mark over `frame`, or moves it there.
+    func show(at frame: WindowFrame)
+    /// Takes the mark off the screen.
+    func hide()
+}
