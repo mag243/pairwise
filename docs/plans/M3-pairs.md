@@ -48,6 +48,7 @@ Done first because everything below adds code to this module.
 - [x] Measured, on Finder windows, in `docs/reference/spike-following.md`.
 - [x] Judged by hand in Terminal: looks very good, with the amber line and live pictures.
 - [ ] Judged by hand in Safari and an Electron app, and at a window's limit.
+- [ ] Find out why the stress test moved nothing in 1 of 40 tries, in two runs in a row (both with the first drag event 10 ms after the press), where an earlier run moved all 40.
 
 ### 7. Together in other ways
 - [x] At a join both windows come forward, and a join or parting by the user makes a sound, which a setting turns off (ADR 0051).
