@@ -41,6 +41,7 @@ extension PairDragModel {
             freeWindowPressed = nil
             if case .pressed(let pressed) = drag {
                 placePartnerAfterShortDrag(pressed)
+                lastPressOutcome += ", released with no panel, moved \(pressed.hasWindowMoved)"
                 Self.logger.info(
                     "released with no panel, moved \(pressed.hasWindowMoved), pictures \(pressed.standIn != nil)"
                 )

@@ -19,7 +19,10 @@ public final class DragStressTest {
     static let size = CGSize(width: 520, height: 340)
     private static let partnerX = 700.0
     static let titleBandY = 12.0
-    private static let sideMargin = 140.0
+    /// Where in the title bar a press lands, from the window's left edge. It stays right of
+    /// about 205, where Finder has a narrow part that does not drag the window, with or
+    /// without Pairwise.
+    private static let pressRange = 220.0...380.0
     private static let dragSteps = 12
     private static let dragStep = 6.0
     private static let tolerance = 3.0
@@ -99,8 +102,7 @@ public final class DragStressTest {
         await place(partner, at: ScreenPoint(x: Self.partnerX, y: Self.origin.y))
         try? dragged.raise()
         await wait(Self.settleWait)
-        let width = Double(Self.size.width) - 2 * Self.sideMargin
-        let x = Self.origin.x + Self.sideMargin + Double.random(in: 0...width)
+        let x = Self.origin.x + Double.random(in: Self.pressRange)
         let press = CGPoint(x: x, y: Self.origin.y + Self.titleBandY)
         let before = Self.waitsBeforePress[index % Self.waitsBeforePress.count]
         let after = Self.waitsAfterPress[
@@ -124,8 +126,8 @@ public final class DragStressTest {
         await wait(Self.settleWait)
         let result = classify(dragged: dragged, partner: partner)
         lines.append(
-            "try \(index): before \(before) ms, after \(after) ms: \(result); "
-                + "press: \(pressOutcome())")
+            "try \(index): before \(before) ms, after \(after) ms, press at x \(Int(x - Self.origin.x)): "
+                + "\(result); press: \(pressOutcome())")
         return result
     }
 
