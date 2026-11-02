@@ -3,13 +3,14 @@ import PairwiseCore
 /// Joining two windows and parting them, with Command held from the press (ADR 0035, 0036).
 extension PairDragModel {
     /// Parts a window in a pair, and watches where it goes. macOS drags it alone.
-    func startJoining(_ number: UInt32) -> String {
+    func startJoining(_ number: UInt32, pointer: ScreenPoint) -> String {
         endPair(of: number)
         guard
             let window = system.window(number: number),
             let frame = window.serverFrame() ?? (try? window.frame())
         else { return "no window to join with" }
-        drag = .joining(PairDrag.Joining(window: window, number: number, frame: frame))
+        drag = .joining(
+            PairDrag.Joining(window: window, number: number, frame: frame, pointer: pointer))
         system.startTicking(every: Self.tickInterval) { [weak self] in self?.tick() }
         return "joining"
     }
@@ -24,7 +25,7 @@ extension PairDragModel {
             window.number != joining.number && book.pair(containing: window.number) == nil
         }
         var current = joining
-        current.target = JoinRule.target(for: now, among: candidates)
+        current.target = JoinRule.target(for: now, pointer: joining.pointer, among: candidates)
         drag = .joining(current)
         if let target = current.target {
             system.showJoinGuide(at: target.frame)

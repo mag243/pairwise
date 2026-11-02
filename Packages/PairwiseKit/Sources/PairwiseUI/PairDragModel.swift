@@ -116,7 +116,7 @@ public final class PairDragModel {
         guard let number = system.windowNumber(at: point) else {
             return "no window under the pointer"
         }
-        if system.isJoinKeyDown { return startJoining(number) }
+        if system.isJoinKeyDown { return startJoining(number, pointer: point) }
         guard
             let partnerEntry = book.partner(of: number),
             let window = pairedWindows[number],
@@ -166,7 +166,11 @@ public final class PairDragModel {
 
     private func holdsDrag(at point: ScreenPoint) -> Bool {
         switch drag {
-        case .none, .passing, .placing, .settling, .joining:
+        case .none, .passing, .placing, .settling:
+            return false
+        case .joining(var joining):
+            joining.pointer = point
+            drag = .joining(joining)
             return false
         case .pressed(var pressed):
             pressed.lastPointer = point

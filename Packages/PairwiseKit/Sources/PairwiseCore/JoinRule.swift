@@ -24,31 +24,39 @@ public enum JoinRule {
     /// How far apart two edges may be to join, in points.
     private static let snapDistance = 24.0
 
-    /// The closest place for a window at `frame` to join one of `windows`, or `nil` when none
-    /// is close enough. A window over another counts as close, on the side of its centre
-    /// (ADR 0037). The window takes the other's height and top.
-    public static func target(for frame: WindowFrame, among windows: [ScreenWindow]) -> JoinTarget?
-    {
-        windows
+    /// The place for a window at `frame` to join one of `windows`, frontmost first, with the
+    /// pointer at `pointer`. The frontmost window under the pointer comes first, on the side
+    /// of the half the pointer is in, whatever the size of the dragged window (ADR 0038).
+    /// Otherwise the closest edge within the snap distance, or `nil`. The window takes the
+    /// other's height and top.
+    public static func target(
+        for frame: WindowFrame, pointer: ScreenPoint, among windows: [ScreenWindow]
+    ) -> JoinTarget? {
+        if let window = windows.first(where: { $0.frame.contains(pointer) }) {
+            let centre = window.frame.origin.x + window.frame.size.width / 2
+            return target(
+                width: frame.size.width, beside: window, on: pointer.x >= centre ? .right : .left)
+        }
+        return
+            windows
             .filter { overlapVertically($0.frame, frame) }
-            .map { window in
-                let isRight = centre(of: frame) >= centre(of: window.frame)
-                let gap =
-                    isRight
-                    ? frame.origin.x - window.frame.maxX : window.frame.origin.x - frame.maxX
-                return (window, isRight ? PairSide.right : .left, gap)
+            .flatMap { window in
+                [
+                    (window, PairSide.right, abs(frame.origin.x - window.frame.maxX)),
+                    (window, PairSide.left, abs(frame.maxX - window.frame.origin.x)),
+                ]
             }
             .filter { $0.2 <= snapDistance }
-            .min { abs($0.2) < abs($1.2) }
-            .map { window, side, _ in
-                JoinTarget(
-                    other: window, side: side,
-                    frame: joinedFrame(width: frame.size.width, beside: window.frame, on: side))
-            }
+            .min { $0.2 < $1.2 }
+            .map { window, side, _ in target(width: frame.size.width, beside: window, on: side) }
     }
 
-    private static func centre(of frame: WindowFrame) -> Double {
-        frame.origin.x + frame.size.width / 2
+    private static func target(
+        width: Double, beside window: ScreenWindow, on side: PairSide
+    ) -> JoinTarget {
+        JoinTarget(
+            other: window, side: side,
+            frame: joinedFrame(width: width, beside: window.frame, on: side))
     }
 
     private static func overlapVertically(_ first: WindowFrame, _ second: WindowFrame) -> Bool {

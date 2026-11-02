@@ -1,6 +1,6 @@
 # 0037. Joining when dragged over the other window
 
-- **Status:** Accepted
+- **Status:** Superseded by 0038
 - **Date:** 2026-11-02
 - **Milestone:** M3
 

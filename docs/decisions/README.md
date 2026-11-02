@@ -42,4 +42,5 @@ Use `0000-template.md` as the basis.
 | 0034 | A menu bar app | Accepted |
 | 0035 | Joining and coming apart with Option | Accepted, the key changed by 0036 |
 | 0036 | Joining with Command | Accepted |
-| 0037 | Joining when dragged over the other window | Accepted |
+| 0037 | Joining when dragged over the other window | Superseded by 0038 |
+| 0038 | Joining the window under the pointer | Accepted |

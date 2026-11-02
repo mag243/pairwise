@@ -52,6 +52,14 @@ import Testing
         #expect(system.isGuideShowing)
     }
 
+    @Test func aPointerOverAWindowShowsItsGuideWhereverTheWindowIs() {
+        _ = system.send(.pressed(Self.press))
+        _ = system.send(.dragged(ScreenPoint(x: 700, y: 200)))
+        window.currentFrame.origin = Self.far
+        system.tick()
+        #expect(system.guideFrames.last == Self.joined)
+    }
+
     @Test func aWindowThatLeavesTheEdgeLosesTheGuide() {
         drag(to: Self.nearRightEdge)
         window.currentFrame.origin = Self.far
