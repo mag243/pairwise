@@ -7,6 +7,7 @@ import ScreenCaptureKit
 extension DragStressTest {
     private static let joinKey: CGKeyCode = 55
     private static let joinSteps = 50
+    private static let joinKeyStep = 10
     private static let guideWait: UInt64 = 300
     private static let floatingLevel = 3
     private static let pictureMargin = 60.0
@@ -52,7 +53,7 @@ extension DragStressTest {
         let distance =
             Self.otherOrigin.x - Double(Self.size.width) + Self.snapGap - Self.leftOrigin.x
         await drag(window, byX: distance, byY: 30, withJoinKey: true, picture: "left")
-        lines.append("expect the window at x 380, y 120, height 500, tight against the other")
+        lines.append("expect the window at x 380, y 120, height 340, tight against the other")
         report("joined on the left", window, other)
     }
 
@@ -78,12 +79,22 @@ extension DragStressTest {
         await place(window, at: ScreenPoint(x: otherFrame.maxX + 200, y: otherFrame.origin.y))
         await wait(Self.settleWait)
         await drag(window, byX: -(200 - Self.snapGap), byY: 20, withJoinKey: true, picture: "right")
-        lines.append("expect the first against the other's right edge, with its height")
+        lines.append("expect the first against the other's right edge, with its own height")
         report("joined on the right", window, other)
         await drag(other, byX: -60, byY: 0, withJoinKey: false, picture: nil)
         report("dragged by the left window: both moved by -60", window, other)
         await drag(window, byX: 40, byY: 0, withJoinKey: false, picture: nil)
         report("dragged by the right window: both moved by 40", window, other)
+        await drag(window, byX: 200, byY: 0, withJoinKey: true, picture: nil)
+        report("parted during the drag: only the first moved, by 200", window, other)
+        guard let frame = other.serverFrame(), let first = window.serverFrame() else { return }
+        isEqualHeightKeyDown = true
+        await drag(
+            window, byX: frame.maxX + Self.snapGap - first.origin.x, byY: 20, withJoinKey: true,
+            picture: "height")
+        isEqualHeightKeyDown = false
+        lines.append("expect the first with the other's height, 500")
+        report("joined with Shift", window, other)
     }
 
     private func drag(
@@ -103,13 +114,14 @@ extension DragStressTest {
         }
         post(.mouseMoved, at: point)
         await wait(Self.windowWait)
-        if withJoinKey {
-            pressJoinKey(true)
-            await wait(Self.windowWait)
-        }
         post(.leftMouseDown, at: point)
         await wait(Self.windowWait)
-        for _ in 0..<Self.joinSteps {
+        for step in 0..<Self.joinSteps {
+            // The key comes during the drag, as it does by hand (ADR 0039).
+            if withJoinKey, step == Self.joinKeyStep {
+                pressJoinKey(true)
+                await wait(Self.windowWait)
+            }
             point.x += byX / Double(Self.joinSteps)
             point.y += byY / Double(Self.joinSteps)
             post(.leftMouseDragged, at: point)

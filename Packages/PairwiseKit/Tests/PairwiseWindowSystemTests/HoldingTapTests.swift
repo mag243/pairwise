@@ -33,6 +33,19 @@ import Testing
         #expect(seen == .dragged(ScreenPoint(x: 5, y: 6), isJoinKeyDown: true))
     }
 
+    @Test func aDragSaysWhetherShiftWasDownInTheEventItself() {
+        var seen: PointerButtonEvent?
+        let tap = HoldingTap { event in
+            seen = event
+            return true
+        }
+        _ = tap.passes(.leftMouseDragged, at: Self.location, flags: [.maskCommand, .maskShift])
+        #expect(
+            seen
+                == .dragged(
+                    ScreenPoint(x: 5, y: 6), isJoinKeyDown: true, isEqualHeightKeyDown: true))
+    }
+
     @Test func aPressSaysWhetherTheJoinKeyWasDownInTheEventItself() {
         var seen: PointerButtonEvent?
         let tap = HoldingTap { event in

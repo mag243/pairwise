@@ -92,8 +92,10 @@ public final class PairDragModel {
         case .pressed(let point, let isJoinKeyDown):
             press(at: point, isJoinKeyDown: isJoinKeyDown)
             return true
-        case .dragged(let point, let isJoinKeyDown):
-            return !holdsDrag(at: point, isJoinKeyDown: isJoinKeyDown)
+        case .dragged(let point, let isJoinKeyDown, let isEqualHeightKeyDown):
+            return !holdsDrag(
+                at: point, isJoinKeyDown: isJoinKeyDown,
+                isEqualHeightKeyDown: isEqualHeightKeyDown)
         case .released(let point):
             release(at: point)
             return true
@@ -138,10 +140,12 @@ public final class PairDragModel {
             let frame = window.serverFrame() ?? (try? window.frame())
         else { return "a window does not answer" }
         let partner = PairDrag.Partner(
-            window: partnerWindow, size: partnerFrame.size, side: partnerEntry.side)
+            window: partnerWindow, origin: partnerFrame.origin, size: partnerFrame.size,
+            side: partnerEntry.side)
         drag = .pressed(
             PairDrag.Pressed(
-                window: window, partner: partner, startTime: system.uptime, frame: frame,
+                number: number, window: window, partner: partner, startTime: system.uptime,
+                frame: frame,
                 pointer: point, lastPointer: point))
         system.startTicking(every: Self.tickInterval) { [weak self] in self?.tick() }
         let current = request
@@ -171,7 +175,9 @@ public final class PairDragModel {
         }
     }
 
-    private func holdsDrag(at point: ScreenPoint, isJoinKeyDown: Bool) -> Bool {
+    private func holdsDrag(
+        at point: ScreenPoint, isJoinKeyDown: Bool, isEqualHeightKeyDown: Bool
+    ) -> Bool {
         switch drag {
         case .none:
             if isJoinKeyDown { startJoiningFreeWindow(at: point) }
@@ -181,11 +187,13 @@ public final class PairDragModel {
         case .joining(var joining):
             joining.pointer = point
             joining.isKeyDown = isJoinKeyDown
+            joining.isTakingHeight = isEqualHeightKeyDown
             drag = .joining(joining)
-            return false
+            return joining.held != nil
         case .pressed(var pressed):
             pressed.lastPointer = point
             drag = .pressed(pressed)
+            if isJoinKeyDown { return part(pressed, at: point) }
             guard pressed.hasWindowMoved else { return false }
             let elapsed = system.uptime - pressed.startTime
             if pressed.standIn == nil, !DragHoldRule.mayWaitForPictures(after: elapsed) {
@@ -200,6 +208,7 @@ public final class PairDragModel {
             moving.standIn.move(to: moving.panelOrigin(forPointer: point))
             stats.record(moveDuration: system.uptime - before)
             moving.lastPointer = point
+            moving.wantsParting = moving.wantsParting || isJoinKeyDown
             drag = .moving(moving)
             return true
         }
@@ -226,7 +235,8 @@ public final class PairDragModel {
     private func takeOver(_ pressed: PairDrag.Pressed, standIn: any WindowStandIn) {
         let now = system.uptime
         let moving = PairDrag.Moving(
-            window: pressed.window, partner: pressed.partner, standIn: standIn,
+            number: pressed.number, window: pressed.window, partner: pressed.partner,
+            standIn: standIn,
             frame: pressed.frame, pointer: pressed.pointer, startTime: now,
             panelDelay: now - pressed.startTime, lastPointer: pressed.lastPointer)
         standIn.show(at: moving.panelOrigin(forPointer: pressed.lastPointer))
@@ -247,14 +257,10 @@ public final class PairDragModel {
                 watch(pressed)
             }
         case .moving(let moving):
-            if isButtonLetGo {
-                release(at: moving.lastPointer)
-            } else {
-                park(moving)
-            }
+            tick(moving)
         case .joining(let joining):
             if isButtonLetGo {
-                release(at: ScreenPoint(x: 0, y: 0))
+                release(at: joining.pointer)
             } else {
                 watch(joining)
             }
@@ -262,6 +268,16 @@ public final class PairDragModel {
             place(placing)
         case .settling(_, let until):
             if system.uptime >= until { endDrag() }
+        }
+    }
+
+    private func tick(_ moving: PairDrag.Moving) {
+        if isButtonLetGo {
+            release(at: moving.lastPointer)
+        } else if moving.wantsParting {
+            part(moving)
+        } else {
+            park(moving)
         }
     }
 

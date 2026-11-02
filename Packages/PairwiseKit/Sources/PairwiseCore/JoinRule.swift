@@ -28,14 +28,19 @@ public enum JoinRule {
     /// pointer at `pointer`. The frontmost window under the pointer comes first, on the side
     /// of the half the pointer is in, whatever the size of the dragged window (ADR 0038).
     /// Otherwise the closest edge within the snap distance, or `nil`. The window takes the
-    /// other's height and top.
+    /// other's top, and its height only when `takingHeight` (ADR 0040).
     public static func target(
-        for frame: WindowFrame, pointer: ScreenPoint, among windows: [ScreenWindow]
+        for frame: WindowFrame, pointer: ScreenPoint, among windows: [ScreenWindow],
+        takingHeight: Bool
     ) -> JoinTarget? {
+        let height = { (window: ScreenWindow) in
+            takingHeight ? window.frame.size.height : frame.size.height
+        }
         if let window = windows.first(where: { $0.frame.contains(pointer) }) {
             let centre = window.frame.origin.x + window.frame.size.width / 2
             return target(
-                width: frame.size.width, beside: window, on: pointer.x >= centre ? .right : .left)
+                size: WindowSize(width: frame.size.width, height: height(window)), beside: window,
+                on: pointer.x >= centre ? .right : .left)
         }
         return
             windows
@@ -48,26 +53,24 @@ public enum JoinRule {
             }
             .filter { $0.2 <= snapDistance }
             .min { $0.2 < $1.2 }
-            .map { window, side, _ in target(width: frame.size.width, beside: window, on: side) }
+            .map { window, side, _ in
+                target(
+                    size: WindowSize(width: frame.size.width, height: height(window)),
+                    beside: window, on: side)
+            }
     }
 
     private static func target(
-        width: Double, beside window: ScreenWindow, on side: PairSide
+        size: WindowSize, beside window: ScreenWindow, on side: PairSide
     ) -> JoinTarget {
         JoinTarget(
             other: window, side: side,
-            frame: joinedFrame(width: width, beside: window.frame, on: side))
+            frame: WindowFrame(
+                x: side == .right ? window.frame.maxX : window.frame.origin.x - size.width,
+                y: window.frame.origin.y, width: size.width, height: size.height))
     }
 
     private static func overlapVertically(_ first: WindowFrame, _ second: WindowFrame) -> Bool {
         first.origin.y < second.maxY && second.origin.y < first.maxY
-    }
-
-    private static func joinedFrame(
-        width: Double, beside other: WindowFrame, on side: PairSide
-    ) -> WindowFrame {
-        WindowFrame(
-            x: side == .right ? other.maxX : other.origin.x - width, y: other.origin.y,
-            width: width, height: other.size.height)
     }
 }

@@ -19,6 +19,8 @@ public final class FakeWindowSystem: WindowSystemProviding {
     public private(set) var screenRecordingRequests = 0
     /// Whether the presses and drags sent carry the join key.
     public var isJoinKeyDown = false
+    /// Whether the drags sent carry the key that takes the other's height.
+    public var isEqualHeightKeyDown = false
     /// The windows `normalWindows()` and `window(number:)` know about.
     public var knownWindows: [FakeWindow] = []
     public private(set) var guideFrames: [WindowFrame] = []
@@ -102,8 +104,11 @@ public final class FakeWindowSystem: WindowSystemProviding {
         if case .pressed(let point, _) = event {
             return holdDecision?(.pressed(point, isJoinKeyDown: isJoinKeyDown)) ?? true
         }
-        if case .dragged(let point, _) = event {
-            return holdDecision?(.dragged(point, isJoinKeyDown: isJoinKeyDown)) ?? true
+        if case .dragged(let point, _, _) = event {
+            return holdDecision?(
+                .dragged(
+                    point, isJoinKeyDown: isJoinKeyDown,
+                    isEqualHeightKeyDown: isEqualHeightKeyDown)) ?? true
         }
         return holdDecision?(event) ?? true
     }

@@ -28,11 +28,11 @@ Done first because everything below adds code to this module.
 - [x] ADR 0035 and 0036: Command held while dragging.
 - [x] `PairwiseCore`, test-first: when a dragged window is close enough to another window's edge to join. The snap distance is a named constant.
 - [x] A guide shows where the window will land, and at the release the two click together, with the seam lighting up briefly (the design notes in `PLAN.md`).
-- [x] The dragged window takes the other's height and top (owner's choice 2).
+- [x] The dragged window keeps its height, with the tops level, and takes the other's height with Shift added (ADR 0040).
 - [x] Checked by hand with a real Command key, pressed during the drag (ADR 0039). Option clashed with tiling (ADR 0036).
 
 ### 5. Coming apart
-- [x] Command at a press on a window in a pair ends the pair (ADR 0036), and only that window moves (ADR 0035).
+- [x] Command at a press or during the drag of a pair ends the pair, and only that window moves (ADR 0035, 0036, 0040).
 - [ ] Check by hand.
 
 ### 6. The shared seam
@@ -70,7 +70,7 @@ Done first because everything below adds code to this module.
 
 ## The owner's choices
 1. **Joining and coming apart:** a key held while dragging: to an edge to join, away to come apart. Normal dragging stays normal. The key is still to be chosen.
-2. **Heights after joining:** the dragged window takes the other's height and top.
+2. **Heights after joining:** each window keeps its own, with the tops level; Command with Shift gives the dragged window the other's height (ADR 0040).
 3. **Minimizing:** together.
 4. **The app:** a menu bar app with no Dock icon, with a settings window.
 5. **The name:** before the first release, as in `PLAN.md`.

@@ -14,9 +14,10 @@ import Testing
 
     private func target(
         _ frame: WindowFrame, pointer: ScreenPoint = Self.awayFromWindows,
-        among windows: [ScreenWindow] = [Self.other]
+        among windows: [ScreenWindow] = [Self.other], takingHeight: Bool = false
     ) -> JoinTarget? {
-        JoinRule.target(for: frame, pointer: pointer, among: windows)
+        JoinRule.target(
+            for: frame, pointer: pointer, among: windows, takingHeight: takingHeight)
     }
 
     @Test func noWindowsGiveNoTarget() {
@@ -30,23 +31,28 @@ import Testing
     @Test func aWindowCloseToTheRightEdgeJoinsOnTheRight() throws {
         let found = try #require(target(frame(x: 810)))
         #expect(found.side == .right)
-        #expect(found.frame == WindowFrame(x: 800, y: 100, width: 200, height: 400))
+        #expect(found.frame == WindowFrame(x: 800, y: 100, width: 200, height: 200))
     }
 
     @Test func aWindowCloseToTheLeftEdgeJoinsOnTheLeft() throws {
         let found = try #require(target(frame(x: 290)))
         #expect(found.side == .left)
-        #expect(found.frame == WindowFrame(x: 300, y: 100, width: 200, height: 400))
+        #expect(found.frame == WindowFrame(x: 300, y: 100, width: 200, height: 200))
     }
 
     @Test func anOverlappingEdgeWithinTheDistanceJoins() {
         #expect(target(frame(x: 790))?.side == .right)
     }
 
+    @Test func askedToItTakesTheOthersHeight() {
+        let found = target(frame(x: 810), takingHeight: true)
+        #expect(found?.frame == WindowFrame(x: 800, y: 100, width: 200, height: 400))
+    }
+
     @Test func aPointerOverTheRightHalfJoinsOnTheRight() throws {
         let found = try #require(target(frame(x: 0), pointer: ScreenPoint(x: 700, y: 200)))
         #expect(found.side == .right)
-        #expect(found.frame == WindowFrame(x: 800, y: 100, width: 200, height: 400))
+        #expect(found.frame == WindowFrame(x: 800, y: 100, width: 200, height: 200))
     }
 
     @Test func aPointerOverTheLeftHalfJoinsOnTheLeft() {

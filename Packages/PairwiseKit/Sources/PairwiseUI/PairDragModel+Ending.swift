@@ -27,7 +27,8 @@ extension PairDragModel {
     }
 
     func release(at point: ScreenPoint) {
-        if case .joining(let joining) = drag {
+        if case .joining(var joining) = drag {
+            if joining.held != nil { joining.pointer = point }
             finish(joining)
             return
         }

@@ -45,3 +45,4 @@ Use `0000-template.md` as the basis.
 | 0037 | Joining when dragged over the other window | Superseded by 0038 |
 | 0038 | Joining the window under the pointer | Accepted |
 | 0039 | The join key during the drag | Accepted |
+| 0040 | Own heights, and parting during a drag | Accepted |

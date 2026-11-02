@@ -8,7 +8,8 @@ import Testing
     private static let press = ScreenPoint(x: 50, y: 110)
     private static let far = ScreenPoint(x: 0, y: 150)
     private static let nearRightEdge = ScreenPoint(x: 810, y: 150)
-    private static let joined = WindowFrame(x: 800, y: 100, width: 200, height: 400)
+    private static let joined = WindowFrame(x: 800, y: 100, width: 200, height: 200)
+    private static let joinedAtItsHeight = WindowFrame(x: 800, y: 100, width: 200, height: 400)
 
     private let system = FakeWindowSystem()
     private let window = FakeWindow(
@@ -74,13 +75,13 @@ import Testing
         #expect(!system.isTicking)
     }
 
-    @Test func theKeyDuringADragOnAWindowInAPairStartsNoJoining() throws {
+    @Test func theKeyDuringADragOnAWindowInAPairPartsIt() throws {
         try model.join(window, to: other, on: .left)
         system.isJoinKeyDown = false
         _ = system.send(.pressed(Self.press))
         system.isJoinKeyDown = true
         _ = system.send(.dragged(ScreenPoint(x: 700, y: 200)))
-        #expect(model.lastPressOutcome == "watching")
+        #expect(model.lastPressOutcome == "joining")
     }
 
     @Test func withoutTheKeyNothingJoins() {
@@ -124,7 +125,43 @@ import Testing
         #expect(!system.isGuideShowing)
     }
 
-    @Test func theReleaseJoinsThemWithTheOthersHeightAndTop() {
+    @Test func aWindowKeepsItsHeightWhenItJoins() {
+        drag(to: Self.nearRightEdge)
+        _ = system.send(.released(Self.press))
+        #expect(window.resizes.isEmpty)
+    }
+
+    @Test func shiftTakesTheOthersHeightAndTheGuideShowsIt() {
+        system.isEqualHeightKeyDown = true
+        _ = system.send(.pressed(Self.press))
+        _ = system.send(.dragged(Self.press))
+        window.currentFrame.origin = Self.nearRightEdge
+        system.tick()
+        #expect(system.guideFrames.last == Self.joinedAtItsHeight)
+        _ = system.send(.released(Self.press))
+        #expect(window.currentFrame == Self.joinedAtItsHeight)
+    }
+
+    @Test func lettingGoOfShiftKeepsTheOwnHeight() {
+        system.isEqualHeightKeyDown = true
+        _ = system.send(.pressed(Self.press))
+        _ = system.send(.dragged(Self.press))
+        window.currentFrame.origin = Self.nearRightEdge
+        system.tick()
+        system.isEqualHeightKeyDown = false
+        _ = system.send(.dragged(Self.press))
+        system.tick()
+        _ = system.send(.released(Self.press))
+        #expect(window.currentFrame == Self.joined)
+    }
+
+    @Test func theSeamIsAsHighAsTheShorterWindow() {
+        drag(to: Self.nearRightEdge)
+        _ = system.send(.released(Self.press))
+        #expect(system.seamFlashes.first?.size.height == 200)
+    }
+
+    @Test func theReleaseJoinsThemWithTheOthersTop() {
         drag(to: Self.nearRightEdge)
         _ = system.send(.released(Self.press))
         #expect(window.currentFrame == Self.joined)
@@ -138,7 +175,7 @@ import Testing
     @Test func theSeamLightsUpAtTheJoin() {
         drag(to: Self.nearRightEdge)
         _ = system.send(.released(Self.press))
-        #expect(system.seamFlashes == [WindowFrame(x: 797, y: 100, width: 6, height: 400)])
+        #expect(system.seamFlashes == [WindowFrame(x: 797, y: 100, width: 6, height: 200)])
     }
 
     @Test func aSeamOnTheLeftLightsUpThere() {
@@ -158,7 +195,11 @@ import Testing
 
     @Test func aRefusedResizeJoinsNothing() {
         window.resizeError = .windowRefused
-        drag(to: Self.nearRightEdge)
+        system.isEqualHeightKeyDown = true
+        _ = system.send(.pressed(Self.press))
+        _ = system.send(.dragged(Self.press))
+        window.currentFrame.origin = Self.nearRightEdge
+        system.tick()
         _ = system.send(.released(Self.press))
         #expect(system.seamFlashes.isEmpty)
         system.isJoinKeyDown = false

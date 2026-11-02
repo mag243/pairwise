@@ -42,6 +42,8 @@ public final class DragStressTest {
     var folders: [URL] = []
     /// Whether the mouse events posted carry the join key, as the join test needs.
     var isJoinKeyDown = false
+    /// Whether the mouse events posted also carry Shift.
+    var isEqualHeightKeyDown = false
 
     /// `pressOutcome` says what became of the last press, and `lastLiveFrames` how many
     /// live frames per window the last drag got. `join` makes a pair of two windows, with the
@@ -228,7 +230,10 @@ public final class DragStressTest {
         let event = CGEvent(
             mouseEventSource: source, mouseType: type, mouseCursorPosition: point,
             mouseButton: .left)
-        if isJoinKeyDown { event?.flags = .maskCommand }
+        var flags: CGEventFlags = []
+        if isJoinKeyDown { flags.insert(.maskCommand) }
+        if isEqualHeightKeyDown { flags.insert(.maskShift) }
+        event?.flags = flags
         event?.post(tap: .cghidEventTap)
     }
 
