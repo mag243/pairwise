@@ -21,12 +21,14 @@ final class HoldingTap: PointerHold {
     }
 
     /// Installs the tap.
-    /// Postcondition: until `stop`, each press, drag and release is decided on.
+    /// Postcondition: until `stop`, each press, drag and release is decided on, and each
+    /// change of a modifier key is reported.
     func start() throws(WindowSystemError) {
         let events =
             CGEventMask(1 << CGEventType.leftMouseDown.rawValue)
             | CGEventMask(1 << CGEventType.leftMouseDragged.rawValue)
             | CGEventMask(1 << CGEventType.leftMouseUp.rawValue)
+            | CGEventMask(1 << CGEventType.flagsChanged.rawValue)
         guard
             let port = CGEvent.tapCreate(
                 tap: .cgSessionEventTap, place: .headInsertEventTap, options: .defaultTap,
@@ -51,6 +53,7 @@ final class HoldingTap: PointerHold {
     }
 
     /// Whether the event passes; anything but the three button events always does.
+    /// Postcondition: a change of a modifier key is reported and passes, whatever the answer.
     func passes(_ type: CGEventType, at location: CGPoint, flags: CGEventFlags) -> Bool {
         switch type {
         case .leftMouseDown:
@@ -62,6 +65,12 @@ final class HoldingTap: PointerHold {
                     ScreenPoint(location), isJoinKeyDown: flags.contains(Self.joinKey),
                     isEqualHeightKeyDown: flags.contains(.maskShift)))
         case .leftMouseUp: return decide(.released(ScreenPoint(location)))
+        case .flagsChanged:
+            _ = decide(
+                .keysChanged(
+                    isJoinKeyDown: flags.contains(Self.joinKey),
+                    isEqualHeightKeyDown: flags.contains(.maskShift)))
+            return true
         case .tapDisabledByTimeout, .tapDisabledByUserInput:
             // Turned back on, or the drag would go on with no more moves; these events have passed.
             Self.logger.info("the system turned the tap off: events passed")

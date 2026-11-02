@@ -99,6 +99,9 @@ public final class PairDragModel {
         case .released(let point):
             release(at: point)
             return true
+        case .keysChanged(let isJoinKeyDown, let isEqualHeightKeyDown):
+            keysChanged(isJoinKeyDown: isJoinKeyDown, isEqualHeightKeyDown: isEqualHeightKeyDown)
+            return true
         }
     }
 

@@ -44,6 +44,20 @@ import Testing
         system.tick()
     }
 
+    @Test func theKeyWithThePointerStillPartsThePair() {
+        startDragWithPanel()
+        _ = system.send(.keysChanged(isJoinKeyDown: true, isEqualHeightKeyDown: false))
+        system.tick()
+        #expect(panel.isDismissed)
+    }
+
+    @Test func aChangeOfKeysWithoutTheJoinKeyLeavesThePairInOneDrag() {
+        startDragWithPanel()
+        _ = system.send(.keysChanged(isJoinKeyDown: false, isEqualHeightKeyDown: true))
+        system.tick()
+        #expect(!panel.isDismissed)
+    }
+
     @Test func theKeyDuringADragBringsThePanelDown() {
         startDragWithPanel()
         part()

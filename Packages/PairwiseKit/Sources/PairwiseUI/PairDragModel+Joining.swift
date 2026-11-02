@@ -50,6 +50,22 @@ extension PairDragModel {
         hasSeenButtonDown = true
     }
 
+    /// A key changed, perhaps with the pointer standing still. The next tick acts on it.
+    /// Elsewhere the next drag event carries the same keys (ADR 0041).
+    func keysChanged(isJoinKeyDown: Bool, isEqualHeightKeyDown: Bool) {
+        switch drag {
+        case .joining(var joining):
+            joining.isKeyDown = isJoinKeyDown
+            joining.isTakingHeight = isEqualHeightKeyDown
+            drag = .joining(joining)
+        case .moving(var moving):
+            moving.wantsParting = moving.wantsParting || isJoinKeyDown
+            drag = .moving(moving)
+        default:
+            break
+        }
+    }
+
     /// Keeps the guide on the place the window would join, once it has moved.
     func watch(_ joining: PairDrag.Joining) {
         var joining = joining
@@ -98,8 +114,10 @@ extension PairDragModel {
     /// macOS or the pointer took it.
     func finish(_ joining: PairDrag.Joining) {
         defer { endDrag() }
-        Self.logger.info("joining ended, place found: \(joining.target != nil)")
-        guard let target = joining.target else {
+        // A key let go since the last tick counts, though the tick has not cleared the place.
+        let place = joining.isKeyDown ? joining.target : nil
+        Self.logger.info("joining ended, place found: \(place != nil)")
+        guard let target = place else {
             var last = joining
             moveHeldWindow(&last)
             return

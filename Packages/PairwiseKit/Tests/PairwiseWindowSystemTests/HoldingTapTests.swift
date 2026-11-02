@@ -56,6 +56,16 @@ import Testing
         #expect(seen == .pressed(ScreenPoint(x: 5, y: 6), isJoinKeyDown: true))
     }
 
+    @Test func aChangeOfKeysIsReportedAndPassesWhateverTheAnswer() {
+        var seen: PointerButtonEvent?
+        let tap = HoldingTap { event in
+            seen = event
+            return false
+        }
+        #expect(tap.passes(.flagsChanged, at: Self.location, flags: .maskCommand))
+        #expect(seen == .keysChanged(isJoinKeyDown: true, isEqualHeightKeyDown: false))
+    }
+
     @Test(arguments: [
         CGEventType.tapDisabledByTimeout, .tapDisabledByUserInput, .mouseMoved,
     ])

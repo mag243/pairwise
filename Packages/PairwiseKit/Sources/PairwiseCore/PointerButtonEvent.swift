@@ -5,4 +5,7 @@ public enum PointerButtonEvent: Equatable, Sendable {
     case pressed(ScreenPoint, isJoinKeyDown: Bool = false)
     case dragged(ScreenPoint, isJoinKeyDown: Bool = false, isEqualHeightKeyDown: Bool = false)
     case released(ScreenPoint)
+    /// A modifier key went down or up, which also happens with the pointer standing still
+    /// (ADR 0041). This event is only read: it always passes.
+    case keysChanged(isJoinKeyDown: Bool, isEqualHeightKeyDown: Bool)
 }
