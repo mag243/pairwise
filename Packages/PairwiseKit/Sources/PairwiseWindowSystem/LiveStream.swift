@@ -33,8 +33,15 @@ final class LiveStream: NSObject {
         super.init()
     }
 
-    /// Starts the frames; they arrive on the main queue.
-    func start() {
+    /// Starts the frames; they arrive on the main queue. With `room`, in pixels, the window is
+    /// not scaled and may grow within it, and each frame says where in it the window is
+    /// (ADR 0049).
+    func start(room: CGSize? = nil) {
+        if let room {
+            configuration.width = Int(room.width)
+            configuration.height = Int(room.height)
+            configuration.scalesToFit = false
+        }
         let stream = SCStream(filter: filter, configuration: configuration, delegate: nil)
         do {
             try stream.addStreamOutput(self, type: .screen, sampleHandlerQueue: .main)
@@ -75,7 +82,14 @@ extension LiveStream: SCStreamOutput {
         else { return }
         nonisolated(unsafe) let frame = surface
         let pixel = Self.centrePixel(of: buffer)
-        MainActor.assumeIsolated { picture.show(frame, centrePixel: pixel) }
+        let info = attachments.first
+        let rect = (info?[.contentRect] as? NSDictionary).flatMap {
+            CGRect(dictionaryRepresentation: $0 as CFDictionary)
+        }
+        let scale = info?[.scaleFactor] as? Double ?? 1
+        MainActor.assumeIsolated {
+            picture.show(frame, centrePixel: pixel, contentRect: rect, scale: scale)
+        }
     }
 
     /// The pixel at the centre of a 32-bit frame.

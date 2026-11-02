@@ -1,6 +1,6 @@
 # 0048. Pictures at the seam
 
-- **Status:** Accepted
+- **Status:** Superseded by 0049
 - **Date:** 2026-11-02
 - **Milestone:** M3
 

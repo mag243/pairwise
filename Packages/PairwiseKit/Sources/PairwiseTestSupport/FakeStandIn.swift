@@ -4,7 +4,7 @@ import PairwiseCore
 @MainActor
 public final class FakeStandIn: WindowStandIn {
     public private(set) var shownAt: ScreenPoint?
-    public private(set) var stillShownAt: ScreenPoint?
+    public private(set) var seamShownAt: ScreenPoint?
     public private(set) var seams: [Double] = []
     public private(set) var moves: [ScreenPoint] = []
     public private(set) var isDismissed = false
@@ -18,8 +18,8 @@ public final class FakeStandIn: WindowStandIn {
         shownAt = origin
     }
 
-    public func showStill(at origin: ScreenPoint) {
-        stillShownAt = origin
+    public func showForSeam(at origin: ScreenPoint) {
+        seamShownAt = origin
     }
 
     public func setSeam(atOffset offset: Double) {

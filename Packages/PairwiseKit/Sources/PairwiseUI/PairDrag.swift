@@ -18,7 +18,7 @@ enum PairDrag {
     case clickingLock(SeamLock)
     /// An open lock was clicked: the next tick joins its windows, as that calls their apps.
     case closingLock(SeamLock)
-    /// The seam moves in a panel with pictures over both windows (ADR 0048).
+    /// The seam moves in a panel with pictures of both windows, which are parked (ADR 0048, 0049).
     case resizingSeam(ResizingSeam)
 
     @MainActor
@@ -43,8 +43,8 @@ enum PairDrag {
         var heldLimits = SeamLimits()
         var partnerLimits = SeamLimits()
         var lastAskedSeam: Double?
-        var lastHeldFrame: WindowFrame?
-        var lastPartnerFrame: WindowFrame?
+        var isHeldParked = false
+        var isPartnerParked = false
         /// There are no pictures: macOS goes on resizing the window.
         var isPassing = false
         /// Set by the release, so that the next tick and not the event calls the apps.

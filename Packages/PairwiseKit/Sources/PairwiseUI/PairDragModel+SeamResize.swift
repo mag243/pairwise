@@ -1,7 +1,7 @@
 import Foundation
 import PairwiseCore
 
-/// What a resize at the seam needs to know (ADR 0048).
+/// What a resize at the seam needs to know (ADR 0048, 0049).
 extension PairDrag.ResizingSeam {
     /// Where the seam belongs for the pointer's last place, within the limits found.
     var seam: Double {
@@ -26,10 +26,11 @@ extension PairDrag.ResizingSeam {
     }
 }
 
-/// A pair being resized at the seam, with its pictures in a panel over both (ADR 0048).
+/// A pair being resized at the seam, with its pictures in a panel and both windows parked
+/// (ADR 0048, 0049).
 extension PairDragModel {
-    /// How often both windows get the seam's place under the panel, in seconds.
-    private static let seamLookInterval: TimeInterval = 0.1
+    /// How often both windows get their widths for the seam, in seconds.
+    private static let seamLookInterval: TimeInterval = 0.05
 
     /// macOS has moved the seam of the pressed window.
     func startFollowingSeam(_ pressed: PairDrag.Pressed) {
@@ -78,7 +79,7 @@ extension PairDragModel {
         var current = resizing
         current.standIn = standIn
         standIn.setSeam(atOffset: current.seamOffset)
-        standIn.showStill(at: current.panelOrigin)
+        standIn.showForSeam(at: current.panelOrigin)
         drag = .resizingSeam(current)
     }
 
@@ -116,7 +117,7 @@ extension PairDragModel {
         if resizing.isReleased || isButtonLetGo {
             finishSeam(resizing)
         } else if resizing.standIn != nil {
-            lookAtSeam(resizing)
+            lookAtSeam(parked(resizing))
         } else if !resizing.isPassing,
             !DragHoldRule.mayWaitForPictures(after: system.uptime - resizing.startTime)
         {
@@ -126,7 +127,32 @@ extension PairDragModel {
         }
     }
 
-    /// Gives both windows the seam's place under the panel, which also shows a window's limit.
+    /// A window that is busy gets another try on a later tick. One that refuses stays where
+    /// it is, under the panel.
+    private func parked(_ resizing: PairDrag.ResizingSeam) -> PairDrag.ResizingSeam {
+        guard !resizing.isHeldParked || !resizing.isPartnerParked,
+            let origin = system.parkingOrigin
+        else { return resizing }
+        var current = resizing
+        if !current.isHeldParked { current.isHeldParked = Self.park(current.window, at: origin) }
+        if !current.isPartnerParked {
+            current.isPartnerParked = Self.park(current.partner, at: origin)
+        }
+        drag = .resizingSeam(current)
+        return current
+    }
+
+    private static func park(_ window: any MovableWindow, at origin: ScreenPoint) -> Bool {
+        do {
+            try window.move(to: origin)
+            return true
+        } catch {
+            return error != .windowBusy
+        }
+    }
+
+    /// Gives both windows their widths for the seam, which also shows a window's limit. Their
+    /// places do not matter while parked.
     private func lookAtSeam(_ resizing: PairDrag.ResizingSeam) {
         guard system.uptime - resizing.lastLook >= Self.seamLookInterval else { return }
         var current = resizing
@@ -139,10 +165,8 @@ extension PairDragModel {
         current.lastAskedSeam = seam
         let held = current.heldFrame(seamAt: seam)
         let partner = current.partnerFrame(seamAt: seam)
-        Self.apply(held, to: current.window, from: current.lastHeldFrame)
-        Self.apply(partner, to: current.partner, from: current.lastPartnerFrame)
-        current.lastHeldFrame = held
-        current.lastPartnerFrame = partner
+        try? current.window.resize(to: held.size)
+        try? current.partner.resize(to: partner.size)
         if let reached = try? current.window.frame() {
             current.heldLimits.note(
                 asked: held.size.width, reached: reached.size.width, start: current.heldStart,
@@ -157,7 +181,7 @@ extension PairDragModel {
         drag = .resizingSeam(current)
     }
 
-    /// Both windows go exactly to the seam. A window with another width than asked, at its
+    /// Both windows come back, exactly to the seam. A window with another width than asked, at its
     /// minimum or maximum or rounding it, keeps its far edge, and the other meets it. Without
     /// pictures, macOS has resized the held window, and the partner goes beside it.
     func finishSeam(_ resizing: PairDrag.ResizingSeam) {
@@ -169,11 +193,9 @@ extension PairDragModel {
             }
             seam = SeamFollow.seam(of: held, partnerOn: resizing.side)
         } else {
-            Self.apply(
-                resizing.heldFrame(seamAt: seam), to: resizing.window, from: resizing.lastHeldFrame)
+            Self.apply(resizing.heldFrame(seamAt: seam), to: resizing.window, from: nil)
         }
-        let partner = resizing.partnerFrame(seamAt: seam)
-        Self.apply(partner, to: resizing.partner, from: resizing.lastPartnerFrame)
+        Self.apply(resizing.partnerFrame(seamAt: seam), to: resizing.partner, from: nil)
         meet(resizing, seamAsked: seam)
         if let standIn = resizing.standIn {
             drag = .settling(standIn: standIn, until: system.uptime + Self.settleTime)

@@ -5,8 +5,9 @@ public protocol WindowStandIn: AnyObject {
     /// Shows the stand-in with its top left corner at `origin`.
     func show(at origin: ScreenPoint)
 
-    /// Shows the stand-in with its top left corner at `origin`, with its pictures still.
-    func showStill(at origin: ScreenPoint)
+    /// Shows the stand-in with its top left corner at `origin`, for a resize at the seam: live
+    /// frames, when it has them, may have other sizes than the pictures (ADR 0049).
+    func showForSeam(at origin: ScreenPoint)
 
     /// Puts the seam between two pictures at `offset` from the left edge, each picture keeping
     /// its far edge, as a resize at the seam does (ADR 0048).

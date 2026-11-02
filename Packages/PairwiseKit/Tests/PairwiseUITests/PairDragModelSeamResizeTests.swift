@@ -56,15 +56,15 @@ import Testing
         system.tick()
     }
 
-    @Test func aMovingSeamShowsThePicturesStillOverThePair() {
+    @Test func aMovingSeamShowsThePicturesOverThePair() {
         startOnLeft()
-        #expect(panel.stillShownAt == ScreenPoint(x: 100, y: 100))
+        #expect(panel.seamShownAt == ScreenPoint(x: 100, y: 100))
         #expect(panel.shownAt == nil)
     }
 
     @Test func thePanelStandsOverTheLeftWindowWhenTheRightIsHeld() {
         start(on: right, moving: right, to: rightWider)
-        #expect(panel.stillShownAt == ScreenPoint(x: 100, y: 100))
+        #expect(panel.seamShownAt == ScreenPoint(x: 100, y: 100))
     }
 
     @Test func theDragEventsAreWithheld() {
@@ -91,12 +91,47 @@ import Testing
         #expect(right.moves.count + right.resizes.count + left.resizes.count == calls)
     }
 
-    @Test func bothWindowsGetTheSeamAtALook() {
+    @Test func bothWindowsGetTheSeamsWidthsAtALook() {
         startOnLeft()
         _ = drag(toX: 560)
         look()
-        #expect(left.currentFrame == WindowFrame(x: 100, y: 100, width: 460, height: 300))
-        #expect(right.currentFrame == WindowFrame(x: 560, y: 100, width: 140, height: 200))
+        #expect(left.currentFrame.size.width == 460)
+        #expect(right.currentFrame.size.width == 140)
+    }
+
+    @Test func bothWindowsAreParkedOnceThePanelShows() {
+        startOnLeft()
+        system.tick()
+        #expect(left.currentFrame.origin == system.parkingOrigin)
+        #expect(right.currentFrame.origin == system.parkingOrigin)
+    }
+
+    @Test func aLookOnlyResizesAWindowThatIsParked() {
+        startOnLeft()
+        system.tick()
+        let moves = right.moves.count
+        _ = drag(toX: 560)
+        look()
+        #expect(right.moves.count == moves)
+    }
+
+    @Test func noWindowIsParkedBeforeThePicturesCome() {
+        system.windowUnderPointer = left
+        _ = system.send(.pressed(Self.press))
+        left.currentFrame = wider
+        system.tick()
+        system.tick()
+        #expect(left.currentFrame.origin.x == 100)
+        #expect(right.moves.isEmpty)
+    }
+
+    @Test func aBusyWindowIsParkedOnALaterTick() {
+        startOnLeft()
+        right.moveError = .windowBusy
+        system.tick()
+        right.moveError = nil
+        system.tick()
+        #expect(right.currentFrame.origin == system.parkingOrigin)
     }
 
     @Test func noLookComesBeforeItsTime() {
@@ -121,9 +156,8 @@ import Testing
         start(on: right, moving: left, to: wider)
         _ = drag(toX: 560)
         look()
-        #expect(left.currentFrame.maxX == 560)
-        #expect(right.currentFrame.origin.x == 560)
-        #expect(right.currentFrame.maxX == 700)
+        #expect(left.currentFrame.size.width == 460)
+        #expect(right.currentFrame.size.width == 140)
     }
 
     @Test func thePartnerKeepsItsHeight() {
@@ -140,7 +174,7 @@ import Testing
         system.tick()
         #expect(!drag(toX: 560))
         system.finishStandIn(with: .success(panel))
-        #expect(panel.stillShownAt == ScreenPoint(x: 100, y: 100))
+        #expect(panel.seamShownAt == ScreenPoint(x: 100, y: 100))
         #expect(panel.seams.last == 460)
     }
 
@@ -213,13 +247,13 @@ import Testing
     @Test func anOuterEdgeResizesOneWindowOnly() {
         start(on: left, moving: left, to: WindowFrame(x: 50, y: 100, width: 450, height: 300))
         #expect(right.moves.isEmpty && right.resizes.isEmpty)
-        #expect(panel.stillShownAt == nil)
+        #expect(panel.seamShownAt == nil)
         #expect(!system.isTicking)
     }
 
     @Test func aPressBesideTheSeamThatMovesAnOuterEdgeStartsNothing() {
         start(on: right, moving: left, to: WindowFrame(x: 50, y: 100, width: 450, height: 300))
         #expect(right.moves.isEmpty && right.resizes.isEmpty)
-        #expect(panel.stillShownAt == nil)
+        #expect(panel.seamShownAt == nil)
     }
 }

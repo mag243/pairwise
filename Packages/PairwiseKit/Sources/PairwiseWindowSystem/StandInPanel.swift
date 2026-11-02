@@ -28,6 +28,9 @@ final class StandInPanel: WindowStandIn {
         let tail = CALayer()
     }
 
+    /// The top left of a window, in points, that holds its close, minimize and zoom buttons.
+    private static let buttonsArea = CGSize(width: 92, height: 52)
+
     /// How many rows of a picture one row of its sample stands for.
     private static let rowsPerSample = 4
 
@@ -39,8 +42,12 @@ final class StandInPanel: WindowStandIn {
     private var slots: [CALayer] = []
     private var images: [CALayer] = []
     private var parts: [SeamLayers] = []
-    /// Where each picture divides, in points from its left, found at the first seam.
-    private var splits: [CGFloat] = []
+    /// Where each picture divides, as a share of its width, found at the first seam.
+    private var splitShares: [CGFloat] = []
+    /// The size of what each picture shows now, which a live frame can change.
+    private var shownSizes: [CGSize] = []
+    private var seam: CGFloat?
+    private var totalWidth: CGFloat { pictures.map(\.size.width).reduce(0, +) }
 
     var liveFrames: [Int] { streams.map(\.frames) }
 
@@ -114,14 +121,15 @@ final class StandInPanel: WindowStandIn {
     }
 
     /// Where two pictures go with the seam at `seam` from the left, each divided at its place
-    /// in `splits` and keeping both edges.
+    /// in `splits` and keeping both edges. The panel's width does not change, and `sizes` can be
+    /// those of live frames, whose widths need not add up to it.
     static func seamLayout(
-        of sizes: [CGSize], splits: [CGFloat], seamAt seam: CGFloat
+        of sizes: [CGSize], splits: [CGFloat], totalWidth: CGFloat, seamAt seam: CGFloat
     ) -> [SeamPlace] {
         guard sizes.count == 2, splits.count == 2 else { return [] }
         let (left, right) = (sizes[0], sizes[1])
         let height = max(left.height, right.height)
-        let rightWidth = left.width + right.width - seam
+        let rightWidth = totalWidth - seam
         return [
             place(
                 of: left, split: splits[0],
@@ -155,9 +163,10 @@ final class StandInPanel: WindowStandIn {
     /// Reads the picture once, at the first seam, as a press that only moves needs none of this.
     private func prepareForSeam() {
         guard parts.isEmpty else { return }
+        shownSizes = pictures.map(\.size)
         for (index, picture) in pictures.enumerated() {
             let split = Self.quietSplit(of: picture)
-            splits.append(split)
+            splitShares.append(split / picture.size.width)
             parts.append(Self.seamLayers(of: picture, split: split, in: slots[index]))
             images[index].isHidden = true
         }
@@ -184,11 +193,19 @@ final class StandInPanel: WindowStandIn {
     }
 
     func setSeam(atOffset offset: Double) {
+        seam = offset
         CATransaction.begin()
         CATransaction.setDisableActions(true)
         prepareForSeam()
+        layOutSeam()
+        CATransaction.commit()
+    }
+
+    private func layOutSeam() {
+        guard let seam else { return }
+        let splits = zip(shownSizes, splitShares).map { $0.width * $1 }
         let places = Self.seamLayout(
-            of: pictures.map(\.size), splits: splits, seamAt: offset)
+            of: shownSizes, splits: splits, totalWidth: totalWidth, seamAt: seam)
         for (index, place) in places.enumerated() {
             slots[index].frame = place.slot
             let layers = parts[index]
@@ -196,12 +213,77 @@ final class StandInPanel: WindowStandIn {
             layers.fill.frame = place.fill
             layers.tail.frame = place.tail
         }
+    }
+
+    /// Where the still picture's buttons go over live frames, and the part of the picture that
+    /// holds them. macOS shows a mark of its own there in the frames of a window it streams
+    /// (ADR 0049).
+    static func buttonsPatch(ofPictureSize size: CGSize) -> (frame: CGRect, part: CGRect) {
+        let area = buttonsArea
+        let height = area.height / size.height
+        // A layer's contents count from the bottom, as its place does.
+        return (
+            CGRect(x: 0, y: size.height - area.height, width: area.width, height: area.height),
+            CGRect(x: 0, y: 1 - height, width: area.width / size.width, height: height)
+        )
+    }
+
+    private func addButtonsPatch(over index: Int) {
+        let picture = pictures[index]
+        let patch = Self.buttonsPatch(ofPictureSize: picture.size)
+        let layer = CALayer()
+        layer.contents = picture.image
+        layer.contentsGravity = .resize
+        layer.contentsRect = patch.part
+        layer.frame = patch.frame
+        slots[index].addSublayer(layer)
+    }
+
+    /// The part of a surface that `rect`, in points at `scale`, takes up, as a share of it.
+    static func share(of rect: CGRect, scale: Double, inSurface surface: CGSize) -> CGRect {
+        CGRect(
+            x: rect.origin.x * scale / surface.width, y: rect.origin.y * scale / surface.height,
+            width: rect.width * scale / surface.width,
+            height: rect.height * scale / surface.height)
+    }
+
+    /// Shows a live frame through the same division as the picture, at its own width.
+    private func show(_ surface: IOSurfaceRef, rect: CGRect, scale: Double, at index: Int) {
+        guard parts.indices.contains(index), rect.width > 0 else { return }
+        let size = CGSize(width: IOSurfaceGetWidth(surface), height: IOSurfaceGetHeight(surface))
+        let part = Self.share(of: rect, scale: scale, inSurface: size)
+        let head = part.width * splitShares[index]
+        let layers = parts[index]
+        CATransaction.begin()
+        CATransaction.setDisableActions(true)
+        for layer in [layers.head, layers.fill, layers.tail] { layer.contents = surface }
+        layers.head.contentsRect = CGRect(
+            x: part.minX, y: part.minY, width: head, height: part.height)
+        layers.fill.contentsRect = CGRect(
+            x: part.minX + head, y: part.minY, width: part.width / rect.width, height: part.height)
+        layers.tail.contentsRect = CGRect(
+            x: part.minX + head, y: part.minY, width: part.width - head, height: part.height)
+        shownSizes[index] = rect.size
+        layOutSeam()
         CATransaction.commit()
     }
 
-    func showStill(at origin: ScreenPoint) {
+    /// Live frames get room for the pair's whole width, as a window can grow to about that.
+    func showForSeam(at origin: ScreenPoint) {
         move(to: origin)
         panel.orderFrontRegardless()
+        prepareForSeam()
+        for (index, stream) in streams.enumerated() where pictures.indices.contains(index) {
+            let picture = pictures[index]
+            let scale = CGFloat(picture.image.width) / picture.size.width
+            addButtonsPatch(over: index)
+            stream.picture.onFrame = { [weak self] surface, rect, frameScale in
+                self?.show(surface, rect: rect, scale: frameScale, at: index)
+            }
+            stream.start(
+                room: CGSize(
+                    width: totalWidth * scale, height: picture.size.height * scale))
+        }
     }
 
     func show(at origin: ScreenPoint) {

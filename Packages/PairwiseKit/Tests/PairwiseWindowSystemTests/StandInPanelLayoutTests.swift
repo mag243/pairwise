@@ -18,7 +18,8 @@ import Testing
     private static let splits: [CGFloat] = [50, 25]
 
     @Test func atTheSeamOfThePressThePartsMeetInTheMiddle() {
-        let layout = StandInPanel.seamLayout(of: Self.sizes, splits: Self.splits, seamAt: 100)
+        let layout = StandInPanel.seamLayout(
+            of: Self.sizes, splits: Self.splits, totalWidth: 150, seamAt: 100)
         #expect(layout[0].slot == CGRect(x: 0, y: 120, width: 100, height: 80))
         #expect(layout[0].head == CGRect(x: 0, y: 0, width: 50, height: 80))
         #expect(layout[0].tail == CGRect(x: 50, y: 0, width: 50, height: 80))
@@ -27,7 +28,8 @@ import Testing
     }
 
     @Test func aNarrowerPictureLosesItsMiddleAndKeepsBothEdges() {
-        let layout = StandInPanel.seamLayout(of: Self.sizes, splits: Self.splits, seamAt: 80)
+        let layout = StandInPanel.seamLayout(
+            of: Self.sizes, splits: Self.splits, totalWidth: 150, seamAt: 80)
         #expect(layout[0].slot.width == 80)
         #expect(layout[0].head == CGRect(x: 0, y: 0, width: 50, height: 80))
         #expect(layout[0].tail == CGRect(x: 30, y: 0, width: 50, height: 80))
@@ -35,7 +37,8 @@ import Testing
     }
 
     @Test func aWiderPictureFillsItsMiddleAndKeepsBothEdges() {
-        let layout = StandInPanel.seamLayout(of: Self.sizes, splits: Self.splits, seamAt: 80)
+        let layout = StandInPanel.seamLayout(
+            of: Self.sizes, splits: Self.splits, totalWidth: 150, seamAt: 80)
         #expect(layout[1].slot == CGRect(x: 80, y: 0, width: 70, height: 200))
         #expect(layout[1].head == CGRect(x: 0, y: 0, width: 25, height: 200))
         #expect(layout[1].fill == CGRect(x: 25, y: 0, width: 20, height: 200))
@@ -43,10 +46,34 @@ import Testing
     }
 
     @Test func thePartsDivideAtTheSplitWhereverThatIs() {
-        let layout = StandInPanel.seamLayout(of: Self.sizes, splits: [30, 25], seamAt: 120)
+        let layout = StandInPanel.seamLayout(
+            of: Self.sizes, splits: [30, 25], totalWidth: 150, seamAt: 120)
         #expect(layout[0].head == CGRect(x: 0, y: 0, width: 30, height: 80))
         #expect(layout[0].fill == CGRect(x: 30, y: 0, width: 20, height: 80))
         #expect(layout[0].tail == CGRect(x: 50, y: 0, width: 70, height: 80))
+    }
+
+    @Test func aLiveFrameOfAnotherWidthLeavesTheSlotsAtTheSeam() {
+        let layout = StandInPanel.seamLayout(
+            of: [CGSize(width: 90, height: 80), CGSize(width: 60, height: 200)],
+            splits: [45, 30], totalWidth: 150, seamAt: 100)
+        #expect(layout[0].slot.width == 100)
+        #expect(layout[0].fill.width == 10)
+        #expect(layout[1].slot == CGRect(x: 100, y: 0, width: 50, height: 200))
+        #expect(layout[1].tail == CGRect(x: 20, y: 0, width: 30, height: 200))
+    }
+
+    @Test func aFramesPartIsAShareOfItsSurface() {
+        let share = StandInPanel.share(
+            of: CGRect(x: 0, y: 0, width: 100, height: 50), scale: 2,
+            inSurface: CGSize(width: 400, height: 200))
+        #expect(share == CGRect(x: 0, y: 0, width: 0.5, height: 0.5))
+    }
+
+    @Test func theButtonsPatchTakesTheTopLeftOfTheWindow() {
+        let patch = StandInPanel.buttonsPatch(ofPictureSize: CGSize(width: 400, height: 200))
+        #expect(patch.frame == CGRect(x: 0, y: 148, width: 92, height: 52))
+        #expect(patch.part == CGRect(x: 0, y: 0.74, width: 0.23, height: 0.26))
     }
 
     @Test func theFillShowsOneColumnAtTheSplit() {

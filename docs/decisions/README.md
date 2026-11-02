@@ -53,4 +53,5 @@ Use `0000-template.md` as the basis.
 | 0045 | Following at the seam | Superseded by 0048 |
 | 0046 | Stopping the seam at a window's limit | Superseded by 0048 |
 | 0047 | A reach that follows the speed | Deprecated |
-| 0048 | Pictures at the seam | Accepted |
+| 0048 | Pictures at the seam | Superseded by 0049 |
+| 0049 | Live pictures at the seam, with the windows parked | Accepted |
