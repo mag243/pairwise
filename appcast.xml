@@ -3,6 +3,19 @@
     <channel>
         <title>Pairwise</title>
         <item>
+            <title>0.2.0</title>
+            <pubDate>Mon, 02 Nov 2026 19:20:14 +0100</pubDate>
+            <sparkle:version>2026.1102.191801</sparkle:version>
+            <sparkle:shortVersionString>0.2.0</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+            <description sparkle:format="markdown"><![CDATA[- Pairwise needs only Accessibility now. While dragging you see an empty plane with each window's icon and title, and nothing is recorded.
+- Still or live pictures while dragging, new settings that take Screen Recording. Live keeps video playing and the seam sharp, with macOS's purple recording icon.
+- Settings comes to the front when you open it from the menu, also from another desktop.
+- A page at https://mag243.github.io/pairwise/.
+]]></description>
+            <enclosure url="https://github.com/mag243/pairwise/releases/download/v0.2.0/Pairwise-0.2.0-2026.1102.191801.zip" length="1655866" type="application/octet-stream" sparkle:edSignature="6Mizrzh2jn8/Mt88GZTwMHL/75g2VPwzzgnE5EyA/NnnFUU5yWKBefHAutzw5TCwmuqOShAcsxLVnI92NuAbCQ=="/>
+        </item>
+        <item>
             <title>0.1.1</title>
             <pubDate>Mon, 02 Nov 2026 17:54:16 +0100</pubDate>
             <sparkle:version>2026.1102.175201</sparkle:version>
