@@ -87,6 +87,7 @@
       }
     },
     "Check for Updates…" : {
+      "comment" : "Menu bar menu: look for a new version now",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -100,10 +101,10 @@
             "value" : "Controleren op updates…"
           }
         }
-      },
-      "comment" : "Menu bar menu: look for a new version now"
+      }
     },
     "Check for updates automatically" : {
+      "comment" : "Setting: look for a new version once a day",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -117,8 +118,7 @@
             "value" : "Automatisch op updates controleren"
           }
         }
-      },
-      "comment" : "Setting: look for a new version once a day"
+      }
     },
     "Command joins with" : {
       "comment" : "Setting: which windows the Command key joins",
@@ -239,6 +239,23 @@
         }
       }
     },
+    "It can then start at login and update itself. It will not ask again." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dann kann es beim Anmelden starten und sich selbst aktualisieren. Diese Frage erscheint nicht noch einmal."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Het kan dan starten bij het inloggen en zichzelf bijwerken. Deze vraag komt niet terug."
+          }
+        }
+      },
+      "comment" : "Alert text: why to move the app"
+    },
     "Joining" : {
       "comment" : "Section of settings",
       "localizations" : {
@@ -358,6 +375,23 @@
         }
       }
     },
+    "Move Pairwise to Applications?" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pairwise in den Ordner „Programme“ bewegen?"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pairwise naar Apps verplaatsen?"
+          }
+        }
+      },
+      "comment" : "Alert title when the app runs from outside Applications"
+    },
     "Move pairs together" : {
       "comment" : "Menu: the switch for moving pairs of windows together",
       "localizations" : {
@@ -374,6 +408,23 @@
           }
         }
       }
+    },
+    "Move to Applications" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In „Programme“ bewegen"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verplaats naar Apps"
+          }
+        }
+      },
+      "comment" : "Alert button"
     },
     "Moves" : {
       "comment" : "Measurement: how often the partner window was moved",
@@ -443,6 +494,23 @@
         }
       }
     },
+    "Not Now" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nicht jetzt"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Niet nu"
+          }
+        }
+      },
+      "comment" : "Alert button"
+    },
     "Not granted" : {
       "comment" : "The Accessibility permission's status",
       "localizations" : {
@@ -460,9 +528,43 @@
         }
       }
     },
+    "Open at login" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beim Anmelden öffnen"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Openen bij inloggen"
+          }
+        }
+      },
+      "comment" : "Setting: start Pairwise when the user logs in"
+    },
     "Pairwise" : {
       "comment" : "The app's name, the title of its window",
       "shouldTranslate" : false
+    },
+    "Pairwise could not be moved" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pairwise konnte nicht bewegt werden"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pairwise kon niet worden verplaatst"
+          }
+        }
+      },
+      "comment" : "Alert title when copying the app failed"
     },
     "Pairwise has no Accessibility access." : {
       "comment" : "Problem message",
@@ -616,6 +718,23 @@
           }
         }
       }
+    },
+    "Startup and updates" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start und Updates"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opstarten en updates"
+          }
+        }
+      },
+      "comment" : "Section of the settings"
     },
     "Still" : {
       "comment" : "Setting: the pictures do not update during a drag",
@@ -771,6 +890,7 @@
       }
     },
     "Update Available…" : {
+      "comment" : "Menu bar menu: a new version waits for the user",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -784,25 +904,7 @@
             "value" : "Update beschikbaar…"
           }
         }
-      },
-      "comment" : "Menu bar menu: a new version waits for the user"
-    },
-    "Updates" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Updates"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Updates"
-          }
-        }
-      },
-      "comment" : "Section of the settings"
+      }
     },
     "While joining, add Shift for the same height, or Control for the other choice of windows." : {
       "comment" : "Text in the settings window",

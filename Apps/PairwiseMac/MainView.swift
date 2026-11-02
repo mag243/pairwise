@@ -27,6 +27,7 @@ struct MainView: View {
 
     let model: PairDragModel
     @Bindable var updater: Updater
+    @State private var loginItem = LoginItem()
 
     @State private var tab = Self.firstTab
 
@@ -121,7 +122,12 @@ struct MainView: View {
     }
 
     @ViewBuilder private var updates: some View {
-        Section("Updates") {
+        Section("Startup and updates") {
+            Toggle("Open at login", isOn: $loginItem.isOn)
+                .disabled(!loginItem.isAvailable)
+            if let failure = loginItem.failure {
+                Text(failure).foregroundStyle(.red)
+            }
             Toggle("Check for updates automatically", isOn: $updater.checksAutomatically)
                 .disabled(!updater.isAvailable)
         }

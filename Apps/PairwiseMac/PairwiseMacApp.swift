@@ -69,6 +69,7 @@ struct PairwiseMacApp: App {
         #if DEBUG
         if await runTestIfAsked(model, system) { return }
         #endif
+        if await AppMover.offerIfNeeded() { return }
         model.startWhenPermitted()
         // The user gives and takes permissions in System Settings, which tells no app.
         while !Task.isCancelled {

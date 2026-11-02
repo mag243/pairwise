@@ -65,3 +65,4 @@ Use `0000-template.md` as the basis.
 | 0057 | Updates with Sparkle | Accepted |
 | 0058 | Publishing a release | Accepted |
 | 0059 | A Homebrew cask | Accepted |
+| 0060 | Starting at login, and the right place | Accepted |

@@ -49,8 +49,8 @@ These need the owner's keychain, accounts or judgment, so the agent prepares the
 - [ ] `brew audit` and `brew style` on the cask pass.
 
 ### 6. Starting at login, and the right place
-- [ ] ADR: `SMAppService.mainApp`, as a setting that is off until the user turns it on, in the settings or at the end of the first start.
-- [ ] When Pairwise runs from elsewhere, such as the disk image, it offers once to move to Applications. Starting at login and the permissions both want one fixed place.
+- [x] ADR 0060: `SMAppService.mainApp`, as a setting that is off until the user turns it on, in the settings or at the end of the first start.
+- [x] When Pairwise runs from elsewhere, such as the disk image, it offers once to move to Applications. Starting at login and the permissions both want one fixed place.
 - [ ] A start at login returns earlier pairs and parked windows as a normal start does (ADR 0053, 0054).
 
 ### 7. Translations and README
