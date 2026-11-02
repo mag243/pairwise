@@ -28,15 +28,15 @@ These need the owner's keychain, accounts or judgment, so the agent prepares the
 - [ ] Check how often macOS asks again about Screen Recording for an app that captures windows without its picker, and what Pairwise does in the meantime. A drag must keep working, with or without pictures.
 
 ### 3. Updates with Sparkle
-- [ ] ADR: Sparkle as a package of the app target only, pinned to an exact version (`PairwiseKit` never imports it), the key, the feed, how often it checks, what is sent.
+- [x] ADR 0057: Sparkle as a package of the app target only, pinned to an exact version (`PairwiseKit` never imports it), the key, the feed, how often it checks, what is sent.
 - [x] The key is made with `generate_keys --account pairwise`, and the private key is in the owner's password manager. Its public key: `KW1bHieAwaAFKS5d6Hyq6vQBB0iksihCVTB+cy1hLqs=`. Without an account of its own, Sparkle's tools take the key already in the keychain, which belongs to another app, so every signing step names this account.
-- [ ] A partial `Info.plist` outside the app's synchronized folder: `SUFeedURL`, `SUPublicEDKey`, `SUEnableAutomaticChecks`.
-- [ ] The updater starts only in a Release build; a debug build and a test run never offer to replace themselves.
-- [ ] "Check for Updates…" in the menu bar menu, and a setting for checking automatically, in en, nl and de.
-- [ ] Pairwise has no Dock icon, so an update found in the background would open behind other windows. Use Sparkle's gentle reminders for background apps, and show that an update waits in the menu bar menu.
-- [ ] An update never lands in the middle of a drag: the window only appears on a check or a click, and installing always takes the user's click.
-- [ ] Sparkle's own licence goes along in the app, and About or the README names it.
-- [ ] The README says what a check sends: only the request for the feed to GitHub, with the app's version. System profiling stays off.
+- [x] A partial `Info.plist` outside the app's synchronized folder: `SUFeedURL`, `SUPublicEDKey`, `SUEnableAutomaticChecks`.
+- [x] The updater starts only in a Release build; a debug build and a test run never offer to replace themselves.
+- [x] "Check for Updates…" in the menu bar menu, and a setting for checking automatically, in en, nl and de.
+- [x] Pairwise has no Dock icon, so an update found in the background would open behind other windows. Use Sparkle's gentle reminders for background apps, and show that an update waits in the menu bar menu.
+- [x] An update never lands in the middle of a drag: the window only appears on a check or a click, and installing always takes the user's click.
+- [x] Sparkle's own licence goes along in the app, and About or the README names it.
+- [x] The README says what a check sends: only the request for the feed to GitHub, with the app's version. System profiling stays off.
 
 ### 4. Publishing
 - [ ] ADR: GitHub Releases in this repository, and the feed on GitHub Pages at `https://mag243.github.io/pairwise/appcast.xml`, from a branch `gh-pages` that holds only the feed and is not a working branch. The address is in every installed copy, so it does not change afterwards.

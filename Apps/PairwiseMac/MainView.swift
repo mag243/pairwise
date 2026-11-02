@@ -5,7 +5,7 @@ import SwiftUI
 /// The settings window: the permissions, the choices for joining, and how Pairwise works.
 struct MainView: View {
     private static let width: CGFloat = 480
-    private static let height: CGFloat = 420
+    private static let height: CGFloat = 460
     #if DEBUG
     private static let millisecondsPerSecond = 1000.0
     private static let fractionDigits = 1
@@ -26,6 +26,7 @@ struct MainView: View {
     }
 
     let model: PairDragModel
+    @Bindable var updater: Updater
 
     @State private var tab = Self.firstTab
 
@@ -52,6 +53,7 @@ struct MainView: View {
             page {
                 permissions
                 joining
+                updates
                 if let problem = model.problem {
                     Text(problem.message).foregroundStyle(.red)
                 }
@@ -115,6 +117,13 @@ struct MainView: View {
                 Text("Windows of the same app").tag(JoinScope.sameApp)
             }
             Toggle("Sound when windows join or part", isOn: playsSounds)
+        }
+    }
+
+    @ViewBuilder private var updates: some View {
+        Section("Updates") {
+            Toggle("Check for updates automatically", isOn: $updater.checksAutomatically)
+                .disabled(!updater.isAvailable)
         }
     }
 

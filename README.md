@@ -13,6 +13,10 @@ Pairwise lives in the menu bar and needs two permissions: Accessibility, to move
 - **Share the seam:** drag the edge between the two windows.
 - **Come apart:** click the closed lock on the seam, or press Command while dragging one of the windows.
 
+## Privacy
+
+Pictures of windows stay in memory during a drag: they are not saved or sent anywhere. Once a day, and when you ask, Pairwise fetches its update feed from GitHub, which sends nothing more than any web request does. You can turn that off in the settings.
+
 ## Requirements
 
 - macOS with Xcode 27.2 (the exact version is pinned in [`tools/versions.env`](tools/versions.env))
@@ -47,4 +51,4 @@ The rules for working in this repository are in [`CLAUDE.md`](CLAUDE.md).
 
 ## License
 
-[MIT](LICENSE). The sounds are from [Interface Sounds by Kenney](https://opengameart.org/content/interface-sounds), under CC0. See [`CONTRIBUTING.md`](CONTRIBUTING.md) on contributions.
+[MIT](LICENSE). Updates come through [Sparkle](https://sparkle-project.org), whose licence is [in the app](Apps/PairwiseMac/Resources/Sparkle-LICENSE.txt). The sounds are from [Interface Sounds by Kenney](https://opengameart.org/content/interface-sounds), under CC0. See [`CONTRIBUTING.md`](CONTRIBUTING.md) on contributions.

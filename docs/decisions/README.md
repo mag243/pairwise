@@ -62,3 +62,4 @@ Use `0000-template.md` as the basis.
 | 0054 | Pairs that last | Accepted |
 | 0055 | Sounds of our own | Accepted |
 | 0056 | Signing and notarization | Accepted |
+| 0057 | Updates with Sparkle | Accepted |

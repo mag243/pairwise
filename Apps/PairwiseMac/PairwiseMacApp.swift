@@ -13,6 +13,7 @@ struct PairwiseMacApp: App {
 
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @State private var pairDrag: PairDragModel
+    @State private var updater = Updater()
 
     init() {
         let system = AccessibilityWindowSystem()
@@ -26,7 +27,7 @@ struct PairwiseMacApp: App {
 
     var body: some Scene {
         MenuBarExtra(isInserted: .constant(!Self.isAnimatedCopy)) {
-            MenuBarContent(model: pairDrag, settingsWindow: Self.settingsWindow)
+            MenuBarContent(model: pairDrag, updater: updater, settingsWindow: Self.settingsWindow)
         } label: {
             Image("MenuBarIcon")
         }
@@ -35,10 +36,10 @@ struct PairwiseMacApp: App {
             if Self.isAnimatedCopy {
                 AnimatedTestView()
             } else {
-                MainView(model: pairDrag)
+                MainView(model: pairDrag, updater: updater)
             }
             #else
-            MainView(model: pairDrag)
+            MainView(model: pairDrag, updater: updater)
             #endif
         }
         .windowResizability(.contentSize)
@@ -138,7 +139,8 @@ extension PairwiseMacApp {
         } else if flag == seamLookFlag {
             await test.runSeamLook()
         } else if flag == settingsLookFlag {
-            await test.savePicture(of: NSHostingView(rootView: MainView(model: model)))
+            await test.savePicture(
+                of: NSHostingView(rootView: MainView(model: model, updater: Updater())))
         } else if flag == killTestFlag {
             await test.runKillTest()
         } else if flag == killCheckFlag {

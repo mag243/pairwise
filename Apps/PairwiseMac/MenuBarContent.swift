@@ -5,6 +5,7 @@ import SwiftUI
 /// The menu of the menu bar item (ADR 0034).
 struct MenuBarContent: View {
     let model: PairDragModel
+    let updater: Updater
     let settingsWindow: String
 
     @Environment(\.openWindow) private var openWindow
@@ -22,6 +23,10 @@ struct MenuBarContent: View {
             NSApplication.shared.activate()
         }
         Divider()
+        Button(updater.isUpdateWaiting ? "Update Available…" : "Check for Updates…") {
+            updater.checkForUpdates()
+        }
+        .disabled(!updater.canCheck)
         Button("About Pairwise") {
             // An app without a Dock icon does not come forward by itself.
             NSApplication.shared.activate()

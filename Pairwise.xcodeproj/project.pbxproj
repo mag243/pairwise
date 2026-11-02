@@ -10,6 +10,7 @@
 		B1000000000000000000B001 /* PairwiseUI in Frameworks */ = {isa = PBXBuildFile; productRef = D1000000000000000000D001 /* PairwiseUI */; };
 		B1000000000000000000B003 /* PairwiseCore in Frameworks */ = {isa = PBXBuildFile; productRef = D1000000000000000000D003 /* PairwiseCore */; };
 		B1000000000000000000B004 /* PairwiseWindowSystem in Frameworks */ = {isa = PBXBuildFile; productRef = D1000000000000000000D004 /* PairwiseWindowSystem */; };
+		B1000000000000000000B005 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = D1000000000000000000D005 /* Sparkle */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -48,6 +49,7 @@
 				B1000000000000000000B001 /* PairwiseUI in Frameworks */,
 				B1000000000000000000B003 /* PairwiseCore in Frameworks */,
 				B1000000000000000000B004 /* PairwiseWindowSystem in Frameworks */,
+				B1000000000000000000B005 /* Sparkle in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -119,6 +121,7 @@
 				D1000000000000000000D001 /* PairwiseUI */,
 				D1000000000000000000D003 /* PairwiseCore */,
 				D1000000000000000000D004 /* PairwiseWindowSystem */,
+				D1000000000000000000D005 /* Sparkle */,
 			);
 			productName = PairwiseMac;
 			productReference = F1000000000000000000F001 /* Pairwise.app */;
@@ -177,6 +180,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				610000000000000000006001 /* XCLocalSwiftPackageReference "Packages/PairwiseKit" */,
+				620000000000000000006002 /* XCRemoteSwiftPackageReference "Sparkle" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 010000000000000000000002 /* Products */;
@@ -323,6 +327,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Apps/PairwiseMac-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = Pairwise;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "© 2026 Maarten Ghijsen";
@@ -352,6 +357,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Apps/PairwiseMac-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = Pairwise;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "© 2026 Maarten Ghijsen";
@@ -433,6 +439,17 @@
 		};
 /* End XCLocalSwiftPackageReference section */
 
+/* Begin XCRemoteSwiftPackageReference section */
+		620000000000000000006002 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sparkle-project/Sparkle";
+			requirement = {
+				kind = exactVersion;
+				version = 2.10.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
 /* Begin XCSwiftPackageProductDependency section */
 		D1000000000000000000D001 /* PairwiseUI */ = {
 			isa = XCSwiftPackageProductDependency;
@@ -445,6 +462,11 @@
 		D1000000000000000000D004 /* PairwiseWindowSystem */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = PairwiseWindowSystem;
+		};
+		D1000000000000000000D005 /* Sparkle */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 620000000000000000006002 /* XCRemoteSwiftPackageReference "Sparkle" */;
+			productName = Sparkle;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
