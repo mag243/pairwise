@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [0.2.1]
 
 - No gap between two windows after dragging their seam, when a window such as Terminal rounds its width to whole characters.
 
