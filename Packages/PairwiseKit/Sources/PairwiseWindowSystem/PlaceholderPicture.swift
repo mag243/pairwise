@@ -1,7 +1,7 @@
 import AppKit
 
-/// A picture of a window that captures nothing: an empty plane with a title bar holding the
-/// app's icon and the window's title (on trial, plan M3a). It stands in for what a capture
+/// A picture of a window that captures nothing: an empty plane with the app's icon, and a title
+/// bar with a window's three buttons, the icon and the title (on trial, plan M3a). It stands in for what a capture
 /// would show, so that it goes through the same panel.
 @MainActor
 enum PlaceholderPicture {
@@ -12,6 +12,16 @@ enum PlaceholderPicture {
     private static let iconInset: CGFloat = 76
     private static let iconGap: CGFloat = 6
     private static let trailingInset: CGFloat = 12
+    private static let buttonDiameter: CGFloat = 12
+    /// The middle of the first button from the window's left edge, and between buttons.
+    private static let firstButtonX: CGFloat = 14
+    private static let buttonSpacing: CGFloat = 20
+    private static let buttonColours = [
+        NSColor(srgbRed: 1, green: 0.37, blue: 0.34, alpha: 1),
+        NSColor(srgbRed: 1, green: 0.74, blue: 0.18, alpha: 1),
+        NSColor(srgbRed: 0.16, green: 0.78, blue: 0.25, alpha: 1),
+    ]
+    private static let bodyIconSize: CGFloat = 96
     private static let titleFontSize: CGFloat = 13
     private static let darkPlane = NSColor(white: 0.14, alpha: 1)
     private static let darkBar = NSColor(white: 0.21, alpha: 1)
@@ -50,7 +60,30 @@ enum PlaceholderPicture {
         let iconRect = CGRect(
             x: iconInset, y: bar.midY - iconSize / 2, width: iconSize, height: iconSize)
         icon?.draw(in: iconRect)
+        drawButtons(in: bar)
+        drawBodyIcon(icon, below: bar)
         drawTitle(title, after: iconRect, in: bar, isDark: isDark)
+    }
+
+    private static func drawButtons(in bar: CGRect) {
+        for (index, colour) in buttonColours.enumerated() {
+            colour.setFill()
+            let middle = firstButtonX + CGFloat(index) * buttonSpacing
+            NSBezierPath(
+                ovalIn: CGRect(
+                    x: middle - buttonDiameter / 2, y: bar.midY - buttonDiameter / 2,
+                    width: buttonDiameter, height: buttonDiameter)
+            ).fill()
+        }
+    }
+
+    /// In the middle of the plane, when it fits there.
+    private static func drawBodyIcon(_ icon: NSImage?, below bar: CGRect) {
+        guard bar.minY >= bodyIconSize, bar.width >= bodyIconSize else { return }
+        icon?.draw(
+            in: CGRect(
+                x: bar.midX - bodyIconSize / 2, y: bar.minY / 2 - bodyIconSize / 2,
+                width: bodyIconSize, height: bodyIconSize))
     }
 
     private static func drawTitle(_ title: String, after icon: CGRect, in bar: CGRect, isDark: Bool)

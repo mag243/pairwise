@@ -56,6 +56,46 @@ import Testing
         #expect(try pixel(image, x: 300, y: 300)[3] == 255)
     }
 
+    @Test func theTitleBarHoldsAWindowsThreeButtons() throws {
+        let image = try picture(isDark: true).image
+        let row = 28
+        let close = try pixel(image, x: 28, y: row)
+        let minimize = try pixel(image, x: 68, y: row)
+        let zoom = try pixel(image, x: 108, y: row)
+        #expect(close[0] > close[1] && close[0] > close[2])
+        #expect(minimize[0] > minimize[2] && minimize[1] > minimize[2])
+        #expect(zoom[1] > zoom[0] && zoom[1] > zoom[2])
+    }
+
+    private func solidIcon() -> NSImage {
+        NSImage(size: CGSize(width: 8, height: 8), flipped: false) { rect in
+            NSColor.systemBlue.setFill()
+            rect.fill()
+            return true
+        }
+    }
+
+    @Test func thePlaneShowsTheAppsIconInItsMiddle() throws {
+        let image = try #require(
+            PlaceholderPicture.make(
+                title: "", icon: solidIcon(), size: Self.size, scale: Self.scale, isDark: true)
+        ).image
+        let middle = try pixel(image, x: 300, y: 228)
+        let beside = try pixel(image, x: 30, y: 228)
+        #expect(middle != beside)
+    }
+
+    @Test func aWindowTooSmallForTheIconShowsOnlyThePlane() throws {
+        let small = CGSize(width: 300, height: 60)
+        let image = try #require(
+            PlaceholderPicture.make(
+                title: "", icon: solidIcon(), size: small, scale: Self.scale, isDark: true)
+        ).image
+        let middle = try pixel(image, x: 300, y: 90)
+        let beside = try pixel(image, x: 30, y: 90)
+        #expect(middle == beside)
+    }
+
     @Test func aWindowWithoutSizeIsNoPicture() {
         #expect(
             PlaceholderPicture.make(
