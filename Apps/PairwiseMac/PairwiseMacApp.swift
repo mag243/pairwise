@@ -17,6 +17,7 @@ struct PairwiseMacApp: App {
         let system = AccessibilityWindowSystem()
         let model = PairDragModel(system: system)
         model.joinScope = MainView.storedJoinScope
+        model.playsSounds = MainView.storedPlaysSounds
         _pairDrag = State(initialValue: model)
         guard !Self.isAnimatedCopy else { return }
         Task { await Self.startWorking(model, system) }

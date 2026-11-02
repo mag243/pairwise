@@ -84,6 +84,7 @@ extension PairDragModel {
         drag = .none
         guard lock.frame.contains(point) else { return true }
         if lock.isClosed {
+            sound(.part)
             endPair(of: lock.pair.left)
             updateLock(forPointerAt: point)
         } else {
@@ -117,6 +118,10 @@ extension PairDragModel {
         do {
             if target.frame != back.frame { try backWindow.move(to: target.frame.origin) }
             try join(backWindow, to: frontWindow, on: side)
+            // Raised last, the window in front stays there; a failure leaves it where it is.
+            try? backWindow.raise()
+            try? frontWindow.raise()
+            sound(.join)
             if let seam = Self.seam(of: target) {
                 system.flashSeam(at: seam.frame(width: Self.seamWidth))
             }

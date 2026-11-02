@@ -447,6 +447,23 @@
         }
       }
     },
+    "Sound when windows join or part" : {
+      "comment" : "Setting: a short sound at a join and a parting",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ton beim Verbinden oder Trennen von Fenstern"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geluid bij het koppelen of loskoppelen van vensters"
+          }
+        }
+      }
+    },
     "Start" : {
       "comment" : "Button that starts following drags",
       "localizations" : {

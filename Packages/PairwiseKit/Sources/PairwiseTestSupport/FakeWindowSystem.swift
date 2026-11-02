@@ -28,6 +28,7 @@ public final class FakeWindowSystem: WindowSystemProviding {
     public private(set) var guideFrames: [WindowFrame] = []
     public private(set) var isGuideShowing = false
     public private(set) var seamFlashes: [WindowFrame] = []
+    public private(set) var sounds: [PairSound] = []
     public private(set) var standInRequests = 0
     public private(set) var normalWindowsRequests = 0
     public var pointerLocation = ScreenPoint(x: 0, y: 0)
@@ -82,6 +83,10 @@ public final class FakeWindowSystem: WindowSystemProviding {
 
     public func hideJoinGuide() {
         isGuideShowing = false
+    }
+
+    public func play(_ sound: PairSound) {
+        sounds.append(sound)
     }
 
     public func flashSeam(at frame: WindowFrame) {

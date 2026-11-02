@@ -6,6 +6,7 @@ extension PairDragModel {
     func startJoining(
         _ number: UInt32, pointer: ScreenPoint, held: PairDrag.Held? = nil
     ) -> String {
+        if book.pair(containing: number) != nil { sound(.part) }
         endPair(of: number)
         guard
             let window = system.window(number: number),
@@ -131,8 +132,11 @@ extension PairDragModel {
         do {
             if joining.isTakingHeight { try joining.window.resize(to: target.frame.size) }
             try joining.window.move(to: target.frame.origin)
-            try? joining.window.raise()
             try join(joining.window, to: other, on: target.side)
+            // Raised last, the dragged window ends on top; a failure leaves it where it is.
+            try? other.raise()
+            try? joining.window.raise()
+            sound(.join)
             if let seam = Self.seam(of: target) {
                 system.flashSeam(at: seam.frame(width: Self.seamWidth))
             }

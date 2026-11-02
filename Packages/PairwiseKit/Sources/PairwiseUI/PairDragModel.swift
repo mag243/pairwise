@@ -29,6 +29,8 @@ public final class PairDragModel {
 
     /// Which windows the join key joins; the scope key gives the other choice (ADR 0043).
     public var joinScope = JoinScope.anyWindow
+    /// Whether a join and a parting by the user make a sound (ADR 0051).
+    public var playsSounds = true
 
     public internal(set) var isAccessibilityGranted: Bool
     public internal(set) var isScreenRecordingGranted: Bool

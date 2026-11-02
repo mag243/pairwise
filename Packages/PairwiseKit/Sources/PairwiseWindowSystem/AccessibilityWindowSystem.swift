@@ -11,6 +11,9 @@ public final class AccessibilityWindowSystem: WindowSystemProviding {
     private static let defaultLiveFramesPerSecond = 30
     /// How long a seam stays lit after two windows join.
     private static let seamFlashTime = Duration.milliseconds(400)
+    /// The system's sounds for a join and a parting (ADR 0051).
+    private static let joinSoundName = "Pop"
+    private static let partSoundName = "Tink"
     /// How much later the pointer's timer may fire, for the system to save energy.
     private static let pointerTimerTolerance = 0.02
 
@@ -149,6 +152,11 @@ public final class AccessibilityWindowSystem: WindowSystemProviding {
     public func hideJoinGuide() {
         joinGuide?.hide()
         joinGuide = nil
+    }
+
+    public func play(_ sound: PairSound) {
+        let name = sound == .join ? Self.joinSoundName : Self.partSoundName
+        NSSound(named: name)?.play()
     }
 
     public func flashSeam(at frame: WindowFrame) {

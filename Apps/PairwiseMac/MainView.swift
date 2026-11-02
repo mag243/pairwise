@@ -10,6 +10,12 @@ struct MainView: View {
     private static let fractionDigits = 1
     private static let frameRates = [15, 30, 60]
     private static let joinScopeKey = "joinScope"
+    private static let playsSoundsKey = "playsSounds"
+
+    /// Whether a join and a parting make a sound, as stored the last time; on until turned off.
+    static var storedPlaysSounds: Bool {
+        UserDefaults.standard.object(forKey: playsSoundsKey) as? Bool ?? true
+    }
 
     /// The choice of which windows Command joins, as stored the last time.
     static var storedJoinScope: JoinScope {
@@ -64,6 +70,7 @@ struct MainView: View {
                 Text("Any window").tag(JoinScope.anyWindow)
                 Text("Windows of the same app").tag(JoinScope.sameApp)
             }
+            Toggle("Sound when windows join or part", isOn: playsSounds)
             Picker("Live pictures", selection: liveFrames) {
                 Text("Still").tag(0)
                 ForEach(Self.frameRates, id: \.self) { rate in
@@ -90,6 +97,15 @@ struct MainView: View {
         } set: {
             model.joinScope = $0
             UserDefaults.standard.set($0.rawValue, forKey: Self.joinScopeKey)
+        }
+    }
+
+    private var playsSounds: Binding<Bool> {
+        Binding {
+            model.playsSounds
+        } set: {
+            model.playsSounds = $0
+            UserDefaults.standard.set($0, forKey: Self.playsSoundsKey)
         }
     }
 

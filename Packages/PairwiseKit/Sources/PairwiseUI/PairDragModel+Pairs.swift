@@ -20,6 +20,11 @@ extension PairDragModel {
         if let number = window.windowNumber { endPair(of: number) }
     }
 
+    /// Plays `sound`, unless the user has turned the sounds off (ADR 0051).
+    func sound(_ sound: PairSound) {
+        if playsSounds { system.play(sound) }
+    }
+
     func endPair(of number: UInt32) {
         if let partner = book.partner(of: number) { pairedWindows[partner.window] = nil }
         pairedWindows[number] = nil

@@ -1,5 +1,11 @@
 import Foundation
 
+/// A short sound that says what became of a pair (ADR 0051).
+public enum PairSound: Equatable, Sendable {
+    case join
+    case part
+}
+
 /// What Pairwise needs from the system to take over a drag.
 @MainActor
 public protocol WindowSystemProviding: AnyObject {
@@ -48,6 +54,9 @@ public protocol WindowSystemProviding: AnyObject {
 
     /// Takes the guide away, if it shows.
     func hideJoinGuide()
+
+    /// Plays `sound`.
+    func play(_ sound: PairSound)
 
     /// Lights up a seam briefly.
     func flashSeam(at frame: WindowFrame)

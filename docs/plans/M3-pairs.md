@@ -50,6 +50,7 @@ Done first because everything below adds code to this module.
 - [ ] Judged by hand in Safari and an Electron app, and at a window's limit.
 
 ### 7. Together in other ways
+- [x] At a join both windows come forward, and a join or parting by the user makes a sound, which a setting turns off (ADR 0051).
 - [ ] Bringing one window of a pair forward brings the other forward, without taking focus from the first.
 - [ ] Minimizing one minimizes the other (owner's choice 3).
 
