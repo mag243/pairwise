@@ -137,6 +137,23 @@
         }
       }
     },
+    "Dragging" : {
+      "comment" : "Section of the settings",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ziehen"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Slepen"
+          }
+        }
+      }
+    },
     "For testing" : {
       "comment" : "Section of settings only in a debug build",
       "localizations" : {
@@ -290,22 +307,39 @@
         }
       }
     },
-    "Lets Pairwise show live pictures of the two joined windows while you drag them. macOS shows its purple recording icon during that time. The pictures stay in memory, and are not saved or sent anywhere." : {
+    "Lets Pairwise show pictures of the two joined windows while you drag them. The pictures stay in memory, and are not saved or sent anywhere." : {
+      "comment" : "Settings: why Pairwise needs Screen Recording",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Damit zeigt Pairwise Live-Bilder der beiden verbundenen Fenster, während du sie ziehst. macOS zeigt in dieser Zeit sein violettes Aufnahmesymbol. Die Bilder bleiben im Arbeitsspeicher und werden weder gesichert noch versendet."
+            "value" : "Damit zeigt Pairwise Bilder der beiden verbundenen Fenster, während du sie ziehst. Die Bilder bleiben im Arbeitsspeicher und werden weder gesichert noch versendet."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Hiermee toont Pairwise livebeelden van de twee gekoppelde vensters terwijl je ze sleept. macOS laat in die tijd zijn paarse opname-icoon zien. De beelden blijven in het geheugen, en worden niet opgeslagen of verstuurd."
+            "value" : "Hiermee toont Pairwise beelden van de twee gekoppelde vensters terwijl je ze sleept. De beelden blijven in het geheugen, en worden niet opgeslagen of verstuurd."
           }
         }
-      },
-      "comment" : "Text in the settings window"
+      }
+    },
+    "Live" : {
+      "comment" : "Value of the setting Pictures while dragging",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Live"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Live"
+          }
+        }
+      }
     },
     "Live frames, window %lld" : {
       "comment" : "Measurement: live frames that arrived for one window",
@@ -528,6 +562,23 @@
         }
       }
     },
+    "One picture of the two windows when you start dragging. No purple icon. Video stands still, and the seam can look stretched." : {
+      "comment" : "Settings: what this value of Pictures while dragging costs",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein Bild der beiden Fenster, sobald du zu ziehen beginnst. Kein violettes Symbol. Videos stehen still, und die Naht kann gedehnt wirken."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eén beeld van de twee vensters zodra je begint te slepen. Geen paars icoon. Video staat stil, en de naad kan uitgerekt lijken."
+          }
+        }
+      }
+    },
     "Open at login" : {
       "comment" : "Setting: start Pairwise when the user logs in",
       "localizations" : {
@@ -544,6 +595,23 @@
           }
         }
       }
+    },
+    "Pairs" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paare"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paren"
+          }
+        }
+      },
+      "comment" : "Tab of the settings window"
     },
     "Pairwise" : {
       "comment" : "The app's name, the title of its window",
@@ -647,6 +715,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Toestemmingen"
+          }
+        }
+      }
+    },
+    "Pictures while dragging" : {
+      "comment" : "Setting: still or live pictures during a drag",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bilder beim Ziehen"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beelden tijdens het slepen"
           }
         }
       }
@@ -902,6 +987,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Update beschikbaar…"
+          }
+        }
+      }
+    },
+    "Video keeps playing and the seam stays sharp. macOS shows its purple recording icon while you drag." : {
+      "comment" : "Settings: what this value of Pictures while dragging costs",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Videos laufen weiter, und die Naht bleibt scharf. macOS zeigt beim Ziehen sein violettes Aufnahmesymbol."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Video blijft spelen en de naad blijft scherp. macOS toont zijn paarse opname-icoon terwijl je sleept."
           }
         }
       }

@@ -13,10 +13,17 @@ struct MainView: View {
     #endif
     private static let joinScopeKey = "joinScope"
     private static let playsSoundsKey = "playsSounds"
+    private static let dragPicturesKey = "dragPictures"
 
     /// Whether a join and a parting make a sound, as stored the last time; on until turned off.
     static var storedPlaysSounds: Bool {
         UserDefaults.standard.object(forKey: playsSoundsKey) as? Bool ?? true
+    }
+
+    /// What the pictures show during a drag, as stored the last time; still until chosen.
+    static var storedDragPictures: DragPictures {
+        UserDefaults.standard.string(forKey: dragPicturesKey).flatMap(DragPictures.init(rawValue:))
+            ?? .standard
     }
 
     /// The choice of which windows Command joins, as stored the last time.
@@ -53,7 +60,6 @@ struct MainView: View {
         TabView(selection: $tab) {
             page {
                 permissions
-                joining
                 updates
                 if let problem = model.problem {
                     Text(problem.message).foregroundStyle(.red)
@@ -61,13 +67,16 @@ struct MainView: View {
             }
             .tabItem { Label("General", systemImage: "gearshape") }
             .tag(0)
+            page { joining }
+                .tabItem { Label("Pairs", systemImage: "rectangle.split.2x1") }
+                .tag(1)
             page { howItWorks }
                 .tabItem { Label("How it works", systemImage: "questionmark.circle") }
-                .tag(1)
+                .tag(2)
             #if DEBUG
             page { testing }
                 .tabItem { Label("For testing", systemImage: "hammer") }
-                .tag(2)
+                .tag(3)
             #endif
         }
         .frame(width: Self.width, height: Self.height)
@@ -99,7 +108,7 @@ struct MainView: View {
             } label: {
                 Text("Screen Recording")
                 Text(
-                    "Lets Pairwise show live pictures of the two joined windows while you drag them. macOS shows its purple recording icon during that time. The pictures stay in memory, and are not saved or sent anywhere."
+                    "Lets Pairwise show pictures of the two joined windows while you drag them. The pictures stay in memory, and are not saved or sent anywhere."
                 )
             }
             if !model.isScreenRecordingGranted {
@@ -118,6 +127,31 @@ struct MainView: View {
                 Text("Windows of the same app").tag(JoinScope.sameApp)
             }
             Toggle("Sound when windows join or part", isOn: playsSounds)
+        }
+        Section("Dragging") {
+            Picker("Pictures while dragging", selection: dragPictures) {
+                Text("Still").tag(DragPictures.still)
+                Text("Live").tag(DragPictures.live)
+            }
+            Text(dragPicturesExplanation).foregroundStyle(.secondary)
+        }
+    }
+
+    private var dragPicturesExplanation: LocalizedStringKey {
+        switch DragPictures(framesPerSecond: model.liveFramesPerSecond) {
+        case .still:
+            "One picture of the two windows when you start dragging. No purple icon. Video stands still, and the seam can look stretched."
+        case .live:
+            "Video keeps playing and the seam stays sharp. macOS shows its purple recording icon while you drag."
+        }
+    }
+
+    private var dragPictures: Binding<DragPictures> {
+        Binding {
+            DragPictures(framesPerSecond: model.liveFramesPerSecond)
+        } set: {
+            model.liveFramesPerSecond = $0.framesPerSecond
+            UserDefaults.standard.set($0.rawValue, forKey: Self.dragPicturesKey)
         }
     }
 

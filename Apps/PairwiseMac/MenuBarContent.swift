@@ -19,8 +19,7 @@ struct MenuBarContent: View {
         Divider()
         Button("Settings…") {
             openWindow(id: settingsWindow)
-            // An app without a Dock icon does not come forward by itself.
-            NSApplication.shared.activate()
+            bringSettingsForward()
         }
         Divider()
         Button(updater.isUpdateWaiting ? "Update Available…" : "Check for Updates…") {
@@ -36,6 +35,22 @@ struct MenuBarContent: View {
         Button("Quit Pairwise") {
             model.stop()
             NSApplication.shared.terminate(nil)
+        }
+    }
+
+    /// An app without a Dock icon does not come forward by itself, and a window that is open on
+    /// another desktop stays there unless told to come along. SwiftUI makes the window after
+    /// this turn of the run loop.
+    private func bringSettingsForward() {
+        NSApplication.shared.activate()
+        let identifier = settingsWindow
+        Task { @MainActor in
+            await Task.yield()
+            let window = NSApplication.shared.windows.first {
+                $0.identifier?.rawValue.contains(identifier) == true
+            }
+            window?.collectionBehavior.insert(.moveToActiveSpace)
+            window?.makeKeyAndOrderFront(nil)
         }
     }
 

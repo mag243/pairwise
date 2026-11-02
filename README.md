@@ -29,7 +29,7 @@ Pairwise lives in the menu bar and needs two permissions: Accessibility, to move
 
 ## Privacy
 
-While you drag a pair or its seam, Pairwise shows live pictures of those two windows, and macOS shows its purple recording icon during that time. That icon is what it should be: a capture of a window is what it reports. Pairwise captures only those two windows, and the pictures stay in memory: they are not saved or sent anywhere. Once a day, and when you ask, Pairwise fetches its update feed from GitHub, which sends nothing more than any web request does. You can turn that off in the settings.
+While you drag a pair or its seam, Pairwise shows pictures of those two windows. By default that is one picture at the start of the drag. With the setting Live, video keeps playing and the seam stays sharp, and macOS shows its purple recording icon during the drag. Either way Pairwise captures only those two windows, and the pictures stay in memory: they are not saved or sent anywhere. Once a day, and when you ask, Pairwise fetches its update feed from GitHub, which sends nothing more than any web request does. You can turn that off in the settings.
 
 ## Requirements
 

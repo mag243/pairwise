@@ -53,7 +53,7 @@ These need the owner's keychain, accounts or judgment, so the agent prepares the
 
 ### 7. The purple recording icon
 - [x] Say why it appears, before people see it: in the Screen Recording permission's text, on the page and in the README.
-- [ ] By hand, with the debug setting Live pictures at Still: does the icon stay away during a drag of a pair and of a seam, and how does that look? If it does and looks well enough, an ADR for a setting.
+- [x] By hand, with the debug setting at Still: the icon stays away for a pair and at a seam, with stretching at the seam. So a setting, Still by default (ADR 0063).
 
 ### 8. Translations and README
 - [x] All new text in en, nl and de (ADR 0010).

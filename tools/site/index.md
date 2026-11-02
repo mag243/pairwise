@@ -34,13 +34,16 @@ Started from anywhere else, Pairwise offers once to move itself into Application
 Pairwise lives in the menu bar and asks for two permissions in System Settings:
 
 - **Accessibility,** to move and resize the windows you join.
-- **Screen Recording,** to show live pictures of the two joined windows while you drag them. macOS shows its purple recording icon during that time. The pictures stay in memory, and are not saved or sent anywhere.
+- **Screen Recording,** to show pictures of the two joined windows while you drag them. The pictures stay in memory, and are not saved or sent anywhere.
 
-## Why does a purple icon appear when I drag?
+## Still or live pictures
 
-While you drag a pair, Pairwise shows live pictures of those two windows, because moving the real windows themselves lags visibly behind the pointer. Capturing a window is what macOS's purple recording icon reports, and that is what it is for: you can see when an app does this.
+While you drag a pair, you see pictures of the two windows, because moving the real windows themselves lags visibly behind the pointer. You choose what those pictures show:
 
-Pairwise captures only the two windows of a pair, and only from the moment you press one of them or their seam until you let go. The pictures stay in memory, and are not saved or sent anywhere. Pairwise is open source, so you can [check this in the code](https://github.com/mag243/pairwise/blob/main/Packages/PairwiseKit/Sources/PairwiseWindowSystem/LiveStream.swift).
+- **Still** is what Pairwise starts with: one picture of the two windows when you start dragging. Video stands still during the drag, and the seam can look stretched.
+- **Live** keeps video playing and the seam sharp. macOS then shows its purple recording icon during the drag, as it does for every app that captures a window continuously.
+
+Either way Pairwise captures only the two windows of a pair, and only from the moment you press one of them or their seam until you let go. The pictures stay in memory, and are not saved or sent anywhere. Pairwise is open source, so you can [check this in the code](https://github.com/mag243/pairwise/tree/main/Packages/PairwiseKit/Sources/PairwiseWindowSystem).
 
 ## Updates
 

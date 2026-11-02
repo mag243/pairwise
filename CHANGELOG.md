@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+- Still or live pictures while dragging, a new setting. Still is the default, with no purple recording icon. Live keeps video playing and the seam sharp.
+- Settings comes to the front when you open it from the menu, also from another desktop.
+- A page at https://mag243.github.io/pairwise/.
+
 ## [0.1.1]
 
 Nothing new to see: this release tries out updating from 0.1.0.

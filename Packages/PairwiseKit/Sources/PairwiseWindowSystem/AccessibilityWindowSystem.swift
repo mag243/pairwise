@@ -8,7 +8,6 @@ import os
 @MainActor
 public final class AccessibilityWindowSystem: WindowSystemProviding {
     private static let logger = Logger(subsystem: "me.m-domain.pairwise", category: "windows")
-    private static let defaultLiveFramesPerSecond = 30
     /// How long a seam stays lit after two windows join.
     private static let seamFlashTime = Duration.milliseconds(400)
     /// The app's sounds for a join and a parting (ADR 0055).
@@ -17,7 +16,7 @@ public final class AccessibilityWindowSystem: WindowSystemProviding {
     /// How much later the pointer's timer may fire, for the system to save energy.
     private static let pointerTimerTolerance = 0.02
 
-    public var liveFramesPerSecond = AccessibilityWindowSystem.defaultLiveFramesPerSecond
+    public var liveFramesPerSecond = DragPictures.live.framesPerSecond
     private let access: any SystemAccess
     /// The only windows that count as normal windows, for the join test, so that it cannot
     /// join a window of the user's (ADR 0027).
