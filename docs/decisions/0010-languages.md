@@ -8,7 +8,7 @@
 The owner's apps are in English, Dutch and German, and all user-facing text goes through String Catalogs.
 
 ## Decision
-The app supports **English** (source language), **Dutch** and **German**, follows the system language and falls back to English. A milestone that adds text is done only when every catalog has complete `nl` and `de` entries. Texts that must not be translated (the name "Pairwise") are marked `shouldTranslate: false`. an earlier project's translation tools (`tools/i18n/`) come over with M3 (ADR 0013).
+The app supports **English** (source language), **Dutch** and **German**, follows the system language and falls back to English. A milestone that adds text is done only when every catalog has complete `nl` and `de` entries. Texts that must not be translated (the name "Pairwise") are marked `shouldTranslate: false`. The translation tools are in `tools/i18n/`, and `tools/build.sh check` fails on a missing translation.
 
 ## Alternatives
 - **English only:** less work, but not what the owner wants.

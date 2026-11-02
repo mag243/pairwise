@@ -103,22 +103,22 @@
         }
       }
     },
-    "Drag a window and hold Command over another window to join them; add Shift to give it the same height, or Control for the other choice of windows. A lock also shows on the seam of windows side by side: click it to join or part them. Holding Command while dragging a joined window parts it too." : {
-      "comment" : "How to join and part windows",
+    "For testing" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ziehe ein Fenster und halte die Befehlstaste über einem anderen Fenster, um sie zu verbinden; mit Umschalt erhält es dieselbe Höhe, mit Control gilt die andere Fensterwahl. Auf der Naht nebeneinanderstehender Fenster erscheint auch ein Schloss: Klicke darauf, um sie zu verbinden oder zu trennen. Auch die Befehlstaste beim Ziehen eines verbundenen Fensters trennt es."
+            "value" : "Zum Testen"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sleep een venster en houd Command ingedrukt boven een ander venster om ze te koppelen; met Shift erbij krijgt het dezelfde hoogte, met Control geldt de andere keuze van vensters. Op de naad van vensters naast elkaar verschijnt ook een slotje: klik erop om ze te koppelen of los te maken. Ook Command tijdens het slepen van een gekoppeld venster maakt het los."
+            "value" : "Om te testen"
           }
         }
-      }
+      },
+      "comment" : "Section of settings only in a debug build"
     },
     "Grant Access…" : {
       "comment" : "Button that opens the system's permission prompt",
@@ -171,22 +171,73 @@
         }
       }
     },
-    "Last drag" : {
-      "comment" : "Section with the measurements of the last drag",
+    "How it works" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Letztes Ziehen"
+            "value" : "So funktioniert es"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Laatste keer slepen"
+            "value" : "Zo werkt het"
           }
         }
-      }
+      },
+      "comment" : "Section of settings: how to use the app"
+    },
+    "Joining" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verbinden"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Koppelen"
+          }
+        }
+      },
+      "comment" : "Section of settings"
+    },
+    "Lets Pairwise move and resize the windows you join." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Damit kann Pairwise die Fenster, die du verbindest, bewegen und ihre Größe ändern."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hiermee kan Pairwise de vensters die je koppelt verplaatsen en van formaat veranderen."
+          }
+        }
+      },
+      "comment" : "Text in the settings window"
+    },
+    "Lets Pairwise show pictures of joined windows while you drag them. They are not saved or sent anywhere." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Damit kann Pairwise Bilder verbundener Fenster zeigen, während du sie ziehst. Sie werden weder gespeichert noch irgendwohin gesendet."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hiermee kan Pairwise beelden van gekoppelde vensters tonen terwijl je ze sleept. Die worden niet bewaard en nergens heen gestuurd."
+          }
+        }
+      },
+      "comment" : "Text in the settings window"
     },
     "Live frames, window %lld" : {
       "comment" : "Measurement: live frames that arrived for one window",
@@ -217,7 +268,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Live foto's"
+            "value" : "Live beelden"
           }
         }
       }
@@ -396,6 +447,23 @@
         }
       }
     },
+    "Pairwise needs both to work." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pairwise braucht beides, um zu funktionieren."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pairwise heeft beide nodig om te werken."
+          }
+        }
+      },
+      "comment" : "Under the two permissions, when one is missing"
+    },
     "Panel appeared after (ms)" : {
       "comment" : "Measurement: time from the press until the picture of both windows showed",
       "localizations" : {
@@ -412,6 +480,23 @@
           }
         }
       }
+    },
+    "Permissions" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Berechtigungen"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toestemmingen"
+          }
+        }
+      },
+      "comment" : "Section of settings"
     },
     "Quit Pairwise" : {
       "comment" : "Menu: quits the app",
@@ -481,23 +566,6 @@
         }
       }
     },
-    "Start" : {
-      "comment" : "Button that starts following drags",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Starten"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Start"
-          }
-        }
-      }
-    },
     "Still" : {
       "comment" : "Setting: the pictures do not update during a drag",
       "localizations" : {
@@ -511,23 +579,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Stilstaand"
-          }
-        }
-      }
-    },
-    "Stop" : {
-      "comment" : "Button that stops following drags",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Stoppen"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Stop"
           }
         }
       }
@@ -600,6 +651,91 @@
         }
       }
     },
+    "To join, drag a window to another and press Command, or click the open lock on the seam of two windows side by side." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ziehe ein Fenster zu einem anderen und drücke die Befehlstaste, um sie zu verbinden, oder klicke auf das offene Schloss an der Naht zweier nebeneinanderliegender Fenster."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sleep een venster naar een ander en druk op Command om ze te koppelen, of klik op het open slotje op de naad van twee vensters naast elkaar."
+          }
+        }
+      },
+      "comment" : "Text in the settings window"
+    },
+    "To move a pair, drag either window." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ziehe eines der Fenster, um ein Paar zu bewegen."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sleep een van de vensters om een paar te verplaatsen."
+          }
+        }
+      },
+      "comment" : "Text in the settings window"
+    },
+    "To part them, click the closed lock on the seam, or press Command while dragging one." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Klicke auf das geschlossene Schloss an der Naht, um sie zu trennen, oder drücke die Befehlstaste, während du eines ziehst."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Klik op het dichte slotje op de naad om ze los te koppelen, of druk op Command terwijl je er een sleept."
+          }
+        }
+      },
+      "comment" : "Text in the settings window"
+    },
+    "To resize both, drag the seam between them." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ziehe die Naht dazwischen, um die Größe beider zu ändern."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sleep de naad ertussen om beide van formaat te veranderen."
+          }
+        }
+      },
+      "comment" : "Text in the settings window"
+    },
+    "While joining, add Shift for the same height, or Control for the other choice of windows." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nimm beim Verbinden Umschalt für dieselbe Höhe hinzu, oder Control für die andere Fensterwahl."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Voeg tijdens het koppelen Shift toe voor dezelfde hoogte, of Control voor de andere keuze van vensters."
+          }
+        }
+      },
+      "comment" : "Text in the settings window"
+    },
     "Windows of the same app" : {
       "comment" : "Setting value: Command joins only windows of the same app",
       "localizations" : {
@@ -613,23 +749,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Vensters van dezelfde app"
-          }
-        }
-      }
-    },
-    "Without it, windows move one at a time." : {
-      "comment" : "What happens without Screen Recording",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ohne diese Berechtigung bewegen sich Fenster einzeln."
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zonder dit bewegen vensters los van elkaar."
           }
         }
       }

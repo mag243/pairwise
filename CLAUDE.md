@@ -28,7 +28,7 @@ tools/build.sh verify                 # check + package tests + build the app: g
 tools/build.sh ci                     # check + package tests + build the app + macOS app tests (default)
 tools/build.sh test DragStatsTests     # one suite or test (swift test --filter)
 tools/build.sh apptest LaunchTests/testShowsWindow   # only these UI tests (comma-separated; takes the screen)
-tools/build.sh check                  # swift-format, SwiftLint, import rules (ADR 0001), shellcheck
+tools/build.sh check                  # swift-format, SwiftLint, import rules (ADR 0001), translations, shellcheck
 tools/build.sh format                 # the only command that rewrites code
 tools/build.sh coverage               # package tests with line coverage, per-module targets (PLAN.md, Test plan)
 tools/build.sh run                    # build and start the macOS app

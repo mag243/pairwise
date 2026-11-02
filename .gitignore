@@ -23,3 +23,7 @@ build/
 
 # Coverage output of swift test and instrumented runs
 *.profraw
+
+# Working files of the translation tools
+tools/i18n/_translation_*.json
+__pycache__/

@@ -1,0 +1,6 @@
+# Keys whose translation is deliberately the same as the English source,
+# grouped by why (tools/i18n/translate.py check). A key that reads Dutch or
+# German in the source never belongs here: that is the bug this check finds.
+
+# The owner's choice for the menu, though Apple's Dutch says "Stop".
+Quit Pairwise

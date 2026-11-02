@@ -2,7 +2,8 @@
 # Checks, builds, and tests Pairwise.
 #
 # Usage: tools/build.sh [command...]
-#   check       Formatting (swift-format), lint (SwiftLint), dependency rules, shellcheck.
+#   check       Formatting (swift-format), lint (SwiftLint), dependency rules, shell scripts
+#               (shellcheck), translations.
 #   format      Rewrite Swift code with SwiftLint --fix and swift-format (the only
 #               command that changes code).
 #   test        Package tests (swift test). Followed by a filter, only matching tests:
@@ -139,6 +140,8 @@ cmd_check() {
   fi
   "$TOOLS_DIR/check_dependencies.sh" || fail "Dependency rules violated (ADR 0001)"
   ok "Dependency rules"
+  python3 "$TOOLS_DIR/i18n/translate.py" check || fail "Translations are incomplete (ADR 0010, tools/i18n)"
+  ok "Translations"
   has shellcheck || fail "shellcheck not found. Run tools/setup.sh."
   shellcheck -x "$TOOLS_DIR"/*.sh "$TOOLS_DIR"/xcode/*.sh "$TOOLS_DIR"/git-hooks/* || fail "shellcheck reported problems"
   ok "shellcheck"

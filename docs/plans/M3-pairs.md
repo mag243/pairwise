@@ -64,13 +64,13 @@ Done first because everything below adds code to this module.
 ### 9. Pairs that last
 - [x] ADR 0054: how a window is found again after a restart (app, title, size, place), since its number does not survive.
 - [x] Pairs are saved, and restored at the start where both windows are found. A pair that cannot be found with confidence is dropped, and no window is moved.
-- [ ] Check by hand: a quit, a restart of an app, a restart of the Mac.
+- [x] Checked by hand: a quit, and a window moved in between. A restart of an app and of the Mac are still to be seen.
 
 ### 10. The app itself
 - [x] ADR 0034: a menu bar app (open decision 2 in `PLAN.md`, owner's choice 4). Done before step 4, at the owner's wish.
 - [x] The menu bar icon, the menu, and the window as settings.
-- [ ] The measurements and the frame rate leave the main interface. The permissions stay, explained plainly. The stress test stays.
-- [ ] Complete `nl` and `de`, with the translation tools of ADR 0010 brought over.
+- [x] The measurements and the frame rate leave the main interface, for debug builds only. The permissions stay, explained plainly. The stress test stays.
+- [x] Complete `nl` and `de`, with the translation tools of ADR 0010 brought over.
 
 ## Acceptance criteria
 - [ ] By hand: two windows of different apps join, move together, share their seam and come apart, without a manual.
