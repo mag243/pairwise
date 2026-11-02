@@ -48,6 +48,7 @@ A separate app cannot make another app's window a child window (`addChildWindow`
 - **M1, spike:** step 1 of the order above. Its result, smooth enough or not, decides whether M2 is needed.
 - **M2, moving together while dragging:** step 2, since M1 was not smooth enough.
 - **M3, Pairwise without plug-in:** step 3.
+- **M3a, release:** signed and notarized, Homebrew and Sparkle; `M3a-release.md`.
 - **M4, the plug-in in our own apps:** step 4.
 - **M5, the plug-in public:** step 5, only if Pairwise has users.
 
