@@ -5,7 +5,7 @@ import PairwiseCore
 /// window will land, and a seam that lights up (ADR 0035). It takes neither focus nor clicks.
 @MainActor
 final class JoinMarkPanel: ScreenMark {
-    private static let colour = NSColor(srgbRed: 0.96, green: 0.65, blue: 0.14, alpha: 1)
+    private static let colour = SeamColour.amber
     private static let fillOpacity = 0.3
 
     private let panel: NSPanel

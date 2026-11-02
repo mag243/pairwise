@@ -75,6 +75,11 @@ import Testing
         #expect(patch.part == CGRect(x: 0, y: 0.74, width: 0.23, height: 0.26))
     }
 
+    @Test func theAmberLineStandsOnTheSeamAlongTheShorterWindow() {
+        let line = StandInPanel.seamLine(of: Self.sizes, seamAt: 90)
+        #expect(line == CGRect(x: 87, y: 120, width: 6, height: 80))
+    }
+
     @Test func theFillShowsOneColumnAtTheSplit() {
         let column = StandInPanel.fillColumn(ofPictureWidth: 100, atSplit: 30)
         #expect(column == CGRect(x: 0.3, y: 0, width: 0.01, height: 1))

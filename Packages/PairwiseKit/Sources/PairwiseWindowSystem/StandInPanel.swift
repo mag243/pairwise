@@ -28,12 +28,6 @@ final class StandInPanel: WindowStandIn {
         let tail = CALayer()
     }
 
-    /// The top left of a window, in points, that holds its close, minimize and zoom buttons.
-    private static let buttonsArea = CGSize(width: 92, height: 52)
-
-    /// How many rows of a picture one row of its sample stands for.
-    private static let rowsPerSample = 4
-
     private let panel: NSPanel
     private let streams: [LiveStream]
     private let pictures: [Picture]
@@ -45,6 +39,8 @@ final class StandInPanel: WindowStandIn {
     /// Where each picture divides, as a share of its width, found at the first seam.
     private var splitShares: [CGFloat] = []
     private var seam: CGFloat?
+    /// The amber line on the seam, added at the first seam.
+    private let seamLineLayer = CALayer()
     private var totalWidth: CGFloat { pictures.map(\.size.width).reduce(0, +) }
 
     var liveFrames: [Int] { streams.map(\.frames) }
@@ -118,74 +114,18 @@ final class StandInPanel: WindowStandIn {
         return layers
     }
 
-    /// Where two pictures go with the seam at `seam` from the left, each divided at its place
-    /// in `splits` and keeping both edges. The panel's width does not change.
-    static func seamLayout(
-        of sizes: [CGSize], splits: [CGFloat], totalWidth: CGFloat, seamAt seam: CGFloat
-    ) -> [SeamPlace] {
-        guard sizes.count == 2, splits.count == 2 else { return [] }
-        let (left, right) = (sizes[0], sizes[1])
-        let height = max(left.height, right.height)
-        let rightWidth = totalWidth - seam
-        return [
-            place(
-                of: left, split: splits[0],
-                inSlot: CGRect(x: 0, y: height - left.height, width: seam, height: left.height)),
-            place(
-                of: right, split: splits[1],
-                inSlot: CGRect(
-                    x: seam, y: height - right.height, width: rightWidth, height: right.height)),
-        ]
-    }
-
-    private static func place(
-        of size: CGSize, split: CGFloat, inSlot slot: CGRect
-    ) -> SeamPlace {
-        let tailWidth = size.width - split
-        return SeamPlace(
-            slot: slot,
-            head: CGRect(x: 0, y: 0, width: split, height: size.height),
-            fill: CGRect(
-                x: split, y: 0, width: max(slot.width - size.width, 0), height: size.height),
-            tail: CGRect(
-                x: slot.width - tailWidth, y: 0, width: tailWidth, height: size.height))
-    }
-
-    /// The part of a picture that fills the room in a wider window, as a share of the picture:
-    /// one column at its split, stretched.
-    static func fillColumn(ofPictureWidth width: CGFloat, atSplit split: CGFloat) -> CGRect {
-        CGRect(x: split / width, y: 0, width: 1 / width, height: 1)
-    }
-
     /// Reads the picture once, at the first seam, as a press that only moves needs none of this.
     private func prepareForSeam() {
         guard parts.isEmpty else { return }
+        seamLineLayer.backgroundColor = SeamColour.amber.cgColor
+        seamLineLayer.cornerRadius = Self.seamLineWidth / 2
+        panel.contentView?.layer?.addSublayer(seamLineLayer)
         for (index, picture) in pictures.enumerated() {
             let split = Self.quietSplit(of: picture)
             splitShares.append(split / picture.size.width)
             parts.append(Self.seamLayers(of: picture, split: split, in: slots[index]))
             images[index].isHidden = true
         }
-    }
-
-    /// One value per point across, and fewer rows than that, which is enough to see text.
-    private static func quietSplit(of picture: Picture) -> CGFloat {
-        let width = Int(picture.size.width)
-        let height = max(Int(picture.size.height) / rowsPerSample, 1)
-        guard
-            width > 0,
-            let context = CGContext(
-                data: nil, width: width, height: height, bitsPerComponent: 8, bytesPerRow: width,
-                space: CGColorSpaceCreateDeviceGray(),
-                bitmapInfo: CGImageAlphaInfo.none.rawValue),
-            let data = context.data
-        else { return picture.size.width / 2 }
-        context.interpolationQuality = .none
-        context.draw(picture.image, in: CGRect(x: 0, y: 0, width: width, height: height))
-        let gray = Array(
-            UnsafeBufferPointer(
-                start: data.assumingMemoryBound(to: UInt8.self), count: width * height))
-        return CGFloat(QuietColumn.index(inGray: gray, width: width, height: height))
     }
 
     func setSeam(atOffset offset: Double) {
@@ -212,31 +152,7 @@ final class StandInPanel: WindowStandIn {
         }
         let live = Self.liveLayout(of: sizes, totalWidth: totalWidth, seamAt: seam)
         for (index, place) in live.enumerated() { images[index].frame = place.frame }
-    }
-
-    /// Where a live frame goes: all of it in its slot, scaled to fit. It differs little from
-    /// the slot, as the window follows the seam, so nothing shows of the scaling, where any
-    /// division would show as a line through the content, also with a still pointer as an app
-    /// can round its width (ADR 0049).
-    static func liveLayout(
-        of sizes: [CGSize], totalWidth: CGFloat, seamAt seam: CGFloat
-    ) -> [(slot: CGRect, frame: CGRect)] {
-        seamLayout(of: sizes, splits: [0, 0], totalWidth: totalWidth, seamAt: seam).map { place in
-            (place.slot, CGRect(origin: .zero, size: place.slot.size))
-        }
-    }
-
-    /// Where the still picture's buttons go over live frames, and the part of the picture that
-    /// holds them. macOS shows a mark of its own there in the frames of a window it streams
-    /// (ADR 0049).
-    static func buttonsPatch(ofPictureSize size: CGSize) -> (frame: CGRect, part: CGRect) {
-        let area = buttonsArea
-        let height = area.height / size.height
-        // A layer's contents count from the bottom, as its place does.
-        return (
-            CGRect(x: 0, y: size.height - area.height, width: area.width, height: area.height),
-            CGRect(x: 0, y: 1 - height, width: area.width / size.width, height: height)
-        )
+        seamLineLayer.frame = Self.seamLine(of: sizes, seamAt: seam)
     }
 
     private func addButtonsPatch(over index: Int) {
@@ -248,14 +164,6 @@ final class StandInPanel: WindowStandIn {
         layer.contentsRect = patch.part
         layer.frame = patch.frame
         slots[index].addSublayer(layer)
-    }
-
-    /// The part of a surface that `rect`, in points at `scale`, takes up, as a share of it.
-    static func share(of rect: CGRect, scale: Double, inSurface surface: CGSize) -> CGRect {
-        CGRect(
-            x: rect.origin.x * scale / surface.width, y: rect.origin.y * scale / surface.height,
-            width: rect.width * scale / surface.width,
-            height: rect.height * scale / surface.height)
     }
 
     /// Shows a live frame in place of the picture and its parts.

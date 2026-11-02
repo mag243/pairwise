@@ -6,7 +6,7 @@ import PairwiseCore
 /// place first.
 @MainActor
 final class SeamLockPanel: SeamLockMark {
-    private static let colour = NSColor(srgbRed: 0.96, green: 0.65, blue: 0.14, alpha: 1)
+    private static let colour = SeamColour.amber
     private static let openColour = NSColor(white: 0.88, alpha: 1)
     private static let symbolColour = NSColor(white: 0.1, alpha: 1)
     private static let symbolSize = 13.0
