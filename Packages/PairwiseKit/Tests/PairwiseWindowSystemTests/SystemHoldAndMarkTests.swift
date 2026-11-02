@@ -91,25 +91,17 @@ import Testing
         #expect(marks.count == 2)
     }
 
-    @Test func theClosedLockIsOneMarkThatMoves() {
-        system.showSeamLock(at: Self.frame)
-        system.showSeamLock(at: Self.frame)
+    @Test func theLockIsOneMarkThatChanges() {
+        system.showSeamLock(at: Self.frame, isClosed: true)
+        system.showSeamLock(at: Self.frame, isClosed: false)
         #expect(markBox.locks.count == 1)
-        #expect(markBox.locks.first?.closedFrames.count == 2)
+        #expect(markBox.locks.first?.states == [true, false])
     }
 
     @Test func hidingTheLockTakesItAway() {
-        system.showSeamLock(at: Self.frame)
+        system.showSeamLock(at: Self.frame, isClosed: true)
         system.hideSeamLock()
         #expect(markBox.locks.first?.isHidden == true)
-    }
-
-    @Test func anOpenLockIsAMarkOfItsOwn() {
-        system.showSeamLock(at: Self.frame)
-        system.hideSeamLock()
-        system.flashOpenSeamLock(at: Self.frame)
-        #expect(markBox.locks.count == 2)
-        #expect(markBox.locks.last?.openFrames == [Self.frame])
     }
 
     @Test func aSeamLightsUpOnAMarkOfItsOwn() {
@@ -122,16 +114,11 @@ import Testing
 
 @MainActor
 private final class FakeLockMark: SeamLockMark {
-    private(set) var closedFrames: [WindowFrame] = []
-    private(set) var openFrames: [WindowFrame] = []
+    private(set) var states: [Bool] = []
     private(set) var isHidden = false
 
-    func showClosed(at frame: WindowFrame) {
-        closedFrames.append(frame)
-    }
-
-    func showOpen(at frame: WindowFrame) {
-        openFrames.append(frame)
+    func show(at frame: WindowFrame, isClosed: Bool) {
+        states.append(isClosed)
     }
 
     func hide() {

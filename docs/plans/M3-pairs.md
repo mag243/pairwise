@@ -35,7 +35,9 @@ Done first because everything below adds code to this module.
 
 ### 5. Coming apart
 - [x] Command at a press or during the drag of a pair ends the pair, and only that window moves (ADR 0035, 0036, 0040).
-- [x] A lock on the seam shows near the pointer, and a click on it ends the pair with both windows staying in place (ADR 0042).
+- [x] A lock on the seam shows near the pointer, and a click on it ends the pair with both windows staying in place (ADR 0042, 0044).
+- [x] Two windows side by side in no pair show an open lock, and a click on it joins them with their tops level (ADR 0044).
+- [ ] Check the open lock by hand.
 - [x] Checked by hand, with the lock.
 
 ### 6. The shared seam
@@ -65,7 +67,7 @@ Done first because everything below adds code to this module.
 
 ## Acceptance criteria
 - [ ] By hand: two windows of different apps join, move together, share their seam and come apart, without a manual.
-- [ ] By hand: a window not in a pair behaves exactly as without Pairwise, including tabs, tiling and snapping.
+- [ ] By hand: a window not in a pair behaves exactly as without Pairwise, including tabs, tiling and snapping, apart from a drag starting on the lock's own small place on a seam (ADR 0044).
 - [ ] The stress test covers joined pairs, a closed partner and a kill during a drag, and passes.
 - [ ] After a kill during a drag, the next start puts the windows back.
 - [ ] Coverage targets are met: Core ≥ 90 %, WindowSystem ≥ 75 %, UI state ≥ 70 %.

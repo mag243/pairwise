@@ -33,7 +33,7 @@ public final class FakeWindowSystem: WindowSystemProviding {
     public var pointerLocation = ScreenPoint(x: 0, y: 0)
     public private(set) var lockFrames: [WindowFrame] = []
     public private(set) var isLockShowing = false
-    public private(set) var openedLocks: [WindowFrame] = []
+    public private(set) var isLockClosed = false
     public private(set) var windowNumberRequests = 0
 
     private var holdDecision: (@MainActor (PointerButtonEvent) -> Bool)?
@@ -88,17 +88,14 @@ public final class FakeWindowSystem: WindowSystemProviding {
         seamFlashes.append(frame)
     }
 
-    public func showSeamLock(at frame: WindowFrame) {
+    public func showSeamLock(at frame: WindowFrame, isClosed: Bool) {
         lockFrames.append(frame)
         isLockShowing = true
+        isLockClosed = isClosed
     }
 
     public func hideSeamLock() {
         isLockShowing = false
-    }
-
-    public func flashOpenSeamLock(at frame: WindowFrame) {
-        openedLocks.append(frame)
     }
 
     public func startWatchingPointer(

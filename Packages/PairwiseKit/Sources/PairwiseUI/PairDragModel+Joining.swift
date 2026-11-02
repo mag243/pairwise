@@ -155,7 +155,7 @@ extension PairDragModel {
             """)
     }
 
-    private static func seam(of target: JoinTarget) -> Seam? {
+    static func seam(of target: JoinTarget) -> Seam? {
         target.side == .right
             ? Seam.between(left: target.other.frame, right: target.frame)
             : Seam.between(left: target.frame, right: target.other.frame)

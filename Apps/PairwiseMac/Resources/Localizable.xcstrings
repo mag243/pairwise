@@ -86,19 +86,19 @@
         }
       }
     },
-    "Drag a window and hold Command over another window to join them; add Shift to give it the same height, or Control for the other choice of windows. To part them, click the lock on their seam, or hold Command while dragging one." : {
+    "Drag a window and hold Command over another window to join them; add Shift to give it the same height, or Control for the other choice of windows. A lock also shows on the seam of windows side by side: click it to join or part them. Holding Command while dragging a joined window parts it too." : {
       "comment" : "How to join and part windows",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ziehe ein Fenster und halte die Befehlstaste über einem anderen Fenster, um sie zu verbinden; mit Umschalt erhält es dieselbe Höhe, mit Control gilt die andere Fensterwahl. Klicke zum Trennen auf das Schloss an ihrer Naht, oder halte beim Ziehen eines der Fenster die Befehlstaste."
+            "value" : "Ziehe ein Fenster und halte die Befehlstaste über einem anderen Fenster, um sie zu verbinden; mit Umschalt erhält es dieselbe Höhe, mit Control gilt die andere Fensterwahl. Auf der Naht nebeneinanderstehender Fenster erscheint auch ein Schloss: Klicke darauf, um sie zu verbinden oder zu trennen. Auch die Befehlstaste beim Ziehen eines verbundenen Fensters trennt es."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sleep een venster en houd Command ingedrukt boven een ander venster om ze te koppelen; met Shift erbij krijgt het dezelfde hoogte, met Control geldt de andere keuze van vensters. Klik om ze los te maken op het slotje op hun naad, of houd Command ingedrukt terwijl je er een sleept."
+            "value" : "Sleep een venster en houd Command ingedrukt boven een ander venster om ze te koppelen; met Shift erbij krijgt het dezelfde hoogte, met Control geldt de andere keuze van vensters. Op de naad van vensters naast elkaar verschijnt ook een slotje: klik erop om ze te koppelen of los te maken. Ook Command tijdens het slepen van een gekoppeld venster maakt het los."
           }
         }
       }

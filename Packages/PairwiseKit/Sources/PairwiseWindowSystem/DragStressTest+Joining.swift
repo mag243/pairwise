@@ -12,6 +12,8 @@ extension DragStressTest {
     private static let floatingLevel = 3
     /// The level of the lock on a seam, which tells it from the guide.
     private static let lockLevel = 8
+    /// How far below the other's top the first window goes before the lock joins them.
+    private static let lockTopOffset = 30.0
     private static let pictureMargin = 60.0
     private static let otherHeight = 500.0
     private static let leftOrigin = ScreenPoint(x: 100, y: 120)
@@ -103,23 +105,38 @@ extension DragStressTest {
     /// Expects the first window on the right, as the steps before leave it.
     private func partWithTheLock(_ window: AccessibilityWindow, _ other: AccessibilityWindow) async
     {
+        guard let place = window.serverFrame()?.origin else { return }
+        await clickLock(between: window, other, label: "closed")
+        report("parted with the lock", window, other)
+        await drag(window, byX: 30, byY: 0, withJoinKey: false, picture: nil)
+        report("a plain drag after the lock: only the first moved, by 30", window, other)
+        await self.place(window, at: ScreenPoint(x: place.x, y: place.y + Self.lockTopOffset))
+        await wait(Self.settleWait)
+        await clickLock(between: window, other, label: "open")
+        lines.append("expect the windows' tops level, tight against each other")
+        report("joined with the lock", window, other)
+        await drag(window, byX: 30, byY: 0, withJoinKey: false, picture: nil)
+        report("dragged after the lock: both moved by 30", window, other)
+    }
+
+    /// Clicks the lock in the middle of the seam, with the first window on the right.
+    private func clickLock(
+        between window: AccessibilityWindow, _ other: AccessibilityWindow, label: String
+    ) async {
         guard let first = window.serverFrame(), let second = other.serverFrame() else { return }
-        let middle = CGPoint(
-            x: first.origin.x,
-            y: first.origin.y + min(first.size.height, second.size.height) / 2)
+        let top = max(first.origin.y, second.origin.y)
+        let bottom = min(first.maxY, second.maxY)
+        let middle = CGPoint(x: first.origin.x, y: (top + bottom) / 2)
         post(.mouseMoved, at: CGPoint(x: middle.x + Self.snapGap, y: middle.y))
         await wait(Self.guideWait)
-        lines.append("near the seam: lock \(ownMarks(atLevel: Self.lockLevel))")
+        lines.append("near the seam, \(label): lock \(ownMarks(atLevel: Self.lockLevel))")
         post(.mouseMoved, at: middle)
         await wait(Self.windowWait)
         post(.leftMouseDown, at: middle)
         await wait(Self.windowWait)
         post(.leftMouseUp, at: middle)
         await wait(Self.settleWait)
-        lines.append("press: \(pressOutcome()); after the click: first still at its place")
-        report("parted with the lock", window, other)
-        await drag(window, byX: 30, byY: 0, withJoinKey: false, picture: nil)
-        report("a plain drag after the lock: only the first moved, by 30", window, other)
+        lines.append("press: \(pressOutcome()); lock now \(ownMarks(atLevel: Self.lockLevel))")
     }
 
     private func drag(

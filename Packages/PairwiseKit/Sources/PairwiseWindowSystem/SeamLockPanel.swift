@@ -1,11 +1,13 @@
 import AppKit
 import PairwiseCore
 
-/// A small lock above other windows, in the amber of the app's seam (ADR 0042). It takes
-/// neither focus nor clicks: the tap sees a press on its place first.
+/// A small lock above other windows: closed in the amber of the app's seam, and open in a
+/// quiet grey (ADR 0044). It takes neither focus nor clicks: the tap sees a press on its
+/// place first.
 @MainActor
 final class SeamLockPanel: SeamLockMark {
     private static let colour = NSColor(srgbRed: 0.96, green: 0.65, blue: 0.14, alpha: 1)
+    private static let openColour = NSColor(white: 0.88, alpha: 1)
     private static let symbolColour = NSColor(white: 0.1, alpha: 1)
     private static let symbolSize = 13.0
     private static let closedSymbol = "lock.fill"
@@ -28,7 +30,6 @@ final class SeamLockPanel: SeamLockMark {
         panel.collectionBehavior = [.transient, .ignoresCycle, .fullScreenAuxiliary]
         let background = NSView()
         background.wantsLayer = true
-        background.layer?.backgroundColor = Self.colour.cgColor
         symbol.contentTintColor = Self.symbolColour
         symbol.symbolConfiguration = .init(pointSize: Self.symbolSize, weight: .semibold)
         symbol.imageAlignment = .alignCenter
@@ -37,28 +38,22 @@ final class SeamLockPanel: SeamLockMark {
         panel.contentView = background
     }
 
-    /// Shows the closed lock over `frame`, or moves it there.
-    func showClosed(at frame: WindowFrame) {
-        show(Self.closedSymbol, at: frame)
-    }
-
-    /// Shows the open lock over `frame`.
-    func showOpen(at frame: WindowFrame) {
-        show(Self.openSymbol, at: frame)
+    /// Shows the lock over `frame`, or moves or changes it there.
+    func show(at frame: WindowFrame, isClosed: Bool) {
+        symbol.image = NSImage(
+            systemSymbolName: isClosed ? Self.closedSymbol : Self.openSymbol,
+            accessibilityDescription: nil)
+        panel.setFrame(NSScreen.appKitFrame(frame), display: false)
+        let content = panel.contentView
+        symbol.frame = content?.bounds ?? .zero
+        content?.layer?.cornerRadius = frame.size.width / 2
+        content?.layer?.backgroundColor = (isClosed ? Self.colour : Self.openColour).cgColor
+        panel.invalidateShadow()
+        panel.orderFrontRegardless()
     }
 
     /// Takes the lock off the screen.
     func hide() {
         panel.close()
-    }
-
-    private func show(_ name: String, at frame: WindowFrame) {
-        symbol.image = NSImage(systemSymbolName: name, accessibilityDescription: nil)
-        panel.setFrame(NSScreen.appKitFrame(frame), display: false)
-        let content = panel.contentView
-        symbol.frame = content?.bounds ?? .zero
-        content?.layer?.cornerRadius = frame.size.width / 2
-        panel.invalidateShadow()
-        panel.orderFrontRegardless()
     }
 }

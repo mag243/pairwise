@@ -224,6 +224,8 @@ public final class PairDragModel {
         switch drag {
         case .none, .passing, .clickingLock:
             break
+        case .closingLock(let lock):
+            closeLock(lock)
         case .pressed(let pressed):
             if isButtonLetGo {
                 release(at: pressed.lastPointer)

@@ -1,7 +1,7 @@
 import Foundation
 import PairwiseCore
 
-/// What the model knows of the lock on a seam (ADR 0042).
+/// What the model knows of the lock on a seam (ADR 0044).
 struct SeamLockWatch {
     var isWatching = false
     /// The lock that shows.
@@ -10,17 +10,16 @@ struct SeamLockWatch {
     var lastPointer: ScreenPoint?
 }
 
-/// The lock on a seam: it shows near the pointer, and a click on it ends the pair.
+/// The lock on a seam: it shows near the pointer, and a click on it parts or joins.
 extension PairDragModel {
-    /// How often the pointer is looked at while a pair exists, in seconds.
+    /// How often the pointer is looked at while Pairwise runs, in seconds.
     private static let pointerInterval: TimeInterval = 0.1
 
-    /// Watches the pointer while Pairwise runs and a pair exists, and otherwise costs nothing.
+    /// Watches the pointer while Pairwise runs, and otherwise costs nothing.
     func updatePointerWatching() {
-        let wanted = isRunning && !book.pairs.isEmpty
-        guard wanted != lockWatch.isWatching else { return }
-        lockWatch.isWatching = wanted
-        if wanted {
+        guard isRunning != lockWatch.isWatching else { return }
+        lockWatch.isWatching = isRunning
+        if isRunning {
             system.startWatchingPointer(every: Self.pointerInterval) { [weak self] in
                 self?.lookAtPointer()
             }
@@ -40,14 +39,18 @@ extension PairDragModel {
         }
         let pointer = system.pointerLocation
         guard pointer != lockWatch.lastPointer || lockWatch.lock != nil else { return }
+        updateLock(forPointerAt: pointer)
+    }
+
+    private func updateLock(forPointerAt pointer: ScreenPoint) {
         lockWatch.lastPointer = pointer
         let lock = SeamLockRule.lock(
             pointer: pointer, pairs: book.pairs, windows: system.normalWindows(),
-            isShowing: lockWatch.lock != nil)
+            scope: joinScope, isShowing: lockWatch.lock != nil)
         guard lock != lockWatch.lock else { return }
         if let lock {
             lockWatch.lock = lock
-            system.showSeamLock(at: lock.frame)
+            system.showSeamLock(at: lock.frame, isClosed: lock.isClosed)
         } else {
             hideLock()
         }
@@ -74,15 +77,52 @@ extension PairDragModel {
         return true
     }
 
-    /// Says whether a release ends a click on the lock. Only a release on the lock ends the
-    /// pair, as with any button.
+    /// Says whether a release ends a click on the lock. Only a release on the lock acts, as
+    /// with any button. Ending a pair asks no app, and the lock turns open at once.
     func releaseLock(at point: ScreenPoint) -> Bool {
         guard case .clickingLock(let lock) = drag else { return false }
         drag = .none
-        if lock.frame.contains(point) {
+        guard lock.frame.contains(point) else { return true }
+        if lock.isClosed {
             endPair(of: lock.pair.left)
-            system.flashOpenSeamLock(at: lock.frame)
+            updateLock(forPointerAt: point)
+        } else {
+            drag = .closingLock(lock)
+            system.startTicking(every: Self.tickInterval) { [weak self] in self?.tick() }
         }
         return true
+    }
+
+    /// Joins the windows of an open lock. The one further back goes tight against the one in
+    /// front, with its top, as a pair's tops are level. A failure leaves them as they are.
+    func closeLock(_ lock: SeamLock) {
+        defer {
+            endDrag()
+            updateLock(forPointerAt: system.pointerLocation)
+        }
+        let windows = system.normalWindows()
+        guard
+            let front = windows.first(where: {
+                $0.number == lock.pair.left || $0.number == lock.pair.right
+            }),
+            let back = windows.first(where: {
+                $0.number != front.number
+                    && ($0.number == lock.pair.left || $0.number == lock.pair.right)
+            }),
+            let backWindow = system.window(number: back.number),
+            let frontWindow = system.window(number: front.number)
+        else { return }
+        let side: PairSide = back.number == lock.pair.left ? .left : .right
+        let target = JoinRule.target(joining: back.frame, beside: front, on: side)
+        do {
+            if target.frame != back.frame { try backWindow.move(to: target.frame.origin) }
+            try join(backWindow, to: frontWindow, on: side)
+            if let seam = Self.seam(of: target) {
+                system.flashSeam(at: seam.frame(width: Self.seamWidth))
+            }
+        } catch {
+            Self.logger.info(
+                "the lock did not join: \(String(describing: error), privacy: .public)")
+        }
     }
 }

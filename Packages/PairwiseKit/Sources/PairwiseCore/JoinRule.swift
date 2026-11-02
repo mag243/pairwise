@@ -86,6 +86,14 @@ public enum JoinRule {
             }
     }
 
+    /// The place for a window at `frame`, keeping its size, on `side` of `window`, tight
+    /// against it and with its top.
+    public static func target(
+        joining frame: WindowFrame, beside window: ScreenWindow, on side: PairSide
+    ) -> JoinTarget {
+        target(size: frame.size, beside: window, on: side)
+    }
+
     private static func target(
         size: WindowSize, beside window: ScreenWindow, on side: PairSide
     ) -> JoinTarget {

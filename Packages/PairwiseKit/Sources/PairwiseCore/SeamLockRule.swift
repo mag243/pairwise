@@ -34,11 +34,14 @@ public struct Seam: Equatable, Sendable {
     }
 }
 
-/// A lock on a seam, to click to end the pair (ADR 0042).
+/// A lock on a seam: closed on a pair, to click to end it, and open on two windows side by
+/// side, to click to join them (ADR 0044).
 public struct SeamLock: Equatable, Sendable {
+    /// The two windows, with their sides, whether they are a pair yet or not.
     public let pair: WindowPair
     /// Where the lock shows.
     public let frame: WindowFrame
+    public let isClosed: Bool
 }
 
 /// When a seam shows its lock.
@@ -52,25 +55,75 @@ public enum SeamLockRule {
     private static let lockSize = 28.0
 
     /// The lock to show with the pointer at `pointer`, among `windows`, frontmost first, or
-    /// `nil`. A pair shows one only when it is on top both at the pointer and at the lock's
-    /// place, so a lock never lies over another window.
+    /// `nil`. A lock shows only when its two windows are on top both at the pointer and at
+    /// the lock's place, so it never lies over another window. An open lock shows only for
+    /// windows that `scope` lets join.
     public static func lock(
-        pointer: ScreenPoint, pairs: [WindowPair], windows: [ScreenWindow], isShowing: Bool
+        pointer: ScreenPoint, pairs: [WindowPair], windows: [ScreenWindow], scope: JoinScope,
+        isShowing: Bool
     ) -> SeamLock? {
-        let distance = isShowing ? keepDistance : showDistance
-        let frames = Dictionary(windows.map { ($0.number, $0.frame) }) { first, _ in first }
+        let search = Search(
+            pointer: pointer, windows: windows,
+            distance: isShowing ? keepDistance : showDistance)
+        return closedLock(pairs: pairs, search)
+            ?? openLock(pairs: pairs, scope: scope, search)
+    }
+
+    private struct Search {
+        let pointer: ScreenPoint
+        let windows: [ScreenWindow]
+        let distance: Double
+    }
+
+    private static func closedLock(pairs: [WindowPair], _ search: Search) -> SeamLock? {
         for pair in pairs {
             guard
-                let left = frames[pair.left], let right = frames[pair.right],
-                let seam = Seam.between(left: left, right: right),
-                abs(pointer.x - seam.x) <= distance,
-                pointer.y >= seam.top, pointer.y <= seam.bottom,
-                isOnTop(pair, at: pointer, among: windows),
-                isOnTop(pair, at: seam.middle, among: windows)
+                let left = search.windows.first(where: { $0.number == pair.left }),
+                let right = search.windows.first(where: { $0.number == pair.right }),
+                let lock = lock(left: left, right: right, isClosed: true, search)
             else { continue }
-            return SeamLock(pair: pair, frame: frame(at: seam.middle))
+            return lock
         }
         return nil
+    }
+
+    /// The window under the pointer and any free window beside it.
+    private static func openLock(
+        pairs: [WindowPair], scope: JoinScope, _ search: Search
+    ) -> SeamLock? {
+        let isFree = { (window: ScreenWindow) in
+            !pairs.contains { $0.left == window.number || $0.right == window.number }
+        }
+        guard
+            let top = search.windows.first(where: { $0.frame.contains(search.pointer) }),
+            isFree(top)
+        else { return nil }
+        let others = JoinRule.candidates(for: top.number, among: search.windows, scope: scope)
+            .filter(isFree)
+        for other in others {
+            if let lock = lock(left: top, right: other, isClosed: false, search)
+                ?? lock(left: other, right: top, isClosed: false, search)
+            {
+                return lock
+            }
+        }
+        return nil
+    }
+
+    private static func lock(
+        left: ScreenWindow, right: ScreenWindow, isClosed: Bool, _ search: Search
+    ) -> SeamLock? {
+        let pointer = search.pointer
+        let pair = WindowPair(left: left.number, right: right.number)
+        guard
+            let seam = Seam.between(left: left.frame, right: right.frame),
+            seam.bottom - seam.top >= lockSize,
+            abs(pointer.x - seam.x) <= search.distance,
+            pointer.y >= seam.top, pointer.y <= seam.bottom,
+            isOnTop(pair, at: pointer, among: search.windows),
+            isOnTop(pair, at: seam.middle, among: search.windows)
+        else { return nil }
+        return SeamLock(pair: pair, frame: frame(at: seam.middle), isClosed: isClosed)
     }
 
     private static func isOnTop(

@@ -52,15 +52,12 @@ public protocol WindowSystemProviding: AnyObject {
     /// Lights up a seam briefly.
     func flashSeam(at frame: WindowFrame)
 
-    /// Shows a closed lock at `frame`, or moves it there. It takes no mouse events: the hold
-    /// sees a press on it first (ADR 0042).
-    func showSeamLock(at frame: WindowFrame)
+    /// Shows a lock at `frame`, or moves or changes it. It takes no mouse events: the hold
+    /// sees a press on it first (ADR 0044).
+    func showSeamLock(at frame: WindowFrame, isClosed: Bool)
 
-    /// Takes the closed lock away, if it shows.
+    /// Takes the lock away, if it shows.
     func hideSeamLock()
-
-    /// Shows an open lock at `frame` for a moment.
-    func flashOpenSeamLock(at frame: WindowFrame)
 
     /// Calls `handler` every `interval` seconds until `stopWatchingPointer`. It costs little
     /// and asks no app, unlike what `handler` may go on to do.

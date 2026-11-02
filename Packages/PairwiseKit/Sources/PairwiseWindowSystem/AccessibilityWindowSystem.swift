@@ -11,8 +11,6 @@ public final class AccessibilityWindowSystem: WindowSystemProviding {
     private static let defaultLiveFramesPerSecond = 30
     /// How long a seam stays lit after two windows join.
     private static let seamFlashTime = Duration.milliseconds(400)
-    /// How long a lock stays open after a click on it.
-    private static let openLockTime = Duration.milliseconds(400)
     /// How much later the pointer's timer may fire, for the system to save energy.
     private static let pointerTimerTolerance = 0.02
 
@@ -162,24 +160,15 @@ public final class AccessibilityWindowSystem: WindowSystemProviding {
         }
     }
 
-    public func showSeamLock(at frame: WindowFrame) {
+    public func showSeamLock(at frame: WindowFrame, isClosed: Bool) {
         let lock = seamLock ?? makeLock()
         seamLock = lock
-        lock.showClosed(at: frame)
+        lock.show(at: frame, isClosed: isClosed)
     }
 
     public func hideSeamLock() {
         seamLock?.hide()
         seamLock = nil
-    }
-
-    public func flashOpenSeamLock(at frame: WindowFrame) {
-        let lock = makeLock()
-        lock.showOpen(at: frame)
-        Task {
-            try? await Task.sleep(for: Self.openLockTime)
-            lock.hide()
-        }
     }
 
     public func startWatchingPointer(

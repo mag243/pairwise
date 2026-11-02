@@ -14,8 +14,10 @@ enum PairDrag {
     case placing(Placing)
     /// Both windows are placed; the panel stays until they have had time to draw.
     case settling(standIn: any WindowStandIn, until: TimeInterval)
-    /// The button is down on the lock of a seam: its events are Pairwise's own (ADR 0042).
+    /// The button is down on the lock of a seam: its events are Pairwise's own (ADR 0044).
     case clickingLock(SeamLock)
+    /// An open lock was clicked: the next tick joins its windows, as that calls their apps.
+    case closingLock(SeamLock)
 
     @MainActor
     struct Pressed {

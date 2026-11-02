@@ -15,7 +15,16 @@ import Testing
         isShowing: Bool = false
     ) -> SeamLock? {
         SeamLockRule.lock(
-            pointer: pointer, pairs: [Self.pair], windows: windows, isShowing: isShowing)
+            pointer: pointer, pairs: [Self.pair], windows: windows, scope: .anyWindow,
+            isShowing: isShowing)
+    }
+
+    private func freeLock(
+        at pointer: ScreenPoint = middle, among windows: [ScreenWindow] = [left, right],
+        scope: JoinScope = .anyWindow
+    ) -> SeamLock? {
+        SeamLockRule.lock(
+            pointer: pointer, pairs: [], windows: windows, scope: scope, isShowing: false)
     }
 
     @Test func aSeamRunsAlongThePartBothWindowsShare() {
@@ -36,6 +45,7 @@ import Testing
     @Test func thePointerNearTheSeamShowsTheLockInItsMiddle() {
         let lock = lock(at: ScreenPoint(x: 410, y: 120))
         #expect(lock?.pair == Self.pair)
+        #expect(lock?.isClosed == true)
         #expect(lock?.frame == WindowFrame(x: 386, y: 186, width: 28, height: 28))
     }
 
@@ -78,9 +88,51 @@ import Testing
         #expect(lock(at: Self.middle, among: [Self.left]) == nil)
     }
 
-    @Test func noPairsMeanNoLock() {
+    @Test func windowsSideBySideInNoPairShowAnOpenLock() {
+        let lock = freeLock()
+        #expect(lock?.pair == Self.pair)
+        #expect(lock?.isClosed == false)
+        #expect(lock?.frame == WindowFrame(x: 386, y: 186, width: 28, height: 28))
+    }
+
+    @Test func theOrderOfTheWindowsDoesNotChangeWhichIsLeft() {
+        let lock = freeLock(among: [Self.right, Self.left])
+        #expect(lock?.pair == Self.pair)
+    }
+
+    @Test func aWindowInAnotherPairShowsNoOpenLock() {
+        let elsewhere = WindowPair(left: 1, right: 9)
         let lock = SeamLockRule.lock(
-            pointer: Self.middle, pairs: [], windows: [Self.left, Self.right], isShowing: false)
+            pointer: Self.middle, pairs: [elsewhere], windows: [Self.left, Self.right],
+            scope: .anyWindow, isShowing: false)
         #expect(lock == nil)
+    }
+
+    @Test func windowsApartShowNoOpenLock() {
+        let apart = ScreenWindow(
+            number: 2, frame: WindowFrame(x: 450, y: 100, width: 300, height: 400))
+        #expect(freeLock(among: [Self.left, apart]) == nil)
+    }
+
+    @Test func aSeamShorterThanTheLockShowsNoLock() {
+        let short = ScreenWindow(
+            number: 2, frame: WindowFrame(x: 400, y: 290, width: 300, height: 400))
+        #expect(freeLock(at: ScreenPoint(x: 400, y: 295), among: [Self.left, short]) == nil)
+    }
+
+    @Test func withinOneAppAnotherAppsWindowShowsNoOpenLock() {
+        let otherApp = ScreenWindow(number: 2, frame: Self.right.frame, owner: 41)
+        #expect(freeLock(among: [Self.left, otherApp], scope: .sameApp) == nil)
+    }
+
+    @Test func withinOneAppItsOwnWindowShowsAnOpenLock() {
+        #expect(freeLock(scope: .sameApp) != nil)
+    }
+
+    @Test func aWindowOverAnOpenLocksPlaceHidesIt() {
+        let cover = ScreenWindow(
+            number: 3, frame: WindowFrame(x: 380, y: 180, width: 50, height: 50))
+        let windows = [cover, Self.left, Self.right]
+        #expect(freeLock(at: ScreenPoint(x: 405, y: 120), among: windows) == nil)
     }
 }

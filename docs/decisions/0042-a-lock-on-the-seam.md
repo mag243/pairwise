@@ -1,6 +1,6 @@
 # 0042. A lock on the seam
 
-- **Status:** Accepted
+- **Status:** Superseded by 0044
 - **Date:** 2026-11-02
 - **Milestone:** M3
 

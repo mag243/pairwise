@@ -37,19 +37,8 @@ import Testing
         system.movePointer(to: Self.nearSeam)
     }
 
-    @Test func noPairMeansThePointerIsNotWatched() {
-        #expect(!system.isWatchingPointer)
-    }
-
-    @Test func aPairHasThePointerWatched() throws {
-        try joinWindows()
+    @Test func whileRunningThePointerIsWatched() {
         #expect(system.isWatchingPointer)
-    }
-
-    @Test func theLastPairEndingStopsTheWatching() throws {
-        try joinWindows()
-        model.leavePair(of: window)
-        #expect(!system.isWatchingPointer)
     }
 
     @Test func stoppingEndsTheWatchingAndRestartingBringsItBack() throws {
@@ -63,7 +52,7 @@ import Testing
 
     @Test func thePointerNearASeamShowsTheLock() throws {
         try showLock()
-        #expect(system.isLockShowing)
+        #expect(system.isLockShowing && system.isLockClosed)
         #expect(system.lockFrames.last == Self.lockFrame)
     }
 
@@ -136,25 +125,24 @@ import Testing
         try showLock()
         _ = system.send(.pressed(Self.onLock))
         _ = system.send(.released(Self.onLock))
-        #expect(!system.isWatchingPointer)
+        _ = system.send(.pressed(Self.far))
+        #expect(system.standInRequests == 0)
         #expect(window.moves.isEmpty && partner.moves.isEmpty)
         #expect(window.resizes.isEmpty && partner.resizes.isEmpty)
     }
 
-    @Test func aClickOnTheLockOpensItAndTakesItAway() throws {
+    @Test func aClickOnTheClosedLockTurnsItOpen() throws {
         try showLock()
         _ = system.send(.pressed(Self.onLock))
         _ = system.send(.released(Self.onLock))
-        #expect(system.openedLocks == [Self.lockFrame])
-        #expect(!system.isLockShowing)
+        #expect(system.isLockShowing && !system.isLockClosed)
     }
 
     @Test func aReleaseAwayFromTheLockCancelsAndIsWithheld() throws {
         try showLock()
         _ = system.send(.pressed(Self.onLock))
         #expect(!system.send(.released(Self.far)))
-        #expect(system.isWatchingPointer)
-        #expect(system.openedLocks.isEmpty)
+        #expect(system.isLockClosed)
     }
 
     @Test func aDragAfterACancelledClickIsAPairDragAgain() throws {

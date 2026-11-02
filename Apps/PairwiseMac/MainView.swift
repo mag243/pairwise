@@ -75,7 +75,7 @@ struct MainView: View {
             }
             .disabled(!model.isAccessibilityGranted || !model.isScreenRecordingGranted)
             Text(
-                "Drag a window and hold Command over another window to join them; add Shift to give it the same height, or Control for the other choice of windows. To part them, click the lock on their seam, or hold Command while dragging one."
+                "Drag a window and hold Command over another window to join them; add Shift to give it the same height, or Control for the other choice of windows. A lock also shows on the seam of windows side by side: click it to join or part them. Holding Command while dragging a joined window parts it too."
             )
             .foregroundStyle(.secondary)
             if let problem = model.problem {

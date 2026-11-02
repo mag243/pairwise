@@ -64,13 +64,11 @@ protocol ScreenMark: AnyObject {
     func hide()
 }
 
-/// A lock on a seam, above other windows (ADR 0042).
+/// A lock on a seam, above other windows (ADR 0044).
 @MainActor
 protocol SeamLockMark: AnyObject {
-    /// Shows the closed lock over `frame`, or moves it there.
-    func showClosed(at frame: WindowFrame)
-    /// Shows the open lock over `frame`.
-    func showOpen(at frame: WindowFrame)
+    /// Shows the lock over `frame`, or moves or changes it there.
+    func show(at frame: WindowFrame, isClosed: Bool)
     /// Takes the lock off the screen.
     func hide()
 }

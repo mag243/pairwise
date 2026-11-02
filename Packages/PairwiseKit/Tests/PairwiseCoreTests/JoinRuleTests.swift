@@ -55,6 +55,17 @@ import Testing
         #expect(setting.switched(if: isKeyDown) == expected)
     }
 
+    @Test func aWindowBesideAnotherTakesItsTopAndClosesTheGap() {
+        let target = JoinRule.target(joining: frame(x: 800, y: 150), beside: Self.other, on: .right)
+        #expect(target.frame == WindowFrame(x: 800, y: 100, width: 200, height: 200))
+        #expect(target.side == .right)
+    }
+
+    @Test func aWindowOnTheLeftOfAnotherEndsAtItsEdge() {
+        let target = JoinRule.target(joining: frame(x: 280, y: 150), beside: Self.other, on: .left)
+        #expect(target.frame == WindowFrame(x: 300, y: 100, width: 200, height: 200))
+    }
+
     @Test func noWindowsGiveNoTarget() {
         #expect(target(frame(x: 0), among: []) == nil)
     }
