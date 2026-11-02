@@ -112,6 +112,24 @@ import Testing
         #expect(system.windowNumber(at: Self.onWindow) == nil)
     }
 
+    @Test func theNormalWindowsLeaveOutOwnAndHigherWindows() {
+        addWindow(process: 5, number: 7)
+        access.windows.append(
+            FakeSystemAccess.description(number: 8, process: 6, frame: Self.rect, level: 25))
+        addWindow(process: access.ownProcess, number: 9)
+        #expect(system.normalWindows().map(\.number) == [7])
+    }
+
+    @Test func aWindowIsFoundByItsNumber() throws {
+        let element = addWindow()
+        let window = try #require(system.window(number: 7) as? AccessibilityWindow)
+        #expect(window.element.isSame(as: element))
+    }
+
+    @Test func aNumberThatHasGoneGivesNoWindow() {
+        #expect(system.window(number: 7) == nil)
+    }
+
     @Test func parkingIsPastAllDisplays() {
         access.displayFrames = [WindowFrame(x: 0, y: 0, width: 100, height: 50)]
         #expect(system.parkingOrigin == ScreenPoint(x: 99, y: 49))

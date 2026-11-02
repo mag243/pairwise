@@ -17,6 +17,12 @@ public final class FakeWindowSystem: WindowSystemProviding {
     public var liveFramesPerSecond = 0
     public private(set) var accessibilityRequests = 0
     public private(set) var screenRecordingRequests = 0
+    public var isJoinKeyDown = false
+    /// The windows `normalWindows()` and `window(number:)` know about.
+    public var knownWindows: [FakeWindow] = []
+    public private(set) var guideFrames: [WindowFrame] = []
+    public private(set) var isGuideShowing = false
+    public private(set) var seamFlashes: [WindowFrame] = []
     public private(set) var standInRequests = 0
     public private(set) var windowNumberRequests = 0
 
@@ -43,6 +49,29 @@ public final class FakeWindowSystem: WindowSystemProviding {
     ) {
         standInRequests += 1
         standInCompletion = completion
+    }
+
+    public func normalWindows() -> [ScreenWindow] {
+        knownWindows.compactMap { window in
+            window.windowNumber.map { ScreenWindow(number: $0, frame: window.currentFrame) }
+        }
+    }
+
+    public func window(number: UInt32) -> (any MovableWindow)? {
+        knownWindows.first { $0.windowNumber == number }
+    }
+
+    public func showJoinGuide(at frame: WindowFrame) {
+        guideFrames.append(frame)
+        isGuideShowing = true
+    }
+
+    public func hideJoinGuide() {
+        isGuideShowing = false
+    }
+
+    public func flashSeam(at frame: WindowFrame) {
+        seamFlashes.append(frame)
     }
 
     public func windowNumber(at point: ScreenPoint) -> UInt32? {

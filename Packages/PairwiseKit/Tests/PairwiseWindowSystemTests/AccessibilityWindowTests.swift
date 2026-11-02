@@ -143,4 +143,16 @@ import Testing
         element.errors[kAXPositionAttribute] = .invalidUIElement
         #expect(!makeWindow().isAvailable)
     }
+
+    @Test func aResizeSetsTheSize() throws {
+        try makeWindow().resize(to: WindowSize(width: 50, height: 60))
+        #expect(try makeWindow().frame().size == WindowSize(width: 50, height: 60))
+    }
+
+    @Test func aRefusedResizeSaysWhy() {
+        element.setErrors[kAXSizeAttribute] = .cannotComplete
+        #expect(throws: WindowSystemError.windowBusy) {
+            try makeWindow().resize(to: WindowSize(width: 50, height: 60))
+        }
+    }
 }

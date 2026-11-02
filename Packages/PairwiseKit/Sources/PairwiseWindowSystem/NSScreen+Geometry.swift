@@ -14,6 +14,18 @@ extension NSScreen {
         }
     }
 
+    /// `frame` in AppKit's coordinates, on displays with a main display `mainHeight` high.
+    static func appKitFrame(_ frame: WindowFrame, mainHeight: CGFloat) -> CGRect {
+        CGRect(
+            x: frame.origin.x, y: Double(mainHeight) - frame.maxY, width: frame.size.width,
+            height: frame.size.height)
+    }
+
+    /// `frame` in AppKit's coordinates.
+    static func appKitFrame(_ frame: WindowFrame) -> CGRect {
+        appKitFrame(frame, mainHeight: screens.first?.frame.height ?? 0)
+    }
+
     /// `point` in AppKit's coordinates, on displays with a main display `mainHeight` high.
     static func appKitPoint(_ point: ScreenPoint, mainHeight: CGFloat) -> CGPoint {
         CGPoint(x: point.x, y: Double(mainHeight) - point.y)

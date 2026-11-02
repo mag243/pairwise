@@ -26,4 +26,10 @@ import Testing
         let point = NSScreen.appKitPoint(ScreenPoint(x: 10, y: 100), mainHeight: 900)
         #expect(point == CGPoint(x: 10, y: 800))
     }
+
+    @Test func aFrameFlipsAgainstTheMainDisplay() {
+        let frame = NSScreen.appKitFrame(
+            WindowFrame(x: 10, y: 100, width: 50, height: 200), mainHeight: 900)
+        #expect(frame == CGRect(x: 10, y: 600, width: 50, height: 200))
+    }
 }

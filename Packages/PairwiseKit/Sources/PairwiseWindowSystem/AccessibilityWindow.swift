@@ -62,6 +62,15 @@ final class AccessibilityWindow: MovableWindow {
         guard result == .success else { throw WindowSystemError(result) }
     }
 
+    func resize(to size: WindowSize) throws(WindowSystemError) {
+        let restoreAnimation = turnOffMoveAnimation()
+        defer { restoreAnimation() }
+        var cgSize = CGSize(width: size.width, height: size.height)
+        guard let value = AXValueCreate(.cgSize, &cgSize) else { throw .windowRefused }
+        let result = element.setAttribute(kAXSizeAttribute, to: value)
+        guard result == .success else { throw WindowSystemError(result) }
+    }
+
     /// An app with this attribute on animates a move, and a parked window would fly across
     /// the screen (ADR 0030). Returns what puts the attribute back.
     private func turnOffMoveAnimation() -> () -> Void {

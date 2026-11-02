@@ -27,6 +27,10 @@ extension PairDragModel {
     }
 
     func release(at point: ScreenPoint) {
+        if case .joining(let joining) = drag {
+            finish(joining)
+            return
+        }
         guard case .moving(let moving) = drag else {
             if case .pressed(let pressed) = drag {
                 placePartnerAfterShortDrag(pressed)
@@ -116,6 +120,7 @@ extension PairDragModel {
         system.stopTicking()
         if case .moving(let moving) = drag { moving.standIn.dismiss() }
         if case .placing(let placing) = drag { placing.standIn.dismiss() }
+        if case .joining = drag { system.hideJoinGuide() }
         if case .settling(let standIn, _) = drag { standIn.dismiss() }
         request += 1
         drag = .none

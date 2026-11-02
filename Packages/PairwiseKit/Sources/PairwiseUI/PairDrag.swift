@@ -9,6 +9,8 @@ enum PairDrag {
     case passing
     case pressed(Pressed)
     case moving(Moving)
+    /// Option is down: macOS drags the window alone, and it may join another at the release.
+    case joining(Joining)
     case placing(Placing)
     /// Both windows are placed; the panel stays until they have had time to draw.
     case settling(standIn: any WindowStandIn, until: TimeInterval)
@@ -26,6 +28,14 @@ enum PairDrag {
         var standIn: (any WindowStandIn)?
         var hasWindowMoved = false
         var lastPointer: ScreenPoint
+    }
+
+    @MainActor
+    struct Joining {
+        let window: any MovableWindow
+        let number: UInt32
+        let frame: WindowFrame
+        var target: JoinTarget?
     }
 
     /// The other window of a pair.

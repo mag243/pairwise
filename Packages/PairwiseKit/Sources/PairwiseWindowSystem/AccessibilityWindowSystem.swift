@@ -9,10 +9,13 @@ import os
 public final class AccessibilityWindowSystem: WindowSystemProviding {
     private static let logger = Logger(subsystem: "me.m-domain.pairwise", category: "windows")
     private static let defaultLiveFramesPerSecond = 30
+    /// How long a seam stays lit after two windows join.
+    private static let seamFlashTime = Duration.milliseconds(400)
 
     public var liveFramesPerSecond = AccessibilityWindowSystem.defaultLiveFramesPerSecond
     private let access: any SystemAccess
     private let capture: WindowCapture
+    private var joinGuide: JoinMarkPanel?
     private var holdingTap: HoldingTap?
     private var ticker: DisplayTicker?
     private var timer: Timer?
@@ -32,6 +35,10 @@ public final class AccessibilityWindowSystem: WindowSystemProviding {
 
     public var parkingOrigin: ScreenPoint? {
         PartnerPlacement.parkingOrigin(onDisplays: access.displays())
+    }
+
+    public var isJoinKeyDown: Bool {
+        CGEventSource.flagsState(.combinedSessionState).contains(.maskAlternate)
     }
 
     public var isPrimaryButtonDown: Bool {
@@ -81,19 +88,57 @@ public final class AccessibilityWindowSystem: WindowSystemProviding {
             Self.logger.info("no normal window of another app on top at the pointer")
             return nil
         }
-        let app = access.application(top.processID)
+        return element(of: top)
+    }
+
+    public func normalWindows() -> [ScreenWindow] {
+        WindowServer.normalWindows(
+            excludingProcess: access.ownProcess, in: access.onScreenWindows()
+        ).map { ScreenWindow(number: $0.number, frame: $0.frame) }
+    }
+
+    public func window(number: UInt32) -> (any MovableWindow)? {
+        access.windowDescription(number)
+            .flatMap(WindowServer.window(from:))
+            .flatMap(element(of:))
+    }
+
+    /// The Accessibility window for a window the window server named: the one of its app
+    /// with its size and the closest origin.
+    private func element(of window: WindowServer.OnScreenWindow) -> AccessibilityWindow? {
+        let app = access.application(window.processID)
         app.limitMessagingTime()
         let elements = app.elements(of: kAXWindowsAttribute)
         let frames = elements.map {
             (try? AccessibilityWindow(element: $0, access: access).frame())
                 ?? WindowFrame(x: 0, y: 0, width: 0, height: 0)
         }
-        guard let index = WindowMatch.index(of: top.frame, among: frames) else {
+        guard let index = WindowMatch.index(of: window.frame, among: frames) else {
             Self.logger.info("the app's \(elements.count) windows do not match the one on top")
             return nil
         }
         return AccessibilityWindow(
-            element: elements[index], serverWindowNumber: top.number, access: access)
+            element: elements[index], serverWindowNumber: window.number, access: access)
+    }
+
+    public func showJoinGuide(at frame: WindowFrame) {
+        let guide = joinGuide ?? JoinMarkPanel()
+        joinGuide = guide
+        guide.show(at: frame)
+    }
+
+    public func hideJoinGuide() {
+        joinGuide?.hide()
+        joinGuide = nil
+    }
+
+    public func flashSeam(at frame: WindowFrame) {
+        let mark = JoinMarkPanel()
+        mark.show(at: frame)
+        Task {
+            try? await Task.sleep(for: Self.seamFlashTime)
+            mark.hide()
+        }
     }
 
     public func startHoldingDrags(

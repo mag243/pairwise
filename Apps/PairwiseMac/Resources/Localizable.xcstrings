@@ -103,6 +103,23 @@
         }
       }
     },
+    "Hold Option and drag a window to another's edge to join them, and away to part them." : {
+      "comment" : "How to join and part windows",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Halte die Wahltaste und ziehe ein Fenster an den Rand eines anderen, um sie zu verbinden, und weg, um sie zu trennen."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Houd Option ingedrukt en sleep een venster naar de rand van een ander om ze te koppelen, en weg om ze los te maken."
+          }
+        }
+      }
+    },
     "Last drag" : {
       "comment" : "Section with the measurements of the last drag",
       "localizations" : {
@@ -511,23 +528,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "De app van het venster reageert niet."
-          }
-        }
-      }
-    },
-    "Windows in a pair move as one when you drag them." : {
-      "comment" : "What the app does",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fenster in einem Paar bewegen sich beim Ziehen als eines."
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vensters in een paar bewegen als één als je ze sleept."
           }
         }
       }

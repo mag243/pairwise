@@ -34,6 +34,24 @@ public protocol WindowSystemProviding: AnyObject {
         completion: @escaping @MainActor (Result<any WindowStandIn, WindowSystemError>) -> Void
     )
 
+    /// Whether the key that joins and parts windows is down now (ADR 0035).
+    var isJoinKeyDown: Bool { get }
+
+    /// The normal windows on screen of other apps, frontmost first.
+    func normalWindows() -> [ScreenWindow]
+
+    /// The window with this number, or `nil` when it has gone.
+    func window(number: UInt32) -> (any MovableWindow)?
+
+    /// Shows where a window will land, or moves that guide there.
+    func showJoinGuide(at frame: WindowFrame)
+
+    /// Takes the guide away, if it shows.
+    func hideJoinGuide()
+
+    /// Lights up a seam briefly.
+    func flashSeam(at frame: WindowFrame)
+
     /// The number of the normal window on top at `point`, or `nil` when there is none or it
     /// is one of Pairwise's own. Asks no app.
     func windowNumber(at point: ScreenPoint) -> UInt32?

@@ -11,8 +11,10 @@ import os
 @MainActor
 @Observable
 public final class PairDragModel {
-    private static let tickInterval: TimeInterval = 1.0 / 120
+    static let tickInterval: TimeInterval = 1.0 / 120
     /// How long a busy app gets to answer at the release, with the panel up.
+    /// How wide a seam lights up, in points.
+    static let seamWidth = 6.0
     static let placingPatience: TimeInterval = 0.5
     /// How long the panel stays over placed windows, for their apps to draw them.
     static let settleTime: TimeInterval = 0.05
@@ -114,6 +116,7 @@ public final class PairDragModel {
         guard let number = system.windowNumber(at: point) else {
             return "no window under the pointer"
         }
+        if system.isJoinKeyDown { return startJoining(number) }
         guard
             let partnerEntry = book.partner(of: number),
             let window = pairedWindows[number],
@@ -163,7 +166,7 @@ public final class PairDragModel {
 
     private func holdsDrag(at point: ScreenPoint) -> Bool {
         switch drag {
-        case .none, .passing, .placing, .settling:
+        case .none, .passing, .placing, .settling, .joining:
             return false
         case .pressed(var pressed):
             pressed.lastPointer = point
@@ -218,7 +221,7 @@ public final class PairDragModel {
 
     /// Calls to the apps happen here and not on an event, since an event that waits holds
     /// up all input.
-    private func tick() {
+    func tick() {
         switch drag {
         case .none, .passing:
             break
@@ -233,6 +236,12 @@ public final class PairDragModel {
                 release(at: moving.lastPointer)
             } else {
                 park(moving)
+            }
+        case .joining(let joining):
+            if isButtonLetGo {
+                release(at: ScreenPoint(x: 0, y: 0))
+            } else {
+                watch(joining)
             }
         case .placing(let placing):
             place(placing)

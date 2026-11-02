@@ -34,6 +34,32 @@ enum WindowServer {
         return OnScreenWindow(number: number, processID: processID, frame: frame)
     }
 
+    /// The normal windows in `descriptions` of other processes than `ownProcess`.
+    static func normalWindows(
+        excludingProcess ownProcess: pid_t, in descriptions: [[String: Any]]
+    ) -> [OnScreenWindow] {
+        descriptions.compactMap { description in
+            guard
+                description[kCGWindowLayer as String] as? Int == normalWindowLevel,
+                let frame = frame(from: description),
+                let number = description[kCGWindowNumber as String] as? CGWindowID,
+                let processID = description[kCGWindowOwnerPID as String] as? pid_t,
+                processID != ownProcess
+            else { return nil }
+            return OnScreenWindow(number: number, processID: processID, frame: frame)
+        }
+    }
+
+    /// The window in a description of one window from the window server.
+    static func window(from description: [String: Any]) -> OnScreenWindow? {
+        guard
+            let frame = frame(from: description),
+            let number = description[kCGWindowNumber as String] as? CGWindowID,
+            let processID = description[kCGWindowOwnerPID as String] as? pid_t
+        else { return nil }
+        return OnScreenWindow(number: number, processID: processID, frame: frame)
+    }
+
     /// The number of the window of `processID` in `descriptions` that matches `frame`.
     static func windowNumber(
         ofProcess processID: pid_t, matching frame: WindowFrame, in descriptions: [[String: Any]]

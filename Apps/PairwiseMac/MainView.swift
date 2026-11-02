@@ -63,8 +63,10 @@ struct MainView: View {
                 if model.isRunning { model.stop() } else { model.start() }
             }
             .disabled(!model.isAccessibilityGranted || !model.isScreenRecordingGranted)
-            Text("Windows in a pair move as one when you drag them.")
-                .foregroundStyle(.secondary)
+            Text(
+                "Hold Option and drag a window to another's edge to join them, and away to part them."
+            )
+            .foregroundStyle(.secondary)
             if let problem = model.problem {
                 Text(problem.message).foregroundStyle(.red)
             }

@@ -75,6 +75,12 @@ import Testing
         system.stopHoldingDrags()
     }
 
+    @Test func aHiddenGuideCostsNothing() {
+        let system = AccessibilityWindowSystem()
+        _ = system.isJoinKeyDown
+        system.hideJoinGuide()
+    }
+
     @Test func aTapWithNothingInstalledStopsQuietly() {
         HoldingTap { _ in true }.stop()
     }

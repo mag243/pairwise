@@ -22,6 +22,7 @@ final class FakePlainWindow: MovableWindow {
 
     func serverFrame() -> WindowFrame? { nil }
     func move(to origin: ScreenPoint) throws(WindowSystemError) {}
+    func resize(to size: WindowSize) throws(WindowSystemError) {}
     func raise() throws(WindowSystemError) {}
 }
 

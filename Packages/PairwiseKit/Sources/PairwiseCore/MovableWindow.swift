@@ -19,6 +19,9 @@ public protocol MovableWindow: AnyObject {
     /// Moves the window's top left corner to `origin`.
     func move(to origin: ScreenPoint) throws(WindowSystemError)
 
+    /// Gives the window the size `size`. An app may keep it from going that far.
+    func resize(to size: WindowSize) throws(WindowSystemError)
+
     /// Brings the window in front of other windows, without taking focus.
     func raise() throws(WindowSystemError)
 }

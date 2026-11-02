@@ -25,14 +25,15 @@ Done first because everything below adds code to this module.
 - [x] The panel holds the pair in its own order, with the partner on either side.
 
 ### 4. Joining
-- [ ] ADR: the gesture (owner's choice 1).
-- [ ] `PairwiseCore`, test-first: when a dragged window is close enough to another window's edge to join. The snap distance is a named constant.
-- [ ] A guide shows where the window will land, and at the release the two click together, with the seam lighting up briefly (the design notes in `PLAN.md`).
-- [ ] The heights after joining (owner's choice 2).
+- [x] ADR 0035: Option held while dragging.
+- [x] `PairwiseCore`, test-first: when a dragged window is close enough to another window's edge to join. The snap distance is a named constant.
+- [x] A guide shows where the window will land, and at the release the two click together, with the seam lighting up briefly (the design notes in `PLAN.md`).
+- [x] The dragged window takes the other's height and top (owner's choice 2).
+- [ ] Check by hand, and whether Option clashes with tiling.
 
 ### 5. Coming apart
-- [ ] ADR, with the gesture of step 4.
-- [ ] The gesture pulls one window out, and only that window moves. The pair ends.
+- [x] Option at a press on a window in a pair ends the pair, and only that window moves (ADR 0035).
+- [ ] Check by hand.
 
 ### 6. The shared seam
 - [ ] A short spike first, as this is the least known part: can Pairwise see a resize soon enough, and should it follow the app's notifications or take over the drag as in ADR 0024? The outcome goes in an ADR.
