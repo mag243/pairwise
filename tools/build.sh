@@ -215,15 +215,24 @@ cmd_build() {
   ok "$MAC_SCHEME"
 }
 
+# Prints the marks of test code that the binary [1] holds (ADR 0050). Read into a variable first:
+# a grep that stops at its first match would fail the pipeline, and so seem to find nothing.
+test_code_in() {
+  local text
+  text="$(strings "$1")"
+  grep -E 'DragStressTest|AnimatedTestView|SCRecordingOutput|--record|--seam-look|--seam-test|--join-test|--drag-stress-test' \
+    <<<"$text" | sort -u | head -n 5 || true
+}
+
 cmd_release() {
   step "Release"
   require_project
   xcode build-release -scheme "$MAC_SCHEME" -destination "$MAC_DESTINATION" -configuration Release build
   local binary="$DERIVED_DATA/Build/Products/Release/$APP_NAME.app/Contents/MacOS/$APP_NAME"
   [[ -f "$binary" ]] || fail "No release app at ${binary#"$ROOT_DIR"/}"
-  if strings "$binary" | grep -qE 'DragStressTest|ScreenRecording|--record|--seam-look|--join-test'; then
-    fail "Test code is in the release build (ADR 0050)"
-  fi
+  local found
+  found="$(test_code_in "$binary")"
+  [[ -z "$found" ]] || fail "Test code is in the release build (ADR 0050): $found"
   ok "No test code in the release build"
 }
 
