@@ -191,6 +191,7 @@ public final class PairDragModel {
     /// Sees what macOS made of the press. Without the window server's place this asks the
     /// app, as for any window it does not tell about.
     private func watch(_ pressed: PairDrag.Pressed) {
+        if !pressed.hasWindowMoved, startFollowingSeamIfPartnerIsHeld(pressed) { return }
         guard
             !pressed.hasWindowMoved,
             let now = pressed.window.serverFrame() ?? (try? pressed.window.frame())

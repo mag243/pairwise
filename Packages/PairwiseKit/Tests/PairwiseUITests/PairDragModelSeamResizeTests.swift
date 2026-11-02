@@ -59,6 +59,39 @@ import Testing
         #expect(left.currentFrame.maxX == 550 + Self.reach)
     }
 
+    /// The grip of a window's edge reaches past the window, so a press on one window can resize
+    /// the window beside it.
+    private func press(
+        on window: FakeWindow, whileResizing resized: FakeWindow, to frame: WindowFrame
+    ) {
+        system.windowUnderPointer = window
+        _ = system.send(.pressed(Self.press))
+        resized.currentFrame = frame
+        system.tick()
+        system.tick()
+    }
+
+    @Test func aPressBesideTheSeamThatResizesTheLeftWindowResizesTheRightOneToo() {
+        press(on: right, whileResizing: left, to: wider)
+        #expect(right.currentFrame.origin.x == 550)
+        #expect(right.currentFrame.maxX == 700)
+    }
+
+    @Test func aPressBesideTheSeamThatResizesTheRightWindowResizesTheLeftOneToo() {
+        press(
+            on: left, whileResizing: right,
+            to: WindowFrame(x: 450, y: 100, width: 250, height: 200))
+        #expect(left.currentFrame.maxX == 450)
+        #expect(left.currentFrame.origin.x == 100)
+    }
+
+    @Test func aPressBesideTheSeamThatResizesTheOuterEdgeOfTheOtherStartsNothing() {
+        press(
+            on: right, whileResizing: left,
+            to: WindowFrame(x: 50, y: 100, width: 450, height: 300))
+        #expect(right.moves.isEmpty && right.resizes.isEmpty)
+    }
+
     @Test func thePartnerKeepsItsHeight() {
         resize(left, to: WindowFrame(x: 100, y: 100, width: 450, height: 350))
         #expect(right.currentFrame.size.height == 200)

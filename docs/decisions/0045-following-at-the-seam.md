@@ -11,6 +11,7 @@ Resizing a window of a pair at its seam has to resize the other, so that the sea
 - **macOS keeps resizing the window, and its drag events pass.** The partner follows on each tick, from the window server's place.
 - **While resizing, the partner reaches under the window being held,** by a fixed 40 points. A pressed window is in front, so a lagging partner shows no gap. At the release both go exactly against each other.
 - **A partner's far edge stays where it was at the press.** Reading it back during the drag would add up rounding and lag.
+- **The window that changes is the one held,** whichever window the pointer is over. The grip of a window's edge reaches past the window, so a press on one window of a pair can resize the other.
 - **Only the seam's edge counts.** Resizing at an outer edge, or at the top or bottom, changes one window only.
 - **Minimum and maximum sizes:** a held window that stops is one macOS has stopped, and the partner stops with it. A partner that gives another width than asked, at its minimum or maximum or rounding it, is seen at the release: it keeps its far edge, and the held window comes back to meet it. The app tells only by the width it ends up with.
 - Everything that calls an app happens on ticks, the release included.

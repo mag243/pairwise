@@ -4,15 +4,38 @@ import PairwiseCore
 extension PairDragModel {
     /// macOS goes on resizing the window, so its events pass, up to a limit of the partner.
     func startFollowingSeam(_ pressed: PairDrag.Pressed) {
-        endDrag()
         let partner = WindowFrame(origin: pressed.partner.origin, size: pressed.partner.size)
         let side = pressed.partner.side
-        drag = .resizingSeam(
+        startFollowing(
             PairDrag.ResizingSeam(
-                window: pressed.window, partner: pressed.partner.window,
-                partnerStart: partner, side: side,
-                seamAtPress: SeamFollow.seam(of: pressed.frame, partnerOn: side),
+                window: pressed.window, partner: pressed.partner.window, partnerStart: partner,
+                side: side, seamAtPress: SeamFollow.seam(of: pressed.frame, partnerOn: side),
                 pointerXAtPress: pressed.pointer.x, lastExactWidth: partner.size.width))
+    }
+
+    /// The grip of a window's edge reaches past the window, so a press on one window of a pair
+    /// can resize the other at the seam. That other window is the one held, then. Says whether
+    /// this is such a press.
+    func startFollowingSeamIfPartnerIsHeld(_ pressed: PairDrag.Pressed) -> Bool {
+        let held = pressed.partner.window
+        let start = WindowFrame(origin: pressed.partner.origin, size: pressed.partner.size)
+        let side: PairSide = pressed.partner.side == .right ? .left : .right
+        guard
+            let now = held.serverFrame() ?? (try? held.frame()),
+            DragHoldRule.isResize(from: start, to: now),
+            SeamFollow.movesSeam(from: start, to: now, partnerOn: side)
+        else { return false }
+        startFollowing(
+            PairDrag.ResizingSeam(
+                window: held, partner: pressed.window, partnerStart: pressed.frame, side: side,
+                seamAtPress: SeamFollow.seam(of: start, partnerOn: side),
+                pointerXAtPress: pressed.pointer.x, lastExactWidth: pressed.frame.size.width))
+        return true
+    }
+
+    private func startFollowing(_ resizing: PairDrag.ResizingSeam) {
+        endDrag()
+        drag = .resizingSeam(resizing)
         system.startTicking(every: Self.tickInterval) { [weak self] in self?.tick() }
     }
 
