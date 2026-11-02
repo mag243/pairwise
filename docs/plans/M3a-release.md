@@ -22,7 +22,7 @@ These need the owner's keychain, accounts or judgment, so the agent prepares the
 - [x] `CHANGELOG.md`, with the changelog section as the release notes.
 
 ### 2. The first start, on a Mac that has never seen Pairwise
-- [ ] Find out why the settings window did not appear with `--show-settings` from `tools/build.sh run`, while the UI test sees it. The same rule opens the window when a permission is missing, so a new user might otherwise see nothing and never learn what Pairwise needs. If it is a bug: a failing test first.
+- [x] The settings window opens by itself with `--show-settings` from `tools/build.sh run`, checked by the owner. The same rule opens it when a permission is missing; that case itself is checked on a release copy in the acceptance criteria.
 - [ ] Granting a permission starts Pairwise without a restart, or the window says plainly what to do. Pairwise also says it when a permission is taken away while it runs.
 - [ ] A release copy and a debug build are different signatures to macOS. Check what that does to permissions already granted, and say in the README how to clear a stale entry.
 - [ ] Check how often macOS asks again about Screen Recording for an app that captures windows without its picker, and what Pairwise does in the meantime. A drag must keep working, with or without pictures.
