@@ -37,7 +37,7 @@ Done first because everything below adds code to this module.
 - [x] Command at a press or during the drag of a pair ends the pair, and only that window moves (ADR 0035, 0036, 0040).
 - [x] A lock on the seam shows near the pointer, and a click on it ends the pair with both windows staying in place (ADR 0042, 0044).
 - [x] Two windows side by side in no pair show an open lock, and a click on it joins them with their tops level (ADR 0044).
-- [ ] Check the open lock by hand.
+- [x] Checked the open lock by hand. A list of the normal windows with eight apps' windows open held no invisible ones.
 - [x] Checked by hand, with the lock.
 
 ### 6. The shared seam
