@@ -17,6 +17,7 @@ ADR 0048 showed still pictures at the seam, with the real windows under the pane
 - **An amber line of 6 points stands on the seam while it moves,** along the shorter window, at the owner's wish. It shows what is being dragged, in the colour of joining, and covers a small gap between the pictures.
 - **Until the first frame, a still picture is scaled in the same way,** so that it lies exactly under that frame. Divided, it showed as a flash just after the start of a drag, and fading it over the frame showed everything double.
 - **An opaque layer in the window's average colour lies under each picture and frame,** with its corners rounded further than a window's, so that it does not show past them. Captured windows are partly see-through. Over the real window, before it is parked, that showed everything double, and after that the desktop showed through, which made the window look darker. A see-through window is not see-through during a resize at the seam.
+- **The panel's layers animate nothing.** Raw frames from the stream proved sharp, while the screen showed ghosts of earlier frames for about a quarter of a second, so they arose in the panel.
 - The rest of ADR 0048 stands: the seam at the pointer, the limits, the release.
 
 ## Alternatives

@@ -1,3 +1,4 @@
+import AppKit
 import CoreGraphics
 import Testing
 
@@ -97,6 +98,11 @@ import Testing
         #expect(abs(parts[0] - 1) < 0.1)
         #expect(parts[1] < 0.1)
         #expect(colour.alpha == 1)
+    }
+
+    @Test(arguments: ["contents", "contentsRect", "bounds", "position", "hidden", "opacity"])
+    func aLayerInThePanelHasItsAnimationsOff(key: String) {
+        #expect(StandInPanel.stillLayer().actions?[key] is NSNull)
     }
 
     @Test func theFillShowsOneColumnAtTheSplit() {

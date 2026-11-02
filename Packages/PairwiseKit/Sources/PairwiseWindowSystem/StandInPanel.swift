@@ -23,9 +23,9 @@ final class StandInPanel: WindowStandIn {
 
     /// The layers of one picture for a seam.
     private struct SeamLayers {
-        let head = CALayer()
-        let fill = CALayer()
-        let tail = CALayer()
+        let head = StandInPanel.stillLayer()
+        let fill = StandInPanel.stillLayer()
+        let tail = StandInPanel.stillLayer()
     }
 
     private let panel: NSPanel
@@ -43,7 +43,7 @@ final class StandInPanel: WindowStandIn {
     /// An opaque layer under each picture, added at the first seam.
     private var backings: [CALayer] = []
     /// The amber line on the seam, added at the first seam.
-    private let seamLineLayer = CALayer()
+    private let seamLineLayer = StandInPanel.stillLayer()
     private var totalWidth: CGFloat { pictures.map(\.size.width).reduce(0, +) }
 
     var liveFrames: [Int] { streams.map(\.frames) }
@@ -69,10 +69,10 @@ final class StandInPanel: WindowStandIn {
         let view = NSView(frame: CGRect(origin: .zero, size: size))
         view.wantsLayer = true
         for (index, picture) in pictures.enumerated() {
-            let slot = CALayer()
+            let slot = StandInPanel.stillLayer()
             slot.frame = layout.frames[index]
             slot.masksToBounds = true
-            let layer = CALayer()
+            let layer = StandInPanel.stillLayer()
             layer.contents = picture.image
             layer.contentsGravity = .resize
             layer.frame = CGRect(origin: .zero, size: picture.size)
@@ -127,7 +127,7 @@ final class StandInPanel: WindowStandIn {
         seamLineLayer.cornerRadius = Self.seamLineWidth / 2
         panel.contentView?.layer?.addSublayer(seamLineLayer)
         for (index, picture) in pictures.enumerated() {
-            let backing = CALayer()
+            let backing = StandInPanel.stillLayer()
             backing.backgroundColor = Self.backingColour(of: picture.image)
             backing.cornerRadius = Self.backingCornerRadius
             slots[index].insertSublayer(backing, at: 0)
@@ -174,7 +174,7 @@ final class StandInPanel: WindowStandIn {
     private func addButtonsPatch(over index: Int) {
         let picture = pictures[index]
         let patch = Self.buttonsPatch(ofPictureSize: picture.size)
-        let layer = CALayer()
+        let layer = StandInPanel.stillLayer()
         layer.contents = picture.image
         layer.contentsGravity = .resize
         layer.contentsRect = patch.part

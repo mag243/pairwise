@@ -78,6 +78,18 @@ extension StandInPanel {
         return CGFloat(QuietColumn.index(inGray: gray, width: width, height: height))
     }
 
+    /// A layer that takes on every change at once. By default a layer animates its changes,
+    /// which between live frames shows as ghosts of earlier frames.
+    nonisolated static func stillLayer() -> CALayer {
+        let layer = CALayer()
+        let keys = [
+            "contents", "contentsRect", "contentsScale", "bounds", "position", "frame", "hidden",
+            "opacity", "backgroundColor", "cornerRadius", "sublayers",
+        ]
+        layer.actions = Dictionary(uniqueKeysWithValues: keys.map { ($0, NSNull()) })
+        return layer
+    }
+
     /// A picture's average colour, opaque: what lies under it, as a captured window is partly
     /// see-through (ADR 0049).
     static func backingColour(of image: CGImage) -> CGColor {
