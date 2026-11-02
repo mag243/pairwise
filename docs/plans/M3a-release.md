@@ -7,8 +7,6 @@ Not in this milestone: the plug-in (M4), the Mac App Store, automatic installs w
 
 ## What only the owner can do
 These need the owner's keychain, accounts or judgment, so the agent prepares them and says when:
-- Search `Pairwise` in class 9 at TMview and USPTO, before the first release.
-- Make the notary profile once: `xcrun notarytool store-credentials pairwise-notary`.
 - Run the release itself, which pushes, publishes and updates the tap.
 - Turn on GitHub Pages for the feed.
 
@@ -16,7 +14,7 @@ These need the owner's keychain, accounts or judgment, so the agent prepares the
 
 ### 1. A signed, notarized app
 - [x] ADR 0056: Developer ID, hardened runtime, notarization with a keychain profile of its own, no unsigned fallback. Releases are made on the owner's Mac; the workflow in CI stays by hand (ADR 0006).
-- [ ] Confirm the bundle identifier `me.m-domain.pairwise` (ADR 0007) and the name: both are permanent from the first release, and macOS ties the permissions to them.
+- [x] Confirm the bundle identifier `me.m-domain.pairwise` (ADR 0007) and the name: both are permanent from the first release, and macOS ties the permissions to them.
 - [x] `tools/build.sh package`: archive, export, notarize, staple, check with `codesign` and `spctl`, and zip. It stops with a message when something is missing. The check for test code (ADR 0050) runs on this build as well.
 - [x] `tools/build.sh package` writes a disk image beside the zip, also notarized, with a window to drag Pairwise into Applications.
 - [x] `CHANGELOG.md`, with the changelog section as the release notes.
@@ -54,8 +52,8 @@ These need the owner's keychain, accounts or judgment, so the agent prepares the
 - [ ] A start at login returns earlier pairs and parked windows as a normal start does (ADR 0053, 0054).
 
 ### 7. Translations and README
-- [ ] All new text in en, nl and de (ADR 0010).
-- [ ] The README says how to install with Homebrew and from the disk image, which permissions Pairwise asks for and why, and how to remove it.
+- [x] All new text in en, nl and de (ADR 0010).
+- [x] The README says how to install with Homebrew and from the disk image, which permissions Pairwise asks for and why, and how to remove it.
 
 ## Tests
 - Package tests for every rule that can do without the system: what the updater may do in which build, and the choice to offer a move.

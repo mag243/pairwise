@@ -2,7 +2,21 @@
 
 *Snap groups for your Mac.* Two windows of any app, brought together side by side, join: they move together, share their seam and come apart again easily, without anything from the apps.
 
-Status: in development, not yet released. Joining, moving together, the shared seam and coming apart work; pairs do not yet survive a restart. See [`docs/plans/README.md`](docs/plans/README.md) for the milestones and their status.
+Status: early, version 0.x. Joining, moving together, the shared seam and coming apart work, and pairs last through a quit and a restart.
+
+## Installing
+
+Pairwise needs macOS 15 or later. With [Homebrew](https://brew.sh):
+
+```sh
+brew install --cask mag243/tap/pairwise
+```
+
+Or download the disk image from the [latest release](https://github.com/mag243/pairwise/releases/latest) and drag Pairwise to Applications. Pairwise updates itself either way, after asking.
+
+To remove it: `brew uninstall --zap pairwise`, or quit it and move it to the Trash. Then also remove it under Privacy & Security in System Settings, where macOS keeps the permissions.
+
+If a permission shows as on but Pairwise says it is missing, turn it off and on again, or remove Pairwise from the list and add it again. macOS ties a permission to the app's signature, so this can happen after running a copy signed differently, such as your own build.
 
 ## Using it
 
