@@ -27,6 +27,7 @@ extension PairDragModel {
         var current = joining
         current.target = JoinRule.target(for: now, pointer: joining.pointer, among: candidates)
         drag = .joining(current)
+        if current.target != joining.target { Self.log(current, frame: now, candidates) }
         if let target = current.target {
             system.showJoinGuide(at: target.frame)
         } else {
@@ -40,7 +41,10 @@ extension PairDragModel {
         defer { endDrag() }
         Self.logger.info("joining ended, place found: \(joining.target != nil)")
         guard let target = joining.target else { return }
-        guard let other = system.window(number: target.other.number) else { return }
+        guard let other = system.window(number: target.other.number) else {
+            Self.logger.info("the window to join has no element: \(target.other.number)")
+            return
+        }
         do {
             try joining.window.resize(to: target.frame.size)
             try joining.window.move(to: target.frame.origin)
@@ -51,6 +55,19 @@ extension PairDragModel {
             Self.logger.info(
                 "the windows did not join: \(String(describing: error), privacy: .public)")
         }
+    }
+
+    private static func log(
+        _ joining: PairDrag.Joining, frame: WindowFrame, _ candidates: [ScreenWindow]
+    ) {
+        let found =
+            joining.target.map { "\($0.other.number) \($0.side) \($0.other.frame)" } ?? "none"
+        logger.info(
+            """
+            join place: \(found, privacy: .public); window \(String(describing: frame), privacy: .public), \
+            pointer \(String(describing: joining.pointer), privacy: .public), \
+            \(candidates.count) candidates
+            """)
     }
 
     private static func seam(of target: JoinTarget) -> WindowFrame {
