@@ -12,16 +12,18 @@ struct MenuBarContent: View {
     var body: some View {
         Toggle("Move pairs together", isOn: isMoving)
         Divider()
-        Button("About Pairwise") {
-            // An app without a Dock icon does not come forward by itself.
-            NSApplication.shared.activate()
-            NSApplication.shared.orderFrontStandardAboutPanel(nil)
-        }
         Button("Settings…") {
             openWindow(id: settingsWindow)
             // An app without a Dock icon does not come forward by itself.
             NSApplication.shared.activate()
         }
+        Divider()
+        Button("About Pairwise") {
+            // An app without a Dock icon does not come forward by itself.
+            NSApplication.shared.activate()
+            NSApplication.shared.orderFrontStandardAboutPanel(nil)
+        }
+        Divider()
         Button("Quit Pairwise") {
             model.stop()
             NSApplication.shared.terminate(nil)

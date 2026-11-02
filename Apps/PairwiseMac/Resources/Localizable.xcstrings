@@ -425,7 +425,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Stop Pairwise"
+            "value" : "Quit Pairwise"
           }
         }
       }
