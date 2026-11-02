@@ -57,9 +57,9 @@ Done first because everything below adds code to this module.
 - [x] Checked by hand.
 
 ### 8. Not losing windows
-- [ ] ADR: what a crash leaves behind.
-- [ ] Before parking, the windows' places are written to a file; after the release it is cleared. At the next start, Pairwise puts back any windows in that file.
-- [ ] A test by killing the app during a drag, in the stress test, on its own windows.
+- [x] ADR 0053: what a crash leaves behind.
+- [x] Before parking, the windows' places are written to a file; after the release it is cleared. At the next start, Pairwise puts back any windows in that file.
+- [x] A test by killing the app during a drag, in the stress test, on its own windows: passed, both windows back in place.
 
 ### 9. Pairs that last
 - [ ] ADR: how a window is found again after a restart (app, title, size, place), since its number does not survive.
@@ -75,7 +75,7 @@ Done first because everything below adds code to this module.
 - [ ] By hand: two windows of different apps join, move together, share their seam and come apart, without a manual.
 - [ ] By hand: a window not in a pair behaves exactly as without Pairwise, including tabs, tiling and snapping, apart from a drag starting on the lock's own small place on a seam (ADR 0044).
 - [ ] The stress test covers joined pairs, a closed partner and a kill during a drag, and passes.
-- [ ] After a kill during a drag, the next start puts the windows back.
+- [x] After a kill during a drag, the next start puts the windows back.
 - [ ] Coverage targets are met: Core ≥ 90 %, WindowSystem ≥ 75 %, UI state ≥ 70 %.
 - [ ] `tools/build.sh ci` is green (when the owner says so, ADR 0011).
 

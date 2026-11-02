@@ -37,6 +37,7 @@ tools/build.sh run --join-test FILE   # the same for joining and parting, with a
 tools/build.sh run --seam-test FILE   # measures how well a window follows a resize at a seam; takes over the pointer
 tools/build.sh run --seam-look FILE   # saves pictures of a resize at the seam next to FILE; takes over the pointer
 tools/build.sh run --record FILE      # the app as usual, recording the screen to FILE for 40 seconds, then it quits
+tools/build.sh run --kill-test FILE   # kills the app during a drag of its own windows; then run --kill-check FILE
 tools/build.sh release                # build the app, Release, and fail if test code is in it (ADR 0050)
 ```
 

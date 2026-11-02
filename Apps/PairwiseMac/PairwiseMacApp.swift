@@ -78,6 +78,8 @@ extension PairwiseMacApp {
     private static let joinTestFlag = "--join-test"
     private static let seamTestFlag = "--seam-test"
     private static let seamLookFlag = "--seam-look"
+    private static let killTestFlag = "--kill-test"
+    private static let killCheckFlag = "--kill-check"
     /// Pairwise works as usual meanwhile, and quits when the recording is finished.
     private static let recordFlag = "--record"
     private static let recordingTime = Duration.seconds(40)
@@ -95,7 +97,8 @@ extension PairwiseMacApp {
             return true
         }
         let flag = arguments.firstIndex {
-            [stressTestFlag, joinTestFlag, seamTestFlag, seamLookFlag].contains($0)
+            [stressTestFlag, joinTestFlag, seamTestFlag, seamLookFlag, killTestFlag, killCheckFlag]
+                .contains($0)
         }
         guard let flag, arguments.indices.contains(flag + 1) else { return false }
         // The seam test measures windows alone, with no tap and no pair.
@@ -112,6 +115,10 @@ extension PairwiseMacApp {
             await test.runSeamTest()
         } else if arguments[flag] == seamLookFlag {
             await test.runSeamLook()
+        } else if arguments[flag] == killTestFlag {
+            await test.runKillTest()
+        } else if arguments[flag] == killCheckFlag {
+            await test.runKillCheck(on: system)
         } else {
             await test.run()
         }
