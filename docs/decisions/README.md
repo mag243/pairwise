@@ -52,3 +52,4 @@ Use `0000-template.md` as the basis.
 | 0044 | A lock that joins and parts | Accepted |
 | 0045 | Following at the seam | Accepted |
 | 0046 | Stopping the seam at a window's limit | Accepted |
+| 0047 | A reach that follows the speed | Accepted |

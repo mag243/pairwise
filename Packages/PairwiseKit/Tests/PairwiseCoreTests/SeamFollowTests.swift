@@ -6,6 +6,30 @@ import Testing
     private static let right = WindowFrame(x: 500, y: 100, width: 200, height: 200)
     private static let reach = SeamFollow.reachUnderHeldWindow
 
+    @Test func aGrowingPartnerReachesAsFarAsTheSeamTravelsInAFewFrames() {
+        #expect(SeamFollow.reach(after: 0, widthChange: 5) == 15)
+    }
+
+    @Test func aFastSeamReachesNoFurtherThanTheMost() {
+        #expect(SeamFollow.reach(after: 0, widthChange: 100) == SeamFollow.reachUnderHeldWindow)
+    }
+
+    @Test func aSlowerSeamDoesNotCutTheReachAtOnce() {
+        #expect(SeamFollow.reach(after: 30, widthChange: 1) == 21)
+    }
+
+    @Test func aStillSeamShrinksTheReach() {
+        #expect(SeamFollow.reach(after: 20, widthChange: 0) == 14)
+    }
+
+    @Test func aSmallReachOnAStillSeamIsGone() {
+        #expect(SeamFollow.reach(after: 1, widthChange: 0) == 0)
+    }
+
+    @Test func aShrinkingPartnerHasNoReach() {
+        #expect(SeamFollow.reach(after: 30, widthChange: -5) == 0)
+    }
+
     /// Notes the same answer as many times as it takes to count as a limit.
     private func limits(
         partnerOn side: PairSide, start: WindowFrame, asked: Double, reached: Double

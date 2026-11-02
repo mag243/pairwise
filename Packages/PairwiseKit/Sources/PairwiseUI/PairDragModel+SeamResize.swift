@@ -57,13 +57,12 @@ extension PairDragModel {
         let held = heldWithinLimits(now, resizing)
         let exact = SeamFollow.partnerFrame(
             start: resizing.partnerStart, partnerOn: resizing.side, beside: held, reach: 0)
-        if held != now {
-            // Coming back to a limit is not growing: the seam stands still there.
-            current.reach = 0
-        } else if exact.size.width != current.lastExactWidth {
-            current.reach =
-                exact.size.width > current.lastExactWidth ? SeamFollow.reachUnderHeldWindow : 0
-        }
+        // Coming back to a limit is not growing: the seam stands still there.
+        current.reach =
+            held != now
+            ? 0
+            : SeamFollow.reach(
+                after: current.reach, widthChange: exact.size.width - current.lastExactWidth)
         current.lastExactWidth = exact.size.width
         let target = SeamFollow.partnerFrame(
             start: resizing.partnerStart, partnerOn: resizing.side, beside: held,
