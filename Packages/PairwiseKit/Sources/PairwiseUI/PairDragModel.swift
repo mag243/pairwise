@@ -58,6 +58,8 @@ public final class PairDragModel {
     @ObservationIgnored var lasting = LastingPairs()
     /// Whether pairs are kept between runs; test runs leave the user's alone (ADR 0054).
     @ObservationIgnored public var keepsPairs = true
+    /// Whether Pairwise starts by itself once the permissions it misses are given.
+    @ObservationIgnored var waitsForPermissions = false
     @ObservationIgnored var hasSeenButtonDown = false
     @ObservationIgnored private var pressTime: TimeInterval = 0
     /// Tells a picture that arrives late from the one this press asked for.
@@ -75,13 +77,16 @@ public final class PairDragModel {
         refreshPermissions()
         guard system.isAccessibilityGranted else {
             problem = .accessibilityDenied
+            waitsForPermissions = true
             return
         }
         putBackParkedWindows()
         guard system.isScreenRecordingGranted else {
             problem = .screenRecordingDenied
+            waitsForPermissions = true
             return
         }
+        waitsForPermissions = false
         do {
             try system.startHoldingDrags { [weak self] event in self?.decide(event) ?? true }
             problem = nil
@@ -95,6 +100,7 @@ public final class PairDragModel {
 
     /// Stops taking over drags, with parked windows put back; all input passes.
     public func stop() {
+        waitsForPermissions = false
         putWindowsBack()
         endDrag()
         if lasting.needsSaving { savePairs() }

@@ -9,6 +9,7 @@ import SwiftUI
 struct PairwiseMacApp: App {
     private static let showSettingsFlag = "--show-settings"
     private static let settingsWindow = "settings"
+    private static let permissionLookInterval = Duration.seconds(2)
 
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @State private var pairDrag: PairDragModel
@@ -67,7 +68,12 @@ struct PairwiseMacApp: App {
         #if DEBUG
         if await runTestIfAsked(model, system) { return }
         #endif
-        if model.isAccessibilityGranted, model.isScreenRecordingGranted { model.start() }
+        model.startWhenPermitted()
+        // The user gives and takes permissions in System Settings, which tells no app.
+        while !Task.isCancelled {
+            try? await Task.sleep(for: permissionLookInterval)
+            model.followPermissions()
+        }
     }
 }
 

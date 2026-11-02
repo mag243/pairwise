@@ -8,6 +8,27 @@ extension PairDragModel {
         isScreenRecordingGranted = system.isScreenRecordingGranted
     }
 
+    /// Starts now, or as soon as `followPermissions` sees that both permissions are given.
+    /// A permission that is still missing is no problem yet: the settings ask for it anyway.
+    public func startWhenPermitted() {
+        start()
+        if waitsForPermissions { problem = nil }
+    }
+
+    /// Reads the permissions, and acts when they changed in System Settings: starts when
+    /// waiting for them, and stops when one was taken away, so that all input passes.
+    public func followPermissions() {
+        refreshPermissions()
+        let isGranted = isAccessibilityGranted && isScreenRecordingGranted
+        if isRunning, !isGranted {
+            stop()
+            waitsForPermissions = true
+            problem = isAccessibilityGranted ? .screenRecordingDenied : .accessibilityDenied
+        } else if waitsForPermissions, isGranted {
+            start()
+        }
+    }
+
     /// Asks the system to show the user where to grant the Accessibility permission.
     public func requestAccessibility() {
         system.requestAccessibility()
