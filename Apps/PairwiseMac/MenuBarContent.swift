@@ -11,6 +11,10 @@ struct MenuBarContent: View {
 
     var body: some View {
         Toggle("Move pairs together", isOn: isMoving)
+        // With the settings closed, this is the only place that says why nothing moves.
+        if let problem = model.problem {
+            Text(problem.message)
+        }
         Divider()
         Button("Settings…") {
             openWindow(id: settingsWindow)
