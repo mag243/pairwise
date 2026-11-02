@@ -44,7 +44,7 @@ These need the owner's keychain, accounts or judgment, so the agent prepares the
 ### 5. Homebrew
 - [x] ADR 0059: a cask `pairwise` in the existing tap `mag243/homebrew-tap`, with `auto_updates true`, so Homebrew leaves updating to Sparkle.
 - [x] The cask sets the minimum macOS, quits Pairwise on uninstall, and with `zap` removes its settings and its records (`parked-windows.json`, `pairs.json`).
-- [ ] `brew audit` and `brew style` on the cask pass.
+- [x] `brew audit` and `brew style` on the cask pass.
 
 ### 6. Starting at login, and the right place
 - [x] ADR 0060: `SMAppService.mainApp`, as a setting that is off until the user turns it on, in the settings or at the end of the first start.
