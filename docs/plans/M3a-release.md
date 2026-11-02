@@ -17,9 +17,9 @@ These need the owner's keychain, accounts or judgment, so the agent prepares the
 ### 1. A signed, notarized app
 - [x] ADR 0056: Developer ID, hardened runtime, notarization with a keychain profile of its own, no unsigned fallback. Releases are made on the owner's Mac; the workflow in CI stays by hand (ADR 0006).
 - [ ] Confirm the bundle identifier `me.m-domain.pairwise` (ADR 0007) and the name: both are permanent from the first release, and macOS ties the permissions to them.
-- [ ] `tools/build.sh package`: archive, export, notarize, staple, check with `codesign` and `spctl`, and zip. It stops with a message when something is missing. The check for test code (ADR 0050) runs on this build as well.
-- [ ] `tools/build.sh package` writes a disk image beside the zip, also notarized, with a window to drag Pairwise into Applications.
-- [ ] `CHANGELOG.md`, with the changelog section as the release notes.
+- [x] `tools/build.sh package`: archive, export, notarize, staple, check with `codesign` and `spctl`, and zip. It stops with a message when something is missing. The check for test code (ADR 0050) runs on this build as well.
+- [x] `tools/build.sh package` writes a disk image beside the zip, also notarized, with a window to drag Pairwise into Applications.
+- [x] `CHANGELOG.md`, with the changelog section as the release notes.
 
 ### 2. The first start, on a Mac that has never seen Pairwise
 - [ ] Find out why the settings window did not appear with `--show-settings` from `tools/build.sh run`, while the UI test sees it. The same rule opens the window when a permission is missing, so a new user might otherwise see nothing and never learn what Pairwise needs. If it is a bug: a failing test first.
