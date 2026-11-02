@@ -52,6 +52,23 @@
         }
       }
     },
+    "Drag a window and hold Command over another window to join them. To part them, hold Command before you drag one away." : {
+      "comment" : "How to join and part windows",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ziehe ein Fenster und halte die Befehlstaste über einem anderen Fenster, um sie zu verbinden. Zum Trennen halte die Befehlstaste, bevor du eines wegziehst."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sleep een venster en houd Command ingedrukt boven een ander venster om ze te koppelen. Houd Command ingedrukt voordat je er een wegsleept om ze los te maken."
+          }
+        }
+      }
+    },
     "Grant Access…" : {
       "comment" : "Button that opens the system's permission prompt",
       "localizations" : {
@@ -99,23 +116,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Toegestaan"
-          }
-        }
-      }
-    },
-    "Hold Command and drag a window to another's edge to join them, and away to part them." : {
-      "comment" : "How to join and part windows",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Halte die Befehlstaste und ziehe ein Fenster an den Rand eines anderen, um sie zu verbinden, und weg, um sie zu trennen."
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Houd Command ingedrukt en sleep een venster naar de rand van een ander om ze te koppelen, en weg om ze los te maken."
           }
         }
       }

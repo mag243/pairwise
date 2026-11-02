@@ -44,3 +44,4 @@ Use `0000-template.md` as the basis.
 | 0036 | Joining with Command | Accepted |
 | 0037 | Joining when dragged over the other window | Superseded by 0038 |
 | 0038 | Joining the window under the pointer | Accepted |
+| 0039 | The join key during the drag | Accepted |

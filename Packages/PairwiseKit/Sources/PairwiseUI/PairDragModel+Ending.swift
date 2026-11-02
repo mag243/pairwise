@@ -32,6 +32,7 @@ extension PairDragModel {
             return
         }
         guard case .moving(let moving) = drag else {
+            freeWindowPressed = nil
             if case .pressed(let pressed) = drag {
                 placePartnerAfterShortDrag(pressed)
                 Self.logger.info(

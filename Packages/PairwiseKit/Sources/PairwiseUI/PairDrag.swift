@@ -36,6 +36,7 @@ enum PairDrag {
         let number: UInt32
         let frame: WindowFrame
         var pointer: ScreenPoint
+        var isKeyDown = true
         var target: JoinTarget?
     }
 

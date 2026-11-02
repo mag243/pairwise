@@ -15,8 +15,23 @@ extension PairDragModel {
         return "joining"
     }
 
+    /// The join key came during the drag of a window in no pair.
+    func startJoiningFreeWindow(at point: ScreenPoint) {
+        guard let number = freeWindowPressed else { return }
+        freeWindowPressed = nil
+        lastPressOutcome = startJoining(number, pointer: point)
+        hasSeenButtonDown = true
+    }
+
     /// Keeps the guide on the place the window would join, once it has moved.
     func watch(_ joining: PairDrag.Joining) {
+        guard joining.isKeyDown else {
+            var current = joining
+            current.target = nil
+            drag = .joining(current)
+            system.hideJoinGuide()
+            return
+        }
         guard
             let now = joining.window.serverFrame() ?? (try? joining.window.frame()),
             DragHoldRule.isMove(from: joining.frame, to: now)

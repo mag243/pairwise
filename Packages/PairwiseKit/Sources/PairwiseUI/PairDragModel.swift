@@ -33,17 +33,20 @@ public final class PairDragModel {
     /// Why the last start or drag did not work; cleared by the next one.
     public internal(set) var problem: WindowSystemError?
     /// What became of the last press, in words for the log and the stress test.
-    public private(set) var lastPressOutcome = ""
+    public internal(set) var lastPressOutcome = ""
     /// The measurements of the last drag that moved the panel.
     public internal(set) var lastDrag: DragReport?
 
     @ObservationIgnored let system: any WindowSystemProviding
+    /// The window of this press, when it is in no pair: the join key can still come during
+    /// the drag (ADR 0039).
+    @ObservationIgnored var freeWindowPressed: UInt32?
     @ObservationIgnored var book = PairBook()
     /// The windows in `book`, by number.
     @ObservationIgnored var pairedWindows: [UInt32: any MovableWindow] = [:]
     @ObservationIgnored var drag = PairDrag.none
     @ObservationIgnored var stats = DragStats()
-    @ObservationIgnored private var hasSeenButtonDown = false
+    @ObservationIgnored var hasSeenButtonDown = false
     @ObservationIgnored private var pressTime: TimeInterval = 0
     /// Tells a picture that arrives late from the one this press asked for.
     @ObservationIgnored var request = 0
@@ -89,8 +92,8 @@ public final class PairDragModel {
         case .pressed(let point, let isJoinKeyDown):
             press(at: point, isJoinKeyDown: isJoinKeyDown)
             return true
-        case .dragged(let point):
-            return !holdsDrag(at: point)
+        case .dragged(let point, let isJoinKeyDown):
+            return !holdsDrag(at: point, isJoinKeyDown: isJoinKeyDown)
         case .released(let point):
             release(at: point)
             return true
@@ -104,6 +107,7 @@ public final class PairDragModel {
         let before = system.uptime
         hasSeenButtonDown = false
         pressTime = before
+        freeWindowPressed = nil
         let outcome = takeOverPress(at: point, isJoinKeyDown: isJoinKeyDown)
         lastPressOutcome = outcome
         let elapsed = system.uptime - before
@@ -121,7 +125,10 @@ public final class PairDragModel {
             let partnerEntry = book.partner(of: number),
             let window = pairedWindows[number],
             let partnerWindow = pairedWindows[partnerEntry.window]
-        else { return "not in a pair" }
+        else {
+            freeWindowPressed = number
+            return "not in a pair"
+        }
         guard
             window.isAvailable, partnerWindow.isAvailable,
             let partnerFrame = partnerWindow.serverFrame() ?? (try? partnerWindow.frame()),
@@ -164,12 +171,16 @@ public final class PairDragModel {
         }
     }
 
-    private func holdsDrag(at point: ScreenPoint) -> Bool {
+    private func holdsDrag(at point: ScreenPoint, isJoinKeyDown: Bool) -> Bool {
         switch drag {
-        case .none, .passing, .placing, .settling:
+        case .none:
+            if isJoinKeyDown { startJoiningFreeWindow(at: point) }
+            return false
+        case .passing, .placing, .settling:
             return false
         case .joining(var joining):
             joining.pointer = point
+            joining.isKeyDown = isJoinKeyDown
             drag = .joining(joining)
             return false
         case .pressed(var pressed):

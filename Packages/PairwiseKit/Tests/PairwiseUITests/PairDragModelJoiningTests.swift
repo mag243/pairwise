@@ -26,14 +26,64 @@ import Testing
         model.start()
     }
 
-    /// Presses with Option, and has macOS move the window to `place`.
+    /// Presses with the key, and has macOS move the window to `place`.
     private func drag(to place: ScreenPoint) {
         _ = system.send(.pressed(Self.press))
         window.currentFrame.origin = place
         system.tick()
     }
 
-    @Test func withoutOptionNothingJoins() {
+    @Test func theKeyPressedDuringADragStartsJoining() {
+        system.isJoinKeyDown = false
+        _ = system.send(.pressed(Self.press))
+        #expect(!system.isTicking)
+        system.isJoinKeyDown = true
+        #expect(system.send(.dragged(ScreenPoint(x: 700, y: 200))))
+        #expect(system.isTicking)
+        window.currentFrame.origin = Self.far
+        system.tick()
+        #expect(system.guideFrames.last == Self.joined)
+    }
+
+    @Test func aDragWithoutTheKeyStartsNothing() {
+        system.isJoinKeyDown = false
+        _ = system.send(.pressed(Self.press))
+        _ = system.send(.dragged(ScreenPoint(x: 700, y: 200)))
+        #expect(!system.isTicking)
+    }
+
+    @Test func lettingGoOfTheKeyTakesTheGuideAwayAndJoinsNothing() {
+        _ = system.send(.pressed(Self.press))
+        _ = system.send(.dragged(ScreenPoint(x: 700, y: 200)))
+        window.currentFrame.origin = Self.far
+        system.tick()
+        system.isJoinKeyDown = false
+        _ = system.send(.dragged(ScreenPoint(x: 700, y: 201)))
+        system.tick()
+        #expect(!system.isGuideShowing)
+        _ = system.send(.released(ScreenPoint(x: 700, y: 201)))
+        #expect(window.resizes.isEmpty)
+    }
+
+    @Test func theKeyAfterTheReleaseStartsNothing() {
+        system.isJoinKeyDown = false
+        _ = system.send(.pressed(Self.press))
+        _ = system.send(.released(Self.press))
+        system.isJoinKeyDown = true
+        _ = system.send(.dragged(ScreenPoint(x: 700, y: 200)))
+        #expect(!system.isTicking)
+    }
+
+    @Test func theKeyDuringADragOnAWindowInAPairStartsNoJoining() throws {
+        try model.join(window, to: other, on: .left)
+        system.isJoinKeyDown = false
+        _ = system.send(.pressed(Self.press))
+        system.isJoinKeyDown = true
+        _ = system.send(.dragged(ScreenPoint(x: 700, y: 200)))
+        #expect(model.lastPressOutcome == "watching")
+    }
+
+    @Test func withoutTheKeyNothingJoins() {
         system.isJoinKeyDown = false
         drag(to: Self.nearRightEdge)
         #expect(!system.isTicking)
@@ -131,7 +181,7 @@ import Testing
         #expect(!system.isTicking)
     }
 
-    @Test func optionAtAPressPartsAPair() throws {
+    @Test func theKeyAtAPressPartsAPair() throws {
         try model.join(window, to: other, on: .left)
         drag(to: Self.far)
         _ = system.send(.released(Self.press))
