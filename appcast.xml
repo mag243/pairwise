@@ -3,6 +3,16 @@
     <channel>
         <title>Pairwise</title>
         <item>
+            <title>0.2.1</title>
+            <pubDate>Mon, 02 Nov 2026 19:27:50 +0100</pubDate>
+            <sparkle:version>2026.1102.192601</sparkle:version>
+            <sparkle:shortVersionString>0.2.1</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+            <description sparkle:format="markdown"><![CDATA[- No gap between two windows after dragging their seam, when a window such as Terminal rounds its width to whole characters.
+]]></description>
+            <enclosure url="https://github.com/mag243/pairwise/releases/download/v0.2.1/Pairwise-0.2.1-2026.1102.192601.zip" length="1656643" type="application/octet-stream" sparkle:edSignature="0TL6GDsF0GTR+RYbK/QpBtkGaF3O4XSTkwio/x9EMdMeUJ7mJ/+BaNuYbseSOoDaE7jWDVEk16btpkFZ4kwHCg=="/>
+        </item>
+        <item>
             <title>0.2.0</title>
             <pubDate>Mon, 02 Nov 2026 19:20:14 +0100</pubDate>
             <sparkle:version>2026.1102.191801</sparkle:version>
