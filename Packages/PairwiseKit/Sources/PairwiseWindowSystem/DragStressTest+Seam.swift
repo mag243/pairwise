@@ -77,14 +77,20 @@ extension DragStressTest {
         await dragSeam(of: window, by: -300)
         lines.append("expect the other at Finder's minimum of 520, the seam shared")
         report("resized to the other's minimum", window, other)
+        await dragSeam(of: other, atRightEdge: true, by: 500)
+        lines.append("expect the first at Finder's minimum of 520, far edge at 1500, seam shared")
+        report("resized to the minimum on the right", window, other)
     }
 
-    /// Drags the left edge of `window`, away from the lock in the middle of the seam.
-    private func dragSeam(of window: AccessibilityWindow, by distance: Double) async {
+    /// Drags an edge of `window`, away from the lock in the middle of the seam.
+    private func dragSeam(
+        of window: AccessibilityWindow, atRightEdge: Bool = false, by distance: Double
+    ) async {
         guard let frame = window.serverFrame() else { return }
         try? window.raise()
         await wait(Self.settleWait)
-        var point = CGPoint(x: frame.origin.x + 1, y: frame.origin.y + Self.seamPressDown)
+        let x = atRightEdge ? frame.maxX - 1 : frame.origin.x + 1
+        var point = CGPoint(x: x, y: frame.origin.y + Self.seamPressDown)
         post(.mouseMoved, at: point)
         await wait(Self.windowWait)
         post(.leftMouseDown, at: point)

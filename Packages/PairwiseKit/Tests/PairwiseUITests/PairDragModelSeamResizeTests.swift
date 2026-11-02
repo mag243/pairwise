@@ -89,6 +89,24 @@ import Testing
         #expect(right.currentFrame == WindowFrame(x: 500, y: 100, width: 200, height: 200))
     }
 
+    @Test func aPartnerOnTheRightThatRefusesKeepsItsPlaceAndTheWindowComesBack() {
+        right.resizeError = .windowRefused
+        resize(left, to: wider)
+        _ = system.send(.released(Self.press))
+        system.tick()
+        #expect(right.currentFrame == WindowFrame(x: 500, y: 100, width: 200, height: 200))
+        #expect(left.currentFrame == WindowFrame(x: 100, y: 100, width: 400, height: 300))
+    }
+
+    @Test func aPartnerThatGivesOtherWidthKeepsItsFarEdge() {
+        right.widthStep = 40
+        resize(left, to: wider)
+        _ = system.send(.released(Self.press))
+        system.tick()
+        #expect(right.currentFrame == WindowFrame(x: 580, y: 100, width: 120, height: 200))
+        #expect(left.currentFrame == WindowFrame(x: 100, y: 100, width: 480, height: 300))
+    }
+
     @Test func aWindowAtThePartnersEdgeAfterTheReleaseIsLeftAlone() {
         resize(left, to: wider)
         _ = system.send(.released(Self.press))

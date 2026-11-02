@@ -19,6 +19,9 @@ public final class FakeWindow: MovableWindow {
     public private(set) var resizes: [WindowSize] = []
     /// When set, resizing throws this.
     public var resizeError: WindowSystemError?
+    /// When set, a width asked for is rounded down to a multiple of this, as with an app that
+    /// sizes in whole characters.
+    public var widthStep: Double?
     /// When set, raising throws this.
     public var raiseError: WindowSystemError?
     /// Runs during each raise, to let a test see what stands at that moment.
@@ -51,6 +54,9 @@ public final class FakeWindow: MovableWindow {
         if let resizeError { throw resizeError }
         resizes.append(size)
         currentFrame.size = size
+        if let widthStep {
+            currentFrame.size.width = (size.width / widthStep).rounded(.down) * widthStep
+        }
     }
 
     public func raise() throws(WindowSystemError) {

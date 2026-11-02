@@ -36,15 +36,20 @@ extension PairDragModel {
         drag = .resizingSeam(current)
     }
 
-    /// Both windows go exactly against each other. A partner that refused to go that far
-    /// keeps its place, and the held window comes back to meet it.
+    /// Both windows go exactly against each other. A partner with another width than asked,
+    /// at its minimum or maximum or rounding it, keeps its far edge, and the held window
+    /// comes back to meet it.
     func finishSeam(_ resizing: PairDrag.ResizingSeam) {
         defer { endDrag() }
         guard let held = try? resizing.window.frame() else { return }
         let target = SeamFollow.partnerFrame(
             start: resizing.partnerStart, partnerOn: resizing.side, beside: held, reach: 0)
         Self.apply(target, to: resizing.partner, from: resizing.lastPartnerFrame)
-        guard let partner = try? resizing.partner.frame() else { return }
+        guard let reached = try? resizing.partner.frame() else { return }
+        let partner = SeamFollow.partnerFrame(
+            start: resizing.partnerStart, partnerOn: resizing.side,
+            withWidth: reached.size.width)
+        Self.apply(partner, to: resizing.partner, from: reached)
         let meeting = SeamFollow.heldFrame(held, meeting: partner, partnerOn: resizing.side)
         if meeting != held { Self.apply(meeting, to: resizing.window, from: held) }
     }

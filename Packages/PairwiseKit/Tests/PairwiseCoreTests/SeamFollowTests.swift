@@ -61,6 +61,18 @@ import Testing
         #expect(frame.size.width == SeamFollow.smallestWidth)
     }
 
+    @Test func aPartnerOnTheRightOfAnotherSizeKeepsItsFarEdge() {
+        let frame = SeamFollow.partnerFrame(
+            start: Self.right, partnerOn: .right, withWidth: 150)
+        #expect(frame == WindowFrame(x: 550, y: 100, width: 150, height: 200))
+    }
+
+    @Test func aPartnerOnTheLeftOfAnotherSizeKeepsItsFarEdge() {
+        let frame = SeamFollow.partnerFrame(
+            start: Self.left, partnerOn: .left, withWidth: 350)
+        #expect(frame == WindowFrame(x: 100, y: 100, width: 350, height: 300))
+    }
+
     @Test func aHeldWindowComesBackToAPartnerOnItsRightThatRefused() {
         let held = WindowFrame(x: 100, y: 100, width: 600, height: 300)
         let partner = WindowFrame(x: 650, y: 100, width: 50, height: 200)
