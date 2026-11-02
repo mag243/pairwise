@@ -46,7 +46,8 @@ Done first because everything below adds code to this module.
 - [x] Live pictures in that panel, at the owner's wish, with both windows parked (ADR 0049).
 - [x] Minimum and maximum sizes: the seam stops where either window refuses to go, during the drag (ADR 0048).
 - [x] Measured, on Finder windows, in `docs/reference/spike-following.md`.
-- [ ] Judged by hand, in Terminal and an Electron app too.
+- [x] Judged by hand in Terminal: looks very good, with the amber line and live pictures.
+- [ ] Judged by hand in Safari and an Electron app, and at a window's limit.
 
 ### 7. Together in other ways
 - [ ] Bringing one window of a pair forward brings the other forward, without taking focus from the first.
