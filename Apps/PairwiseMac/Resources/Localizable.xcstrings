@@ -35,6 +35,23 @@
         }
       }
     },
+    "About Pairwise" : {
+      "comment" : "Menu item that shows the app's name and version",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Über Pairwise"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Over Pairwise"
+          }
+        }
+      }
+    },
     "Accessibility" : {
       "comment" : "The system permission Pairwise needs",
       "localizations" : {
