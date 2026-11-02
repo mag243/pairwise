@@ -25,6 +25,7 @@ public final class DragStressTest {
     private static let pressRange = 220.0...380.0
     private static let dragSteps = 12
     private static let dragStep = 6.0
+    private static let closedPartnerWait: UInt64 = 1000
     private static let tolerance = 3.0
     /// Waits in milliseconds, tried in turn: from arriving at a place to the press, and
     /// from the press to the first drag event.
@@ -91,8 +92,44 @@ public final class DragStressTest {
         lines.append("summary: \(counts.sorted { $0.key < $1.key })")
         await controlTries(dragged: dragged, partner: partner)
         await liveTries(dragged: dragged)
+        await closedPartnerTry(dragged: dragged, partner: partner)
         close(dragged)
+    }
+
+    /// A partner that closes ends the pair by itself: the other window stays, and then drags
+    /// alone. The look at the pairs comes a few times a second, so this waits for it.
+    private func closedPartnerTry(
+        dragged: AccessibilityWindow, partner: AccessibilityWindow
+    ) async {
+        await place(dragged, at: Self.origin)
+        await place(partner, at: ScreenPoint(x: Self.origin.x + Self.size.width, y: Self.origin.y))
+        await wait(Self.settleWait)
+        guard joined(dragged, partner) else { return }
+        try? dragged.raise()
+        await wait(Self.settleWait)
         close(partner)
+        await wait(Self.closedPartnerWait)
+        let stayed = dragged.serverFrame()?.origin.distance(to: Self.origin) ?? .infinity
+        var point = CGPoint(
+            x: Self.origin.x + Self.pressRange.lowerBound, y: Self.origin.y + Self.titleBandY)
+        post(.mouseMoved, at: point)
+        await wait(Self.windowWait)
+        post(.leftMouseDown, at: point)
+        await wait(Self.windowWait)
+        for _ in 0..<Self.dragSteps {
+            point.x += Self.dragStep
+            post(.leftMouseDragged, at: point)
+            await wait(Self.stepWait)
+        }
+        post(.leftMouseUp, at: point)
+        await wait(Self.settleWait)
+        let moved = dragged.serverFrame()?.origin.distance(to: Self.origin) ?? 0
+        let passed =
+            stayed <= Self.tolerance && moved > Self.tolerance
+            && pressOutcome() == "not in a pair"
+        lines.append(
+            "closed partner: stayed within \(Int(stayed)), then moved \(Int(moved)), "
+                + "press: \(pressOutcome()): \(passed ? "passed" : "FAILED")")
     }
 
     private func oneTry(

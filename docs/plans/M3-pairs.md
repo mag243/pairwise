@@ -16,7 +16,7 @@ Done first because everything below adds code to this module.
 ### 2. Tell a window drag from everything else
 - [x] ADR 0032: a press and its drag events pass until the window has really moved, and only then is the drag taken over. This replaces the proposed table of roles, and the fixed band of 52 points goes.
 - [x] `PairwiseCore`, test-first: what counts as a move and as a resize.
-- [ ] Check by hand: dragging a tab in Safari works, clicks work, a toolbar's empty space moves the pair. Check Terminal, Finder, Safari and one Electron app.
+- [x] Checked by hand: dragging a tab in Safari works, clicks work, a toolbar's empty space moves the pair. Checked in Terminal, Finder, Safari and one Electron app.
 
 ### 3. Pairs as a model
 - [x] `PairwiseCore`, test-first: a pair, which side each window is on, the rules (not a window with itself, a window in one pair only).
@@ -47,7 +47,7 @@ Done first because everything below adds code to this module.
 - [x] Minimum and maximum sizes: the seam stops where either window refuses to go, during the drag (ADR 0048).
 - [x] Measured, on Finder windows, in `docs/reference/spike-following.md`.
 - [x] Judged by hand in Terminal: looks very good, with the amber line and live pictures.
-- [ ] Judged by hand in Safari and an Electron app, and at a window's limit.
+- [x] Judged by hand in Safari and an Electron app, and at a window's limit.
 - [x] Found why the stress test moved nothing in about 1 of 40 tries: each press was at about 205 in Finder's title bar, which does not drag a window, also without a pair. The test presses elsewhere now.
 
 ### 7. Together in other ways
@@ -64,7 +64,7 @@ Done first because everything below adds code to this module.
 ### 9. Pairs that last
 - [x] ADR 0054: how a window is found again after a restart (app, title, size, place), since its number does not survive.
 - [x] Pairs are saved, and restored at the start where both windows are found. A pair that cannot be found with confidence is dropped, and no window is moved.
-- [x] Checked by hand: a quit, and a window moved in between. A restart of an app and of the Mac are still to be seen.
+- [x] Checked by hand: a quit, and a window moved in between. Also a restart of an app and of the Mac.
 
 ### 10. The app itself
 - [x] ADR 0034: a menu bar app (open decision 2 in `PLAN.md`, owner's choice 4). Done before step 4, at the owner's wish.
@@ -73,8 +73,8 @@ Done first because everything below adds code to this module.
 - [x] Complete `nl` and `de`, with the translation tools of ADR 0010 brought over.
 
 ## Acceptance criteria
-- [ ] By hand: two windows of different apps join, move together, share their seam and come apart, without a manual.
-- [ ] By hand: a window not in a pair behaves exactly as without Pairwise, including tabs, tiling and snapping, apart from a drag starting on the lock's own small place on a seam (ADR 0044).
+- [x] By hand: two windows of different apps join, move together, share their seam and come apart, without a manual.
+- [x] By hand: a window not in a pair behaves exactly as without Pairwise, including tabs, tiling and snapping, apart from a drag starting on the lock's own small place on a seam (ADR 0044).
 - [ ] The stress test covers joined pairs, a closed partner and a kill during a drag, and passes.
 - [x] After a kill during a drag, the next start puts the windows back.
 - [x] Coverage targets are met: Core ≥ 90 %, WindowSystem ≥ 75 %, UI state ≥ 70 %.
