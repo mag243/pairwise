@@ -2,7 +2,7 @@ import Foundation
 
 /// A point in global screen coordinates, with the origin at the top left of the
 /// main display and y growing downwards.
-public struct ScreenPoint: Equatable, Sendable {
+public struct ScreenPoint: Codable, Equatable, Sendable {
     public var x: Double
     public var y: Double
 

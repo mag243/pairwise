@@ -55,6 +55,13 @@ public protocol WindowSystemProviding: AnyObject {
     /// Takes the guide away, if it shows.
     func hideJoinGuide()
 
+    /// Keeps `record` outside this process, so that it survives a crash, or removes what is
+    /// kept when it is `nil` (ADR 0053).
+    func saveParkingRecord(_ record: Data?)
+
+    /// What `saveParkingRecord` kept, also from an earlier run of the app.
+    func loadParkingRecord() -> Data?
+
     /// Plays `sound`.
     func play(_ sound: PairSound)
 

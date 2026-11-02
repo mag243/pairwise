@@ -29,6 +29,8 @@ public final class FakeWindowSystem: WindowSystemProviding {
     public private(set) var isGuideShowing = false
     public private(set) var seamFlashes: [WindowFrame] = []
     public private(set) var sounds: [PairSound] = []
+    /// What survives a crash, kept here as a test goes on with a new model.
+    public var parkingRecord: Data?
     public private(set) var standInRequests = 0
     public private(set) var normalWindowsRequests = 0
     public var pointerLocation = ScreenPoint(x: 0, y: 0)
@@ -83,6 +85,14 @@ public final class FakeWindowSystem: WindowSystemProviding {
 
     public func hideJoinGuide() {
         isGuideShowing = false
+    }
+
+    public func saveParkingRecord(_ record: Data?) {
+        parkingRecord = record
+    }
+
+    public func loadParkingRecord() -> Data? {
+        parkingRecord
     }
 
     public func play(_ sound: PairSound) {

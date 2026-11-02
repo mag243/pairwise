@@ -133,6 +133,10 @@ extension PairDragModel {
         guard !resizing.isHeldParked || !resizing.isPartnerParked,
             let origin = system.parkingOrigin
         else { return resizing }
+        recordParking(of: [
+            WindowToPark(window: resizing.window, frame: resizing.heldStart),
+            WindowToPark(window: resizing.partner, frame: resizing.partnerStart),
+        ])
         var current = resizing
         if !current.isHeldParked { current.isHeldParked = Self.park(current.window, at: origin) }
         if !current.isPartnerParked {
@@ -197,6 +201,7 @@ extension PairDragModel {
         }
         Self.apply(resizing.partnerFrame(seamAt: seam), to: resizing.partner, from: nil)
         meet(resizing, seamAsked: seam)
+        forgetParking()
         if let standIn = resizing.standIn {
             drag = .settling(standIn: standIn, until: system.uptime + Self.settleTime)
         } else {

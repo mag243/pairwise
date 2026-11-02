@@ -1,5 +1,5 @@
 /// A window's place and size in global screen coordinates (see `ScreenPoint`).
-public struct WindowFrame: Equatable, Sendable {
+public struct WindowFrame: Codable, Equatable, Sendable {
     public var origin: ScreenPoint
     public var size: WindowSize
 

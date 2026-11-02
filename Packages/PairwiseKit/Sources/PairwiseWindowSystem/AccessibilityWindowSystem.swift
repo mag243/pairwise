@@ -25,6 +25,7 @@ public final class AccessibilityWindowSystem: WindowSystemProviding {
     private let capture: WindowCapture
     private let makeMark: () -> any ScreenMark
     private let makeLock: () -> any SeamLockMark
+    private let parkingRecordURL: URL
     private let makeHold: (@escaping @MainActor (PointerButtonEvent) -> Bool) -> any PointerHold
     private var joinGuide: (any ScreenMark)?
     private var seamLock: (any SeamLockMark)?
@@ -42,14 +43,21 @@ public final class AccessibilityWindowSystem: WindowSystemProviding {
         makeMark: @escaping () -> any ScreenMark = { JoinMarkPanel() },
         makeLock: @escaping () -> any SeamLockMark = { SeamLockPanel() },
         makeHold: @escaping (@escaping @MainActor (PointerButtonEvent) -> Bool) -> any PointerHold =
-            { HoldingTap(decide: $0) }
+            { HoldingTap(decide: $0) },
+        parkingRecordURL: URL = AccessibilityWindowSystem.defaultParkingRecordURL
     ) {
+        self.parkingRecordURL = parkingRecordURL
         self.access = access
         self.makeMark = makeMark
         self.makeLock = makeLock
         self.makeHold = makeHold
         capture = WindowCapture(service: captureService)
     }
+
+    /// In the app's folder in Application Support, where a new run finds it (ADR 0053).
+    static let defaultParkingRecordURL = URL.applicationSupportDirectory
+        .appending(path: "me.m-domain.pairwise", directoryHint: .isDirectory)
+        .appending(path: "parked-windows.json")
 
     public var isAccessibilityGranted: Bool { AXIsProcessTrusted() }
 
@@ -152,6 +160,28 @@ public final class AccessibilityWindowSystem: WindowSystemProviding {
     public func hideJoinGuide() {
         joinGuide?.hide()
         joinGuide = nil
+    }
+
+    public func saveParkingRecord(_ record: Data?) {
+        do {
+            guard let record else {
+                if FileManager.default.fileExists(atPath: parkingRecordURL.path) {
+                    try FileManager.default.removeItem(at: parkingRecordURL)
+                }
+                return
+            }
+            try FileManager.default.createDirectory(
+                at: parkingRecordURL.deletingLastPathComponent(),
+                withIntermediateDirectories: true)
+            try record.write(to: parkingRecordURL, options: .atomic)
+        } catch {
+            Self.logger.info(
+                "the parking record failed: \(String(describing: error), privacy: .public)")
+        }
+    }
+
+    public func loadParkingRecord() -> Data? {
+        try? Data(contentsOf: parkingRecordURL)
     }
 
     public func play(_ sound: PairSound) {

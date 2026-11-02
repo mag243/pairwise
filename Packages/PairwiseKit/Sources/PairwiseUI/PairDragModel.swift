@@ -53,6 +53,8 @@ public final class PairDragModel {
     @ObservationIgnored var stats = DragStats()
     @ObservationIgnored var lockWatch = SeamLockWatch()
     @ObservationIgnored var togetherWatch = TogetherWatch()
+    /// Whether a record of parked windows is kept (ADR 0053).
+    @ObservationIgnored var isParkingRecorded = false
     @ObservationIgnored var hasSeenButtonDown = false
     @ObservationIgnored private var pressTime: TimeInterval = 0
     /// Tells a picture that arrives late from the one this press asked for.
@@ -72,6 +74,7 @@ public final class PairDragModel {
             problem = .accessibilityDenied
             return
         }
+        putBackParkedWindows()
         guard system.isScreenRecordingGranted else {
             problem = .screenRecordingDenied
             return

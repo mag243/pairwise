@@ -54,7 +54,7 @@ Done first because everything below adds code to this module.
 - [x] At a join both windows come forward, and a join or parting by the user makes a sound, which a setting turns off (ADR 0051).
 - [x] Bringing one window of a pair forward brings the other forward, without taking focus from the first (ADR 0052).
 - [x] Minimizing one minimizes the other (owner's choice 3), and bringing one back brings the other (ADR 0052).
-- [ ] Check by hand.
+- [x] Checked by hand.
 
 ### 8. Not losing windows
 - [ ] ADR: what a crash leaves behind.

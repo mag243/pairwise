@@ -6,6 +6,12 @@ extension PairDragModel {
     func park(_ moving: PairDrag.Moving) {
         guard !moving.isWindowParked || !moving.isPartnerParked else { return }
         guard let origin = system.parkingOrigin else { return }
+        recordParking(of: [
+            WindowToPark(window: moving.window, frame: moving.frame),
+            WindowToPark(
+                window: moving.partner.window,
+                frame: WindowFrame(origin: moving.partner.origin, size: moving.partner.size)),
+        ])
         var current = moving
         do {
             if !current.isWindowParked {
@@ -73,6 +79,7 @@ extension PairDragModel {
             // Raised last, the dragged window ends on top; a failure leaves it in place.
             try? current.partner.window.raise()
             try? current.window.raise()
+            forgetParking()
             drag = .settling(standIn: current.standIn, until: system.uptime + Self.settleTime)
         } catch {
             drag = .placing(current)
@@ -103,10 +110,12 @@ extension PairDragModel {
             try? moving.window.move(to: origin)
             try? moving.partner.window.move(
                 to: place(of: moving.partner, beside: origin, moving.frame.size))
+            forgetParking()
         case .placing(let placing):
             try? placing.window.move(to: placing.target)
             try? placing.partner.window.move(
                 to: place(of: placing.partner, beside: placing.target, placing.size))
+            forgetParking()
         case .resizingSeam(let resizing):
             finishSeam(resizing)
         default:

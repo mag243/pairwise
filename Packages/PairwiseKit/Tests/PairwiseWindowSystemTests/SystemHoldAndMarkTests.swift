@@ -1,3 +1,4 @@
+import Foundation
 import PairwiseCore
 import Testing
 
@@ -123,5 +124,36 @@ private final class FakeLockMark: SeamLockMark {
 
     func hide() {
         isHidden = true
+    }
+}
+
+@MainActor
+@Suite struct ParkingRecordFileTests {
+    private let folder = FileManager.default.temporaryDirectory
+        .appending(path: "PairwiseTests-\(UUID().uuidString)", directoryHint: .isDirectory)
+    private var url: URL { folder.appending(path: "parked-windows.json") }
+
+    private func system() -> AccessibilityWindowSystem {
+        AccessibilityWindowSystem(
+            access: FakeSystemAccess(), captureService: FakeCaptureService(),
+            parkingRecordURL: url)
+    }
+
+    @Test func aRecordSurvivesInANewSystem() {
+        defer { try? FileManager.default.removeItem(at: folder) }
+        system().saveParkingRecord(Data("record".utf8))
+        #expect(system().loadParkingRecord() == Data("record".utf8))
+    }
+
+    @Test func nilRemovesTheRecord() {
+        defer { try? FileManager.default.removeItem(at: folder) }
+        let system = system()
+        system.saveParkingRecord(Data("record".utf8))
+        system.saveParkingRecord(nil)
+        #expect(system.loadParkingRecord() == nil)
+    }
+
+    @Test func noRecordGivesNone() {
+        #expect(system().loadParkingRecord() == nil)
     }
 }

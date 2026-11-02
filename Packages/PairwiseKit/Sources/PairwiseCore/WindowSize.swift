@@ -1,5 +1,5 @@
 /// The size of a window, in points.
-public struct WindowSize: Equatable, Sendable {
+public struct WindowSize: Codable, Equatable, Sendable {
     public var width: Double
     public var height: Double
 

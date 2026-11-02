@@ -37,6 +37,7 @@ extension PairDragModel {
     func part(_ moving: PairDrag.Moving) {
         try? moving.window.move(to: moving.origin(forPointer: moving.lastPointer))
         try? moving.partner.window.move(to: moving.partner.origin)
+        forgetParking()
         endDrag()
         lastPressOutcome = startJoining(
             moving.number, pointer: moving.lastPointer,
