@@ -20,7 +20,7 @@ If a permission shows as on but Pairwise says it is missing, turn it off and on 
 
 ## Using it
 
-Pairwise lives in the menu bar and needs two permissions: Accessibility, to move other apps' windows, and Screen Recording, for the pictures of a pair shown while it is dragged. They stay in memory, and nothing is saved or sent anywhere.
+Pairwise lives in the menu bar and needs one permission: Accessibility, to move other apps' windows.
 
 - **Join:** drag a window and press Command over another window, or click the open lock on the seam of two windows side by side. Add Shift to give the dragged window the other's height, and Control for the other choice of windows in the settings.
 - **Move together:** drag either window of a pair.
@@ -29,7 +29,7 @@ Pairwise lives in the menu bar and needs two permissions: Accessibility, to move
 
 ## Privacy
 
-While you drag a pair or its seam, Pairwise shows pictures of those two windows. By default that is one picture at the start of the drag. With the setting Live, video keeps playing and the seam stays sharp, and macOS shows its purple recording icon during the drag. Either way Pairwise captures only those two windows, and the pictures stay in memory: they are not saved or sent anywhere. Once a day, and when you ask, Pairwise fetches its update feed from GitHub, which sends nothing more than any web request does. You can turn that off in the settings.
+By default Pairwise records nothing: while you drag a pair, you see an empty plane with each window's icon and title. Two settings show more, and take the Screen Recording permission: Still shows one picture at the start of the drag, and Live keeps video playing and the seam sharp, with macOS's purple recording icon during the drag. They capture only those two windows, and the pictures stay in memory: they are not saved or sent anywhere. Once a day, and when you ask, Pairwise fetches its update feed from GitHub, which sends nothing more than any web request does. You can turn that off in the settings.
 
 ## Requirements
 

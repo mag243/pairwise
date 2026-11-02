@@ -32,9 +32,33 @@ import Testing
         #expect(waiting.isScreenRecordingGranted)
     }
 
-    @Test func theChoiceOfPlaceholdersReachesTheSystem() {
-        model.showsPlaceholders = true
+    @Test func placeholdersAreWhatAUserWhoHasNotChosenGets() {
+        #expect(model.dragPictures == .placeholder)
         #expect(system.showsPlaceholders)
+    }
+
+    @Test func liveReachesTheSystem() {
+        model.dragPictures = .live
+        #expect(!system.showsPlaceholders)
+        #expect(system.liveFramesPerSecond == DragPictures.live.framesPerSecond)
+    }
+
+    @Test func withoutThePermissionLiveFallsBackOnPlaceholders() {
+        system.isScreenRecordingGranted = false
+        model.refreshPermissions()
+        model.dragPictures = .live
+        #expect(system.showsPlaceholders)
+        #expect(system.liveFramesPerSecond == 0)
+    }
+
+    @Test func aGrantedPermissionTurnsTheChoiceOnWithoutARestart() {
+        system.isScreenRecordingGranted = false
+        model.refreshPermissions()
+        model.dragPictures = .live
+        system.isScreenRecordingGranted = true
+        model.followPermissions()
+        #expect(!system.showsPlaceholders)
+        #expect(system.liveFramesPerSecond == DragPictures.live.framesPerSecond)
     }
 
     @Test func withoutAccessibilityNothingIsTakenOver() {
@@ -53,9 +77,10 @@ import Testing
         #expect(!model.isRunning)
     }
 
-    @Test func theSystemsFrameRateIsTheFirstChoice() {
+    @Test func theStandardChoiceSetsTheFrameRateWhateverTheSystemHad() {
         system.liveFramesPerSecond = 15
-        #expect(PairDragModel(system: system).liveFramesPerSecond == 15)
+        #expect(PairDragModel(system: system).liveFramesPerSecond == 0)
+        #expect(system.liveFramesPerSecond == 0)
     }
 
     @Test func choosingAFrameRateGoesToTheSystem() {

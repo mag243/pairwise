@@ -21,7 +21,7 @@ struct PairwiseMacApp: App {
         let model = PairDragModel(system: system)
         model.joinScope = MainView.storedJoinScope
         model.playsSounds = MainView.storedPlaysSounds
-        model.liveFramesPerSecond = MainView.storedDragPictures.framesPerSecond
+        model.dragPictures = MainView.storedDragPictures
         _pairDrag = State(initialValue: model)
         guard !Self.isAnimatedCopy else { return }
         Task { await Self.startWorking(model, system) }
@@ -62,7 +62,6 @@ struct PairwiseMacApp: App {
         Self.isAnimatedCopy
             || CommandLine.arguments.contains(Self.showSettingsFlag)
             || !pairDrag.isAccessibilityGranted
-            || !pairDrag.isScreenRecordingGranted
     }
 
     private static func startWorking(
@@ -105,7 +104,7 @@ extension PairwiseMacApp {
         // Test runs join windows of their own, and leave the user's saved pairs alone.
         model.keepsPairs = !isTestRun
         // They measure the live pictures too, whatever the user chose.
-        if isTestRun { model.liveFramesPerSecond = DragPictures.live.framesPerSecond }
+        if isTestRun { model.dragPictures = .live }
         if let flag = arguments.firstIndex(of: recordFlag), arguments.indices.contains(flag + 1) {
             model.start()
             await ScreenRecording(outputPath: arguments[flag + 1]).record(for: recordingTime)

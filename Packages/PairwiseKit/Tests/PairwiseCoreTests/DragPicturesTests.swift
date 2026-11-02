@@ -2,24 +2,22 @@ import PairwiseCore
 import Testing
 
 @Suite struct DragPicturesTests {
-    @Test func aUserWhoHasNotChosenGetsStillPictures() {
-        #expect(DragPictures.standard == .still)
+    @Test func aUserWhoHasNotChosenGetsPlaceholders() {
+        #expect(DragPictures.standard == .placeholder)
     }
 
-    @Test func stillRunsNoStream() {
+    @Test func onlyLiveRunsAStream() {
+        #expect(DragPictures.placeholder.framesPerSecond == 0)
         #expect(DragPictures.still.framesPerSecond == 0)
-    }
-
-    @Test func liveRunsAStream() {
         #expect(DragPictures.live.framesPerSecond > 0)
     }
 
-    @Test(arguments: DragPictures.allCases)
-    func aChoiceSurvivesItsFrameRate(pictures: DragPictures) {
-        #expect(DragPictures(framesPerSecond: pictures.framesPerSecond) == pictures)
+    @Test func placeholdersNeedNoScreenRecording() {
+        #expect(!DragPictures.placeholder.needsScreenRecording)
     }
 
-    @Test func anyOtherFrameRateCountsAsLive() {
-        #expect(DragPictures(framesPerSecond: 15) == .live)
+    @Test(arguments: [DragPictures.still, .live])
+    func picturesOfWindowsNeedScreenRecording(pictures: DragPictures) {
+        #expect(pictures.needsScreenRecording)
     }
 }

@@ -31,19 +31,17 @@ Started from anywhere else, Pairwise offers once to move itself into Application
 
 ## Permissions
 
-Pairwise lives in the menu bar and asks for two permissions in System Settings:
+Pairwise lives in the menu bar and needs one permission in System Settings: **Accessibility,** to move and resize the windows you join.
 
-- **Accessibility,** to move and resize the windows you join.
-- **Screen Recording,** to show pictures of the two joined windows while you drag them. The pictures stay in memory, and are not saved or sent anywhere.
+## What you see while dragging
 
-## Still or live pictures
+Moving the real windows lags visibly behind the pointer, so while you drag a pair you see something else in their place. You choose what:
 
-While you drag a pair, you see pictures of the two windows, because moving the real windows themselves lags visibly behind the pointer. You choose what those pictures show:
-
-- **Still** is what Pairwise starts with: one picture of the two windows when you start dragging. Video stands still during the drag, and the seam can look stretched.
+- **Placeholder** is what Pairwise starts with: an empty plane with the window's icon and title. Nothing is recorded, and Pairwise does not even ask for Screen Recording.
+- **Still** shows one picture of the two windows when you start dragging. Video stands still during the drag, and the seam can look stretched.
 - **Live** keeps video playing and the seam sharp. macOS then shows its purple recording icon during the drag, as it does for every app that captures a window continuously.
 
-Either way Pairwise captures only the two windows of a pair, and only from the moment you press one of them or their seam until you let go. The pictures stay in memory, and are not saved or sent anywhere. Pairwise is open source, so you can [check this in the code](https://github.com/mag243/pairwise/tree/main/Packages/PairwiseKit/Sources/PairwiseWindowSystem).
+Still and Live take the Screen Recording permission, which Pairwise asks for when you choose one. They capture only the two windows of a pair, and only from the moment you press one of them or their seam until you let go. The pictures stay in memory, and are not saved or sent anywhere. Pairwise is open source, so you can [check this in the code](https://github.com/mag243/pairwise/tree/main/Packages/PairwiseKit/Sources/PairwiseWindowSystem).
 
 ## Updates
 

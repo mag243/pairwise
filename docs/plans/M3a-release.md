@@ -55,13 +55,13 @@ These need the owner's keychain, accounts or judgment, so the agent prepares the
 - [x] Say why it appears, before people see it: in the Screen Recording permission's text, on the page and in the README.
 - [x] By hand, with the debug setting at Still: the icon stays away for a pair and at a seam, with stretching at the seam. So a setting, Still by default (ADR 0063).
 
-### 8. Pictures without any capture, on trial
-A third choice beside Still and Live, for dragging with no Screen Recording permission at all. First a trial in the debug build; what follows depends on how it looks by hand.
+### 8. Pictures without any capture
+A third choice beside Still and Live, for dragging with no Screen Recording permission at all (ADR 0064).
 
 - [x] By hand: Still and Live as they are, and Settings coming to the front from the menu, also from another desktop.
 - [x] Trial, in the debug setting: during a drag and at a seam, each window shows as an empty plane that follows light or dark mode, with the app's icon in its middle, and a title bar holding the three buttons, the icon and the window's title, read through the Accessibility API. Nothing is captured.
-- [ ] By hand: does it move and resize cleanly, and how does the jump to the real content at the release feel?
-- [ ] Decide with the owner whether it stays, and whether it is the default. If it stays: an ADR first, then Pairwise works with Accessibility alone, the permission is asked only for Still or Live, and the first start, the settings' texts, the page, the README and the translations follow.
+- [x] By hand: does it move and resize cleanly, and how does the jump to the real content at the release feel?
+- [x] Decide with the owner whether it stays, and whether it is the default. If it stays: an ADR first, then Pairwise works with Accessibility alone, the permission is asked only for Still or Live, and the first start, the settings' texts, the page, the README and the translations follow.
 - [ ] Moving the real windows stays out: M1 showed that the partner visibly lags (ADR 0024).
 
 ### 9. Translations and README

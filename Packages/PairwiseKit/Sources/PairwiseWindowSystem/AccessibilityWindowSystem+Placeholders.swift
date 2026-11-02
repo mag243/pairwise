@@ -1,7 +1,7 @@
 import AppKit
 import PairwiseCore
 
-/// Stand-ins without any capture (on trial, plan M3a).
+/// Stand-ins without any capture (ADR 0064).
 extension AccessibilityWindowSystem {
     private static let screenScaleWithoutScreen: CGFloat = 2
 

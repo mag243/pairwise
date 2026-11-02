@@ -324,23 +324,6 @@
         }
       }
     },
-    "Lets Pairwise show pictures of the two joined windows while you drag them. The pictures stay in memory, and are not saved or sent anywhere." : {
-      "comment" : "Settings: why Pairwise needs Screen Recording",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Damit zeigt Pairwise Bilder der beiden verbundenen Fenster, während du sie ziehst. Die Bilder bleiben im Arbeitsspeicher und werden weder gesichert noch versendet."
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hiermee toont Pairwise beelden van de twee gekoppelde vensters terwijl je ze sleept. De beelden blijven in het geheugen, en worden niet opgeslagen of verstuurd."
-          }
-        }
-      }
-    },
     "Live" : {
       "comment" : "Value of the setting Pictures while dragging",
       "localizations" : {
@@ -579,6 +562,23 @@
         }
       }
     },
+    "Nothing is recorded. An empty plane with the window's title moves until you let go." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Es wird nichts aufgenommen. Eine leere Fläche mit dem Fenstertitel bewegt sich mit, bis du loslässt."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Er wordt niets opgenomen. Een leeg vlak met de titel van het venster beweegt mee tot je loslaat."
+          }
+        }
+      },
+      "comment" : "Settings: what this value of Pictures while dragging costs"
+    },
     "One picture of the two windows when you start dragging. No purple icon. Video stands still, and the seam can look stretched." : {
       "comment" : "Settings: what this value of Pictures while dragging costs",
       "localizations" : {
@@ -595,6 +595,23 @@
           }
         }
       }
+    },
+    "Only for still or live pictures while dragging. The pictures stay in memory, and are not saved or sent anywhere." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nur für Standbilder oder Live-Bilder beim Ziehen. Die Bilder bleiben im Arbeitsspeicher und werden weder gesichert noch versendet."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alleen voor stilstaande of livebeelden tijdens het slepen. De beelden blijven in het geheugen, en worden niet opgeslagen of verstuurd."
+          }
+        }
+      },
+      "comment" : "Settings: what Screen Recording is for"
     },
     "Open at login" : {
       "comment" : "Setting: start Pairwise when the user logs in",
@@ -668,39 +685,22 @@
         }
       }
     },
-    "Pairwise has no Screen Recording access." : {
-      "comment" : "The Screen Recording permission is missing",
+    "Pairwise needs Accessibility to work." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pairwise hat keinen Zugriff auf die Bildschirmaufnahme."
+            "value" : "Pairwise benötigt die Bedienungshilfen, um zu funktionieren."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pairwise heeft geen toegang tot Schermopname."
+            "value" : "Pairwise heeft Toegankelijkheid nodig om te werken."
           }
         }
-      }
-    },
-    "Pairwise needs both to work." : {
-      "comment" : "Under the two permissions, when one is missing",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pairwise braucht beides, um zu funktionieren."
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pairwise heeft beide nodig om te werken."
-          }
-        }
-      }
+      },
+      "comment" : "Settings: without this permission nothing works"
     },
     "Panel appeared after (ms)" : {
       "comment" : "Measurement: time from the press until the picture of both windows showed",
@@ -754,6 +754,7 @@
       }
     },
     "Placeholder" : {
+      "comment" : "Value of the setting Pictures while dragging",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -767,8 +768,24 @@
             "value" : "Plaatshouder"
           }
         }
+      }
+    },
+    "Placeholders are used until Screen Recording is on, under General." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bis die Bildschirmaufnahme unter „Allgemein“ aktiviert ist, werden Platzhalter verwendet."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tot Schermopname aanstaat, onder Algemeen, worden plaatshouders gebruikt."
+          }
+        }
       },
-      "comment" : "Debug setting: pictures that capture nothing, on trial"
+      "comment" : "Settings: the choice needs a permission that is missing"
     },
     "Quit Pairwise" : {
       "comment" : "Menu: quits the app",

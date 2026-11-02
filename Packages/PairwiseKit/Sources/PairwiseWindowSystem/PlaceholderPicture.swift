@@ -1,13 +1,12 @@
 import AppKit
 
 /// A picture of a window that captures nothing: an empty plane with the app's icon, and a title
-/// bar with a window's three buttons, the icon and the title (on trial, plan M3a).
+/// bar with a window's three buttons and its title (ADR 0064).
 @MainActor
 enum PlaceholderPicture {
     /// Where the parts of a placeholder go, with the origin at its bottom left.
     struct Places {
         let bar: CGRect
-        let barIcon: CGRect
         let title: CGRect
         let buttons: [CGRect]
         /// `nil` when the plane has no room for it.
@@ -27,10 +26,8 @@ enum PlaceholderPicture {
     static var titleFont: NSFont { .titleBarFont(ofSize: titleFontSize) }
 
     private static let titleBarHeight: CGFloat = 28
-    private static let iconSize: CGFloat = 16
-    /// Where the icon starts, past the buttons.
-    private static let iconInset: CGFloat = 76
-    private static let iconGap: CGFloat = 6
+    /// Where the title starts, past the buttons.
+    private static let titleInset: CGFloat = 76
     private static let trailingInset: CGFloat = 12
     /// The middle of the first button from the window's left edge, and between buttons.
     private static let firstButtonX: CGFloat = 14
@@ -45,13 +42,10 @@ enum PlaceholderPicture {
     static func places(for size: CGSize) -> Places {
         let bar = CGRect(
             x: 0, y: size.height - titleBarHeight, width: size.width, height: titleBarHeight)
-        let barIcon = CGRect(
-            x: iconInset, y: bar.midY - iconSize / 2, width: iconSize, height: iconSize)
         let lineHeight = ceil(titleFont.ascender - titleFont.descender + titleFont.leading)
-        let titleStart = barIcon.maxX + iconGap
         let title = CGRect(
-            x: titleStart, y: bar.midY - lineHeight / 2,
-            width: max(0, bar.width - titleStart - trailingInset), height: lineHeight)
+            x: titleInset, y: bar.midY - lineHeight / 2,
+            width: max(0, bar.width - titleInset - trailingInset), height: lineHeight)
         let buttons = buttonColours.indices.map { index in
             CGRect(
                 x: firstButtonX + CGFloat(index) * buttonSpacing - buttonDiameter / 2,
@@ -62,7 +56,7 @@ enum PlaceholderPicture {
             x: bar.midX - bodyIconSize / 2, y: bar.minY / 2 - bodyIconSize / 2,
             width: bodyIconSize, height: bodyIconSize)
         return Places(
-            bar: bar, barIcon: barIcon, title: title, buttons: buttons,
+            bar: bar, title: title, buttons: buttons,
             bodyIcon: hasRoom ? bodyIcon : nil)
     }
 
@@ -94,7 +88,6 @@ enum PlaceholderPicture {
         bounds.fill()
         barColour(isDark: isDark).setFill()
         places.bar.fill()
-        icon?.draw(in: places.barIcon)
         for (colour, place) in zip(buttonColours, places.buttons) {
             colour.setFill()
             NSBezierPath(ovalIn: place).fill()

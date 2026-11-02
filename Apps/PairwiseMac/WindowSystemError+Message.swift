@@ -8,7 +8,6 @@ extension WindowSystemError {
         case .accessibilityDenied: "Pairwise has no Accessibility access."
         case .eventTapUnavailable:
             "The pointer cannot be watched. Quit and reopen Pairwise after granting access."
-        case .screenRecordingDenied: "Pairwise has no Screen Recording access."
         case .captureFailed: "No picture of the windows: this drag moves one window."
         case .windowGone: "The window has gone."
         case .windowRefused: "The window refuses to move."

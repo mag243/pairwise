@@ -269,7 +269,8 @@ public final class AccessibilityWindowSystem: WindowSystemProviding {
         let tap = makeHold(decide)
         try tap.start()
         holdingTap = tap
-        Task { await capture.prepare() }
+        // Asking for the list of windows takes the permission that placeholders do without.
+        if !showsPlaceholders { Task { await capture.prepare() } }
     }
 
     public func stopHoldingDrags() {

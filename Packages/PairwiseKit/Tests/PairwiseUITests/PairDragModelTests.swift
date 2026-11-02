@@ -70,12 +70,13 @@ import Testing
         #expect(system.send(.dragged(Self.further)))
     }
 
-    @Test func withoutScreenRecordingNothingIsTakenOver() {
+    @Test func withoutScreenRecordingPairwiseRunsWithPlaceholders() {
         model.stop()
         system.isScreenRecordingGranted = false
         model.start()
-        #expect(model.problem == .screenRecordingDenied)
-        #expect(!system.isHolding)
+        #expect(model.problem == nil)
+        #expect(model.isRunning)
+        #expect(system.showsPlaceholders)
     }
 
     @Test func aPressAndReleaseAlwaysPass() {

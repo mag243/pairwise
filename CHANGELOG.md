@@ -2,7 +2,8 @@
 
 ## [Unreleased]
 
-- Still or live pictures while dragging, a new setting. Still is the default, with no purple recording icon. Live keeps video playing and the seam sharp.
+- Pairwise needs only Accessibility now. While dragging you see an empty plane with each window's icon and title, and nothing is recorded.
+- Still or live pictures while dragging, new settings that take Screen Recording. Live keeps video playing and the seam sharp, with macOS's purple recording icon.
 - Settings comes to the front when you open it from the menu, also from another desktop.
 - A page at https://mag243.github.io/pairwise/.
 

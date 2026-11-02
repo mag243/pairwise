@@ -7,7 +7,6 @@ final class PlaceholderLayers {
     /// The layer to add to the panel, which holds all the others.
     let root = StandInPanel.stillLayer()
     private let bar = StandInPanel.stillLayer()
-    private let barIcon = StandInPanel.stillLayer()
     private let bodyIcon = StandInPanel.stillLayer()
     private let buttons = PlaceholderPicture.buttonColours.map { colour in
         let layer = StandInPanel.stillLayer()
@@ -23,10 +22,8 @@ final class PlaceholderLayers {
         root.cornerRadius = PlaceholderPicture.cornerRadius
         root.masksToBounds = true
         bar.backgroundColor = PlaceholderPicture.barColour(isDark: isDark).cgColor
-        barIcon.contents = icon
         bodyIcon.contents = icon
         bodyIcon.contentsGravity = .resizeAspect
-        barIcon.contentsGravity = .resizeAspect
         title.string = text
         title.font = PlaceholderPicture.titleFont
         title.fontSize = PlaceholderPicture.titleFontSize
@@ -34,7 +31,7 @@ final class PlaceholderLayers {
         title.truncationMode = .end
         title.contentsScale = scale
         title.actions = StandInPanel.stillLayer().actions
-        for layer in [bar, bodyIcon] + buttons + [barIcon, title] {
+        for layer in [bar, bodyIcon] + buttons + [title] {
             root.addSublayer(layer)
         }
     }
@@ -44,7 +41,6 @@ final class PlaceholderLayers {
         root.frame = CGRect(origin: .zero, size: size)
         let places = PlaceholderPicture.places(for: size)
         bar.frame = places.bar
-        barIcon.frame = places.barIcon
         title.frame = places.title
         bodyIcon.frame = places.bodyIcon ?? .zero
         for (layer, place) in zip(buttons, places.buttons) {

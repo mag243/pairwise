@@ -11,8 +11,6 @@ struct MainView: View {
     private static let millisecondsPerSecond = 1000.0
     private static let fractionDigits = 1
     private static let frameRates = [15, 30, 60]
-    /// The trial without any capture, in the picker of frame rates (plan M3a).
-    private static let placeholderTag = -1
     #endif
     private static let joinScopeKey = "joinScope"
     private static let playsSoundsKey = "playsSounds"
@@ -23,7 +21,7 @@ struct MainView: View {
         UserDefaults.standard.object(forKey: playsSoundsKey) as? Bool ?? true
     }
 
-    /// What the pictures show during a drag, as stored the last time; still until chosen.
+    /// What the pictures show during a drag, as stored the last time; placeholders until chosen.
     static var storedDragPictures: DragPictures {
         UserDefaults.standard.string(forKey: dragPicturesKey).flatMap(DragPictures.init(rawValue:))
             ?? .standard
@@ -111,14 +109,14 @@ struct MainView: View {
             } label: {
                 Text("Screen Recording")
                 Text(
-                    "Lets Pairwise show pictures of the two joined windows while you drag them. The pictures stay in memory, and are not saved or sent anywhere."
+                    "Only for still or live pictures while dragging. The pictures stay in memory, and are not saved or sent anywhere."
                 )
             }
             if !model.isScreenRecordingGranted {
                 Button("Grant Screen Recording…") { model.requestScreenRecording() }
             }
-            if !model.isAccessibilityGranted || !model.isScreenRecordingGranted {
-                Text("Pairwise needs both to work.").foregroundStyle(.secondary)
+            if !model.isAccessibilityGranted {
+                Text("Pairwise needs Accessibility to work.").foregroundStyle(.secondary)
             }
         }
     }
@@ -133,15 +131,22 @@ struct MainView: View {
         }
         Section("Dragging") {
             Picker("Pictures while dragging", selection: dragPictures) {
+                Text("Placeholder").tag(DragPictures.placeholder)
                 Text("Still").tag(DragPictures.still)
                 Text("Live").tag(DragPictures.live)
             }
             Text(dragPicturesExplanation).foregroundStyle(.secondary)
+            if model.dragPictures.needsScreenRecording, !model.isScreenRecordingGranted {
+                Text("Placeholders are used until Screen Recording is on, under General.")
+                    .foregroundStyle(.secondary)
+            }
         }
     }
 
     private var dragPicturesExplanation: LocalizedStringKey {
-        switch DragPictures(framesPerSecond: model.liveFramesPerSecond) {
+        switch model.dragPictures {
+        case .placeholder:
+            "Nothing is recorded. An empty plane with the window's title moves until you let go."
         case .still:
             "One picture of the two windows when you start dragging. No purple icon. Video stands still, and the seam can look stretched."
         case .live:
@@ -151,10 +156,13 @@ struct MainView: View {
 
     private var dragPictures: Binding<DragPictures> {
         Binding {
-            DragPictures(framesPerSecond: model.liveFramesPerSecond)
+            model.dragPictures
         } set: {
-            model.liveFramesPerSecond = $0.framesPerSecond
+            model.dragPictures = $0
             UserDefaults.standard.set($0.rawValue, forKey: Self.dragPicturesKey)
+            if $0.needsScreenRecording, !model.isScreenRecordingGranted {
+                model.requestScreenRecording()
+            }
         }
     }
 
@@ -212,7 +220,6 @@ struct MainView: View {
     @ViewBuilder private var testing: some View {
         Section("For testing") {
             Picker("Live pictures", selection: liveFrames) {
-                Text("Placeholder").tag(Self.placeholderTag)
                 Text("Still").tag(0)
                 ForEach(Self.frameRates, id: \.self) { rate in
                     Text("\(rate) frames a second").tag(rate)
@@ -228,10 +235,9 @@ struct MainView: View {
 
     private var liveFrames: Binding<Int> {
         Binding {
-            model.showsPlaceholders ? Self.placeholderTag : model.liveFramesPerSecond
+            model.liveFramesPerSecond
         } set: {
-            model.showsPlaceholders = $0 == Self.placeholderTag
-            model.liveFramesPerSecond = max(0, $0)
+            model.liveFramesPerSecond = $0
         }
     }
 

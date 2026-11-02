@@ -27,9 +27,9 @@ public final class PairDragModel {
         didSet { system.liveFramesPerSecond = liveFramesPerSecond }
     }
 
-    /// Whether the pictures are placeholders and nothing is captured, on trial (plan M3a).
-    public var showsPlaceholders = false {
-        didSet { system.showsPlaceholders = showsPlaceholders }
+    /// What the pictures show during a drag, the user's choice (ADR 0064).
+    public var dragPictures = DragPictures.standard {
+        didSet { applyDragPictures() }
     }
 
     /// Which windows the join key joins; the scope key gives the other choice (ADR 0043).
@@ -75,22 +75,19 @@ public final class PairDragModel {
         liveFramesPerSecond = system.liveFramesPerSecond
         isAccessibilityGranted = system.isAccessibilityGranted
         isScreenRecordingGranted = system.isScreenRecordingGranted
+        applyDragPictures()
     }
 
     /// Starts taking over drags; a failure lands in `problem`, and all input passes.
     public func start() {
         refreshPermissions()
+        applyDragPictures()
         guard system.isAccessibilityGranted else {
             problem = .accessibilityDenied
             waitsForPermissions = true
             return
         }
         putBackParkedWindows()
-        guard system.isScreenRecordingGranted else {
-            problem = .screenRecordingDenied
-            waitsForPermissions = true
-            return
-        }
         waitsForPermissions = false
         do {
             try system.startHoldingDrags { [weak self] event in self?.decide(event) ?? true }

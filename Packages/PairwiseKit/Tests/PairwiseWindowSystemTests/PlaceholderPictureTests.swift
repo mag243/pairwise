@@ -112,7 +112,7 @@ import Testing
     }
 
     @Test func aNarrowWindowKeepsItsButtonsAndLosesItsTitlesRoom() {
-        let places = PlaceholderPicture.places(for: CGSize(width: 90, height: 200))
+        let places = PlaceholderPicture.places(for: CGSize(width: 80, height: 200))
         #expect(places.title.width == 0)
         #expect(places.buttons.count == 3)
         #expect(places.bodyIcon == nil)

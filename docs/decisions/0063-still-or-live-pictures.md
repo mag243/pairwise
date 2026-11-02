@@ -1,6 +1,6 @@
 # 0063. Still or live pictures
 
-- **Status:** Accepted
+- **Status:** Superseded by 0064
 - **Date:** 2026-11-02
 - **Milestone:** M3a
 

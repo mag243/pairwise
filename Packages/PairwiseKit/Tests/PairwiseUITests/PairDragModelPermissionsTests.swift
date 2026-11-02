@@ -9,7 +9,6 @@ import Testing
 
     private func waitingModel() -> PairDragModel {
         system.isAccessibilityGranted = false
-        system.isScreenRecordingGranted = false
         let model = PairDragModel(system: system)
         model.startWhenPermitted()
         return model
@@ -17,13 +16,13 @@ import Testing
 
     private func runningModel() -> PairDragModel {
         system.isAccessibilityGranted = true
-        system.isScreenRecordingGranted = true
         let model = PairDragModel(system: system)
         model.startWhenPermitted()
         return model
     }
 
-    @Test func startsAtOnceWhenBothAreGiven() {
+    @Test func startsAtOnceWithAccessibilityAlone() {
+        system.isScreenRecordingGranted = false
         #expect(runningModel().isRunning)
     }
 
@@ -33,33 +32,41 @@ import Testing
         #expect(model.problem == nil)
     }
 
-    @Test func staysWaitingWhileOneIsMissing() {
+    @Test func screenRecordingAloneIsNotEnough() {
         let model = waitingModel()
-        system.isAccessibilityGranted = true
+        system.isScreenRecordingGranted = true
         model.followPermissions()
-        #expect(model.isAccessibilityGranted)
+        #expect(model.isScreenRecordingGranted)
         #expect(!model.isRunning)
         #expect(!system.isHolding)
     }
 
-    @Test func startsWhenTheLastOneIsGiven() {
+    @Test func startsWhenAccessibilityIsGiven() {
         let model = waitingModel()
         system.isAccessibilityGranted = true
-        system.isScreenRecordingGranted = true
         model.followPermissions()
         #expect(model.isRunning)
         #expect(system.isHolding)
     }
 
-    @Test(arguments: [true, false])
-    func stopsWhenOneIsTakenAway(accessibilityStays: Bool) {
+    @Test func stopsWhenAccessibilityIsTakenAway() {
         let model = runningModel()
-        system.isAccessibilityGranted = accessibilityStays
-        system.isScreenRecordingGranted = !accessibilityStays
+        system.isAccessibilityGranted = false
         model.followPermissions()
         #expect(!model.isRunning)
         #expect(!system.isHolding)
-        #expect(model.problem != nil)
+        #expect(model.problem == .accessibilityDenied)
+    }
+
+    @Test func goesOnWhenScreenRecordingIsTakenAway() {
+        system.isScreenRecordingGranted = true
+        let model = runningModel()
+        model.dragPictures = .live
+        system.isScreenRecordingGranted = false
+        model.followPermissions()
+        #expect(model.isRunning)
+        #expect(model.problem == nil)
+        #expect(system.showsPlaceholders)
     }
 
     @Test func startsAgainWhenItIsGivenBack() {
@@ -81,7 +88,6 @@ import Testing
 
     @Test func aTurnedOnSwitchWithoutPermissionWaitsToo() {
         system.isAccessibilityGranted = false
-        system.isScreenRecordingGranted = true
         let model = PairDragModel(system: system)
         model.start()
         #expect(model.problem == .accessibilityDenied)
