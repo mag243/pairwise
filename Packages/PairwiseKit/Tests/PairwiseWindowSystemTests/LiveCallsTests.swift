@@ -75,6 +75,10 @@ import Testing
         system.stopHoldingDrags()
     }
 
+    @Test func aMarkCanBeMadeAndHiddenUnseen() {
+        JoinMarkPanel().hide()
+    }
+
     @Test func aHiddenGuideCostsNothing() {
         let system = AccessibilityWindowSystem()
         _ = system.isJoinKeyDown
