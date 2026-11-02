@@ -70,3 +70,4 @@ Use `0000-template.md` as the basis.
 | 0062 | A debug build of its own | Accepted |
 | 0063 | Still or live pictures | Superseded by 0064 |
 | 0064 | Placeholders by default | Accepted |
+| 0065 | Screenshots by command | Accepted |
