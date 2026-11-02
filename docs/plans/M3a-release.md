@@ -40,7 +40,7 @@ These need the owner's keychain, accounts or judgment, so the agent prepares the
 
 ### 4. Publishing
 - [ ] ADR: GitHub Releases in this repository, and the feed on GitHub Pages at `https://mag243.github.io/pairwise/appcast.xml`, from a branch `gh-pages` that holds only the feed and is not a working branch. The address is in every installed copy, so it does not change afterwards.
-- [ ] `tools/release.sh`, run by the owner: check that `main` is clean and `ci` is green, read the version, tag, package, sign the zip with Sparkle's key, make the release, add it to the feed, and bump the cask. It stops before anything public when a step fails.
+- [ ] `tools/build.sh publish`, run by the owner: check that the tree is clean and the tag `v<version>` points at `HEAD`, run `package`, then `tools/publish.sh`: sign the zip with Sparkle's key, make the release, add it to the feed, and bump the cask. It stops before anything public when a step fails.
 - [ ] The version is `MARKETING_VERSION`; the build number keeps growing by itself (ADR 0009), which is what Sparkle compares.
 
 ### 5. Homebrew
