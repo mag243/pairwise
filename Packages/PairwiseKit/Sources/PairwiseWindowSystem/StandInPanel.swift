@@ -44,8 +44,6 @@ final class StandInPanel: WindowStandIn {
     private var parts: [SeamLayers] = []
     /// Where each picture divides, as a share of its width, found at the first seam.
     private var splitShares: [CGFloat] = []
-    /// The size of what each picture shows now, which a live frame can change.
-    private var shownSizes: [CGSize] = []
     private var seam: CGFloat?
     private var totalWidth: CGFloat { pictures.map(\.size.width).reduce(0, +) }
 
@@ -121,8 +119,7 @@ final class StandInPanel: WindowStandIn {
     }
 
     /// Where two pictures go with the seam at `seam` from the left, each divided at its place
-    /// in `splits` and keeping both edges. The panel's width does not change, and `sizes` can be
-    /// those of live frames, whose widths need not add up to it.
+    /// in `splits` and keeping both edges. The panel's width does not change.
     static func seamLayout(
         of sizes: [CGSize], splits: [CGFloat], totalWidth: CGFloat, seamAt seam: CGFloat
     ) -> [SeamPlace] {
@@ -163,7 +160,6 @@ final class StandInPanel: WindowStandIn {
     /// Reads the picture once, at the first seam, as a press that only moves needs none of this.
     private func prepareForSeam() {
         guard parts.isEmpty else { return }
-        shownSizes = pictures.map(\.size)
         for (index, picture) in pictures.enumerated() {
             let split = Self.quietSplit(of: picture)
             splitShares.append(split / picture.size.width)
@@ -203,15 +199,30 @@ final class StandInPanel: WindowStandIn {
 
     private func layOutSeam() {
         guard let seam else { return }
-        let splits = zip(shownSizes, splitShares).map { $0.width * $1 }
+        let sizes = pictures.map(\.size)
+        let splits = zip(sizes, splitShares).map { $0.width * $1 }
         let places = Self.seamLayout(
-            of: shownSizes, splits: splits, totalWidth: totalWidth, seamAt: seam)
+            of: sizes, splits: splits, totalWidth: totalWidth, seamAt: seam)
         for (index, place) in places.enumerated() {
             slots[index].frame = place.slot
             let layers = parts[index]
             layers.head.frame = place.head
             layers.fill.frame = place.fill
             layers.tail.frame = place.tail
+        }
+        let live = Self.liveLayout(of: sizes, totalWidth: totalWidth, seamAt: seam)
+        for (index, place) in live.enumerated() { images[index].frame = place.frame }
+    }
+
+    /// Where a live frame goes: all of it in its slot, scaled to fit. It differs little from
+    /// the slot, as the window follows the seam, so nothing shows of the scaling, where any
+    /// division would show as a line through the content, also with a still pointer as an app
+    /// can round its width (ADR 0049).
+    static func liveLayout(
+        of sizes: [CGSize], totalWidth: CGFloat, seamAt seam: CGFloat
+    ) -> [(slot: CGRect, frame: CGRect)] {
+        seamLayout(of: sizes, splits: [0, 0], totalWidth: totalWidth, seamAt: seam).map { place in
+            (place.slot, CGRect(origin: .zero, size: place.slot.size))
         }
     }
 
@@ -247,23 +258,17 @@ final class StandInPanel: WindowStandIn {
             height: rect.height * scale / surface.height)
     }
 
-    /// Shows a live frame through the same division as the picture, at its own width.
+    /// Shows a live frame in place of the picture and its parts.
     private func show(_ surface: IOSurfaceRef, rect: CGRect, scale: Double, at index: Int) {
         guard parts.indices.contains(index), rect.width > 0 else { return }
         let size = CGSize(width: IOSurfaceGetWidth(surface), height: IOSurfaceGetHeight(surface))
-        let part = Self.share(of: rect, scale: scale, inSurface: size)
-        let head = part.width * splitShares[index]
         let layers = parts[index]
         CATransaction.begin()
         CATransaction.setDisableActions(true)
-        for layer in [layers.head, layers.fill, layers.tail] { layer.contents = surface }
-        layers.head.contentsRect = CGRect(
-            x: part.minX, y: part.minY, width: head, height: part.height)
-        layers.fill.contentsRect = CGRect(
-            x: part.minX + head, y: part.minY, width: part.width / rect.width, height: part.height)
-        layers.tail.contentsRect = CGRect(
-            x: part.minX + head, y: part.minY, width: part.width - head, height: part.height)
-        shownSizes[index] = rect.size
+        for layer in [layers.head, layers.fill, layers.tail] { layer.isHidden = true }
+        images[index].isHidden = false
+        images[index].contents = surface
+        images[index].contentsRect = Self.share(of: rect, scale: scale, inSurface: size)
         layOutSeam()
         CATransaction.commit()
     }

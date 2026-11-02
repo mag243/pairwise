@@ -53,14 +53,13 @@ import Testing
         #expect(layout[0].tail == CGRect(x: 50, y: 0, width: 70, height: 80))
     }
 
-    @Test func aLiveFrameOfAnotherWidthLeavesTheSlotsAtTheSeam() {
-        let layout = StandInPanel.seamLayout(
-            of: [CGSize(width: 90, height: 80), CGSize(width: 60, height: 200)],
-            splits: [45, 30], totalWidth: 150, seamAt: 100)
-        #expect(layout[0].slot.width == 100)
-        #expect(layout[0].fill.width == 10)
-        #expect(layout[1].slot == CGRect(x: 100, y: 0, width: 50, height: 200))
-        #expect(layout[1].tail == CGRect(x: 20, y: 0, width: 30, height: 200))
+    @Test func aLiveFrameFillsItsSlotWithNoDivision() {
+        let places = StandInPanel.liveLayout(
+            of: Self.sizes, totalWidth: 150, seamAt: 90)
+        #expect(places[0].slot == CGRect(x: 0, y: 120, width: 90, height: 80))
+        #expect(places[0].frame == CGRect(x: 0, y: 0, width: 90, height: 80))
+        #expect(places[1].slot == CGRect(x: 90, y: 0, width: 60, height: 200))
+        #expect(places[1].frame == CGRect(x: 0, y: 0, width: 60, height: 200))
     }
 
     @Test func aFramesPartIsAShareOfItsSurface() {
