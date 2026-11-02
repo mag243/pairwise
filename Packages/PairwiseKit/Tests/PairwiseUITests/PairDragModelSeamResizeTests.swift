@@ -3,18 +3,23 @@ import PairwiseTestSupport
 import PairwiseUI
 import Testing
 
-/// A window of a pair resized at the seam, with its partner following (ADR 0045).
+/// A pair resized at the seam, with pictures in a panel over both windows (ADR 0048).
 @MainActor
 @Suite struct PairDragModelSeamResizeTests {
-    private static let press = ScreenPoint(x: 499, y: 200)
-    private static let reach = SeamFollow.reachUnderHeldWindow
+    private static let press = ScreenPoint(x: 500, y: 200)
+    private static let lookInterval = 0.1
+    private static let settleTime = 0.05
 
     private let system = FakeWindowSystem()
+    private let panel = FakeStandIn()
     private let left = FakeWindow(
         frame: WindowFrame(x: 100, y: 100, width: 400, height: 300), number: 1)
     private let right = FakeWindow(
         frame: WindowFrame(x: 500, y: 100, width: 200, height: 200), number: 2)
     private let model: PairDragModel
+
+    private let wider = WindowFrame(x: 100, y: 100, width: 410, height: 300)
+    private let rightWider = WindowFrame(x: 490, y: 100, width: 210, height: 200)
 
     init() throws {
         system.isScreenRecordingGranted = true
@@ -24,160 +29,197 @@ import Testing
         try model.join(left, to: right, on: .left)
     }
 
-    /// Presses on `held`, and has macOS move its seam so that the following starts.
-    private func resize(_ held: FakeWindow, to frame: WindowFrame) {
-        system.windowUnderPointer = held
+    /// Presses on `pressed`, with the pictures there, and has macOS move the seam of `held`.
+    private func start(on pressed: FakeWindow, moving held: FakeWindow, to frame: WindowFrame) {
+        system.windowUnderPointer = pressed
         _ = system.send(.pressed(Self.press))
+        system.finishStandIn(with: .success(panel))
         held.currentFrame = frame
         system.tick()
+    }
+
+    private func startOnLeft() {
+        start(on: left, moving: left, to: wider)
+    }
+
+    private func drag(toX x: Double) -> Bool {
+        system.send(.dragged(ScreenPoint(x: x, y: 200)))
+    }
+
+    private func look() {
+        system.uptime += Self.lookInterval
         system.tick()
     }
 
-    private let wider = WindowFrame(x: 100, y: 100, width: 450, height: 300)
-
-    @Test func aShrinkingPartnerOnTheRightMeetsTheSeam() {
-        resize(left, to: wider)
-        #expect(right.currentFrame.origin.x == 550)
-        #expect(right.currentFrame.maxX == 700)
-    }
-
-    @Test func aShrinkingPartnerOnTheLeftMeetsTheSeam() {
-        resize(right, to: WindowFrame(x: 450, y: 100, width: 250, height: 200))
-        #expect(left.currentFrame.origin.x == 100)
-        #expect(left.currentFrame.maxX == 450)
-    }
-
-    @Test func aGrowingPartnerOnTheRightReachesUnderTheWindow() {
-        resize(left, to: WindowFrame(x: 100, y: 100, width: 350, height: 300))
-        #expect(right.currentFrame.origin.x == 450 - Self.reach)
-        #expect(right.currentFrame.maxX == 700)
-    }
-
-    @Test func aGrowingPartnerOnTheLeftReachesUnderTheWindow() {
-        resize(right, to: WindowFrame(x: 550, y: 100, width: 150, height: 200))
-        #expect(left.currentFrame.origin.x == 100)
-        #expect(left.currentFrame.maxX == 550 + Self.reach)
-    }
-
-    /// The grip of a window's edge reaches past the window, so a press on one window can resize
-    /// the window beside it.
-    private func press(
-        on window: FakeWindow, whileResizing resized: FakeWindow, to frame: WindowFrame
-    ) {
-        system.windowUnderPointer = window
-        _ = system.send(.pressed(Self.press))
-        resized.currentFrame = frame
-        system.tick()
+    private func release() {
+        _ = system.send(.released(Self.press))
         system.tick()
     }
 
-    @Test func aPressBesideTheSeamThatResizesTheLeftWindowResizesTheRightOneToo() {
-        press(on: right, whileResizing: left, to: wider)
-        #expect(right.currentFrame.origin.x == 550)
-        #expect(right.currentFrame.maxX == 700)
+    @Test func aMovingSeamShowsThePicturesStillOverThePair() {
+        startOnLeft()
+        #expect(panel.stillShownAt == ScreenPoint(x: 100, y: 100))
+        #expect(panel.shownAt == nil)
     }
 
-    @Test func aPressBesideTheSeamThatResizesTheRightWindowResizesTheLeftOneToo() {
-        press(
-            on: left, whileResizing: right,
-            to: WindowFrame(x: 450, y: 100, width: 250, height: 200))
-        #expect(left.currentFrame.maxX == 450)
-        #expect(left.currentFrame.origin.x == 100)
+    @Test func thePanelStandsOverTheLeftWindowWhenTheRightIsHeld() {
+        start(on: right, moving: right, to: rightWider)
+        #expect(panel.stillShownAt == ScreenPoint(x: 100, y: 100))
     }
 
-    @Test func aPressBesideTheSeamThatResizesTheOuterEdgeOfTheOtherStartsNothing() {
-        press(
-            on: right, whileResizing: left,
-            to: WindowFrame(x: 50, y: 100, width: 450, height: 300))
-        #expect(right.moves.isEmpty && right.resizes.isEmpty)
+    @Test func theDragEventsAreWithheld() {
+        startOnLeft()
+        #expect(!drag(toX: 520))
     }
 
-    @Test func thePartnerKeepsItsHeight() {
-        resize(left, to: WindowFrame(x: 100, y: 100, width: 450, height: 350))
-        #expect(right.currentFrame.size.height == 200)
-    }
-
-    @Test func theEventsPassWhileResizing() {
-        resize(left, to: wider)
-        #expect(system.send(.dragged(Self.press)))
+    @Test func theReleaseEventPasses() {
+        startOnLeft()
         #expect(system.send(.released(Self.press)))
     }
 
-    @Test func aStillSeamAsksTheAppNothingMore() {
-        resize(left, to: wider)
-        let moves = right.moves.count
+    @Test func theSeamInThePanelFollowsThePointer() {
+        startOnLeft()
+        _ = drag(toX: 560)
+        #expect(panel.seams.last == 460)
+    }
+
+    @Test func aDragEventCallsNoApp() {
+        startOnLeft()
+        look()
+        let calls = right.moves.count + right.resizes.count + left.resizes.count
+        _ = drag(toX: 560)
+        #expect(right.moves.count + right.resizes.count + left.resizes.count == calls)
+    }
+
+    @Test func bothWindowsGetTheSeamAtALook() {
+        startOnLeft()
+        _ = drag(toX: 560)
+        look()
+        #expect(left.currentFrame == WindowFrame(x: 100, y: 100, width: 460, height: 300))
+        #expect(right.currentFrame == WindowFrame(x: 560, y: 100, width: 140, height: 200))
+    }
+
+    @Test func noLookComesBeforeItsTime() {
+        startOnLeft()
+        look()
+        let resizes = right.resizes.count
+        _ = drag(toX: 560)
         system.tick()
-        #expect(right.moves.count == moves)
+        #expect(right.resizes.count == resizes)
+    }
+
+    @Test func aStillSeamAsksTheAppsNothingMore() {
+        startOnLeft()
+        _ = drag(toX: 560)
+        look()
+        let resizes = right.resizes.count
+        look()
+        #expect(right.resizes.count == resizes)
+    }
+
+    @Test func aPressBesideTheSeamThatMovesTheOtherWindowsSeamWorksAlike() {
+        start(on: right, moving: left, to: wider)
+        _ = drag(toX: 560)
+        look()
+        #expect(left.currentFrame.maxX == 560)
+        #expect(right.currentFrame.origin.x == 560)
+        #expect(right.currentFrame.maxX == 700)
+    }
+
+    @Test func thePartnerKeepsItsHeight() {
+        startOnLeft()
+        _ = drag(toX: 560)
+        look()
+        #expect(right.currentFrame.size.height == 200)
+    }
+
+    @Test func aPictureThatComesLateShowsWithTheSeamWhereItIsNow() {
+        system.windowUnderPointer = left
+        _ = system.send(.pressed(Self.press))
+        left.currentFrame = wider
+        system.tick()
+        #expect(!drag(toX: 560))
+        system.finishStandIn(with: .success(panel))
+        #expect(panel.stillShownAt == ScreenPoint(x: 100, y: 100))
+        #expect(panel.seams.last == 460)
+    }
+
+    @Test func noPicturesLetTheEventsPassAndTheReleasePutsThePartnerBeside() {
+        system.windowUnderPointer = left
+        _ = system.send(.pressed(Self.press))
+        left.currentFrame = wider
+        system.tick()
+        system.finishStandIn(with: .failure(.captureFailed))
+        #expect(drag(toX: 560))
+        left.currentFrame = WindowFrame(x: 100, y: 100, width: 460, height: 300)
+        release()
+        #expect(right.currentFrame == WindowFrame(x: 560, y: 100, width: 140, height: 200))
+    }
+
+    @Test func picturesThatTakeTooLongLetTheEventsPass() {
+        system.windowUnderPointer = left
+        _ = system.send(.pressed(Self.press))
+        left.currentFrame = wider
+        system.tick()
+        system.uptime += 2
+        system.tick()
+        #expect(drag(toX: 560))
     }
 
     @Test func theReleaseActsOnTheNextTickAndNotOnTheEvent() {
-        let narrower = WindowFrame(x: 100, y: 100, width: 350, height: 300)
-        resize(left, to: narrower)
-        _ = system.send(.released(Self.press))
-        #expect(right.currentFrame.origin.x == 450 - Self.reach)
+        startOnLeft()
+        _ = drag(toX: 560)
+        _ = system.send(.released(ScreenPoint(x: 560, y: 200)))
+        #expect(right.currentFrame.origin.x == 500)
         system.tick()
-        #expect(right.currentFrame == WindowFrame(x: 450, y: 100, width: 250, height: 200))
+        #expect(left.currentFrame == WindowFrame(x: 100, y: 100, width: 460, height: 300))
+        #expect(right.currentFrame == WindowFrame(x: 560, y: 100, width: 140, height: 200))
+    }
+
+    @Test func thePanelStaysForTheSettleTimeAfterTheRelease() {
+        startOnLeft()
+        release()
+        #expect(!panel.isDismissed)
+        system.uptime += Self.settleTime
+        system.tick()
+        #expect(panel.isDismissed)
         #expect(!system.isTicking)
     }
 
     @Test func aLostReleaseStillEndsTheResize() {
-        resize(left, to: wider)
+        startOnLeft()
+        _ = drag(toX: 560)
         system.isPrimaryButtonDown = false
         system.tick()
-        #expect(right.currentFrame == WindowFrame(x: 550, y: 100, width: 150, height: 200))
+        #expect(right.currentFrame == WindowFrame(x: 560, y: 100, width: 140, height: 200))
     }
 
-    @Test func aPartnerThatRefusesKeepsItsPlaceAndTheWindowComesBack() {
-        left.resizeError = .windowRefused
-        resize(right, to: WindowFrame(x: 450, y: 100, width: 250, height: 200))
-        _ = system.send(.released(Self.press))
-        system.tick()
-        #expect(right.currentFrame == WindowFrame(x: 500, y: 100, width: 200, height: 200))
-    }
-
-    @Test func aPartnerOnTheRightThatRefusesKeepsItsPlaceAndTheWindowComesBack() {
-        right.resizeError = .windowRefused
-        resize(left, to: wider)
-        _ = system.send(.released(Self.press))
-        system.tick()
-        #expect(right.currentFrame == WindowFrame(x: 500, y: 100, width: 200, height: 200))
-        #expect(left.currentFrame == WindowFrame(x: 100, y: 100, width: 400, height: 300))
-    }
-
-    @Test func aPartnerThatGivesOtherWidthKeepsItsFarEdge() {
-        right.widthStep = 40
-        resize(left, to: wider)
-        _ = system.send(.released(Self.press))
-        system.tick()
-        #expect(right.currentFrame == WindowFrame(x: 580, y: 100, width: 120, height: 200))
-        #expect(left.currentFrame == WindowFrame(x: 100, y: 100, width: 480, height: 300))
-    }
-
-    @Test func aWindowAtThePartnersEdgeAfterTheReleaseIsLeftAlone() {
-        resize(left, to: wider)
-        _ = system.send(.released(Self.press))
-        system.tick()
-        #expect(left.moves.isEmpty && left.resizes.isEmpty)
+    @Test func aPressRightAfterAReleasePutsTheWindowsExactly() {
+        startOnLeft()
+        _ = drag(toX: 560)
+        _ = system.send(.released(ScreenPoint(x: 560, y: 200)))
+        _ = system.send(.pressed(Self.press))
+        #expect(right.currentFrame == WindowFrame(x: 560, y: 100, width: 140, height: 200))
+        #expect(panel.isDismissed)
     }
 
     @Test func thePairGoesOnAfterAResize() {
-        resize(left, to: wider)
-        _ = system.send(.released(Self.press))
-        system.tick()
+        startOnLeft()
+        release()
         _ = system.send(.pressed(Self.press))
         #expect(system.standInRequests == 2)
     }
 
     @Test func anOuterEdgeResizesOneWindowOnly() {
-        resize(left, to: WindowFrame(x: 50, y: 100, width: 450, height: 300))
+        start(on: left, moving: left, to: WindowFrame(x: 50, y: 100, width: 450, height: 300))
         #expect(right.moves.isEmpty && right.resizes.isEmpty)
+        #expect(panel.stillShownAt == nil)
         #expect(!system.isTicking)
     }
 
-    @Test func aPressDuringAFinishPutsTheWindowsExactly() {
-        resize(left, to: wider)
-        _ = system.send(.released(Self.press))
-        _ = system.send(.pressed(Self.press))
-        #expect(right.currentFrame == WindowFrame(x: 550, y: 100, width: 150, height: 200))
+    @Test func aPressBesideTheSeamThatMovesAnOuterEdgeStartsNothing() {
+        start(on: right, moving: left, to: WindowFrame(x: 50, y: 100, width: 450, height: 300))
+        #expect(right.moves.isEmpty && right.resizes.isEmpty)
+        #expect(panel.stillShownAt == nil)
     }
 }

@@ -1,9 +1,9 @@
-/// Where the seam of a pair can go, as learned from the partner's answers during a drag
-/// (ADR 0046). Apps do not tell their limits in advance.
+/// Where the seam of a pair can go, as learned from the windows' answers during a drag
+/// (ADR 0048). Apps do not tell their limits in advance.
 public struct SeamLimits: Equatable, Sendable {
-    /// How many times in a row a partner gives the same width for it to count as a limit. An
+    /// How many times in a row a window gives the same width for it to count as a limit. An
     /// app that lags changes its width as it catches up.
-    public static let answersForALimit = 3
+    public static let answersForALimit = 2
     /// How far a width may be from what was asked and still count as an answer, in points, as
     /// an app can round it to whole characters.
     private static let roundingTolerance = 24.0
@@ -15,8 +15,8 @@ public struct SeamLimits: Equatable, Sendable {
 
     public init() {}
 
-    /// Notes that a partner that was at `start` at the press, asked for the width `asked`,
-    /// ended up with `reached`.
+    /// Notes that a window on `side` of the seam, that was at `start` at the press, asked for
+    /// the width `asked`, ended up with `reached`.
     public mutating func note(
         asked: Double, reached: Double, start: WindowFrame, partnerOn side: PairSide
     ) {

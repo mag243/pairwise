@@ -1,6 +1,6 @@
 # 0046. Stopping the seam at a window's limit
 
-- **Status:** Accepted
+- **Status:** Superseded by 0048
 - **Date:** 2026-11-02
 - **Milestone:** M3
 

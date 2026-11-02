@@ -53,10 +53,11 @@ import Testing
         #expect(partner.moves.isEmpty)
     }
 
-    @Test func aResizeIsLeftAlone() {
+    @Test func aResizeAtAnOuterEdgeIsLeftAlone() {
         _ = system.send(.pressed(Self.onTitleBar))
         system.finishStandIn(with: .success(panel))
         _ = system.send(.dragged(Self.further))
+        window.currentFrame.origin.x -= 10
         window.currentFrame.size.width += 10
         system.tick()
         #expect(system.send(.dragged(Self.further)))

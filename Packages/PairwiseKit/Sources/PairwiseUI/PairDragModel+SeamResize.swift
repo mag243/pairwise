@@ -1,16 +1,48 @@
+import Foundation
 import PairwiseCore
 
-/// A window of a pair being resized at the seam, with its partner following (ADR 0045, 0046).
+/// What a resize at the seam needs to know (ADR 0048).
+extension PairDrag.ResizingSeam {
+    /// Where the seam belongs for the pointer's last place, within the limits found.
+    var seam: Double {
+        let wanted = seamAtPress + lastPointerX - pointerXAtPress
+        return partnerLimits.clamped(seamAt: heldLimits.clamped(seamAt: wanted))
+    }
+
+    /// The left window at the press, whose origin is that of the panel.
+    private var leftWindow: WindowFrame { side == .right ? heldStart : partnerStart }
+
+    var panelOrigin: ScreenPoint { leftWindow.origin }
+
+    /// How far from the panel's left edge the seam is.
+    var seamOffset: Double { seam - leftWindow.origin.x }
+
+    func heldFrame(seamAt x: Double) -> WindowFrame {
+        SeamFollow.frame(start: heldStart, on: side.opposite, seamAt: x)
+    }
+
+    func partnerFrame(seamAt x: Double) -> WindowFrame {
+        SeamFollow.frame(start: partnerStart, on: side, seamAt: x)
+    }
+}
+
+/// A pair being resized at the seam, with its pictures in a panel over both (ADR 0048).
 extension PairDragModel {
-    /// macOS goes on resizing the window, so its events pass, up to a limit of the partner.
+    /// How often both windows get the seam's place under the panel, in seconds.
+    private static let seamLookInterval: TimeInterval = 0.1
+
+    /// macOS has moved the seam of the pressed window.
     func startFollowingSeam(_ pressed: PairDrag.Pressed) {
         let partner = WindowFrame(origin: pressed.partner.origin, size: pressed.partner.size)
         let side = pressed.partner.side
         startFollowing(
             PairDrag.ResizingSeam(
-                window: pressed.window, partner: pressed.partner.window, partnerStart: partner,
-                side: side, seamAtPress: SeamFollow.seam(of: pressed.frame, partnerOn: side),
-                pointerXAtPress: pressed.pointer.x, lastExactWidth: partner.size.width))
+                window: pressed.window, partner: pressed.partner.window, heldStart: pressed.frame,
+                partnerStart: partner, side: side,
+                seamAtPress: SeamFollow.seam(of: pressed.frame, partnerOn: side),
+                pointerXAtPress: pressed.pointer.x, startTime: pressed.startTime,
+                lastPointerX: pressed.lastPointer.x, lastLook: system.uptime),
+            standIn: pressed.standIn)
     }
 
     /// The grip of a window's edge reaches past the window, so a press on one window of a pair
@@ -19,7 +51,7 @@ extension PairDragModel {
     func startFollowingSeamIfPartnerIsHeld(_ pressed: PairDrag.Pressed) -> Bool {
         let held = pressed.partner.window
         let start = WindowFrame(origin: pressed.partner.origin, size: pressed.partner.size)
-        let side: PairSide = pressed.partner.side == .right ? .left : .right
+        let side = pressed.partner.side.opposite
         guard
             let now = held.serverFrame() ?? (try? held.frame()),
             DragHoldRule.isResize(from: start, to: now),
@@ -27,86 +59,137 @@ extension PairDragModel {
         else { return false }
         startFollowing(
             PairDrag.ResizingSeam(
-                window: held, partner: pressed.window, partnerStart: pressed.frame, side: side,
+                window: held, partner: pressed.window, heldStart: start,
+                partnerStart: pressed.frame, side: side,
                 seamAtPress: SeamFollow.seam(of: start, partnerOn: side),
-                pointerXAtPress: pressed.pointer.x, lastExactWidth: pressed.frame.size.width))
+                pointerXAtPress: pressed.pointer.x, startTime: pressed.startTime,
+                lastPointerX: pressed.lastPointer.x, lastLook: system.uptime),
+            standIn: pressed.standIn)
         return true
     }
 
-    private func startFollowing(_ resizing: PairDrag.ResizingSeam) {
-        endDrag()
+    /// The press's ticks go on, and its pictures may still come.
+    private func startFollowing(_ resizing: PairDrag.ResizingSeam, standIn: (any WindowStandIn)?) {
         drag = .resizingSeam(resizing)
-        system.startTicking(every: Self.tickInterval) { [weak self] in self?.tick() }
+        if let standIn { show(standIn, for: resizing) }
+    }
+
+    private func show(_ standIn: any WindowStandIn, for resizing: PairDrag.ResizingSeam) {
+        var current = resizing
+        current.standIn = standIn
+        standIn.setSeam(atOffset: current.seamOffset)
+        standIn.showStill(at: current.panelOrigin)
+        drag = .resizingSeam(current)
+    }
+
+    /// The pictures of the press have come. Without them, macOS goes on resizing the window.
+    func receive(
+        _ result: Result<any WindowStandIn, WindowSystemError>, for resizing: PairDrag.ResizingSeam
+    ) {
+        switch result {
+        case .success(let standIn):
+            if resizing.isPassing { standIn.dismiss() } else { show(standIn, for: resizing) }
+        case .failure(let error):
+            Self.logger.info("no pictures: \(String(describing: error), privacy: .public)")
+            problem = error
+            letEventsPass(resizing)
+        }
+    }
+
+    private func letEventsPass(_ resizing: PairDrag.ResizingSeam) {
+        var current = resizing
+        current.isPassing = true
+        drag = .resizingSeam(current)
+    }
+
+    /// Calls no app, as this runs on an event: the seam moves in the panel alone. Says whether
+    /// the event is withheld.
+    func holds(_ resizing: PairDrag.ResizingSeam, at point: ScreenPoint) -> Bool {
+        var current = resizing
+        current.lastPointerX = point.x
+        drag = .resizingSeam(current)
+        current.standIn?.setSeam(atOffset: current.seamOffset)
+        return !current.isPassing
     }
 
     func tick(_ resizing: PairDrag.ResizingSeam) {
         if resizing.isReleased || isButtonLetGo {
             finishSeam(resizing)
-        } else {
-            followSeam(resizing)
+        } else if resizing.standIn != nil {
+            lookAtSeam(resizing)
+        } else if !resizing.isPassing,
+            !DragHoldRule.mayWaitForPictures(after: system.uptime - resizing.startTime)
+        {
+            Self.logger.info("pictures took too long: the resize passes")
+            problem = .captureFailed
+            letEventsPass(resizing)
         }
     }
 
-    /// A busy app catches up on a later tick. A held window past a limit comes back first,
-    /// with its events withheld, so that macOS does not take it further.
-    private func followSeam(_ resizing: PairDrag.ResizingSeam) {
-        guard let now = resizing.window.serverFrame() ?? (try? resizing.window.frame()) else {
+    /// Gives both windows the seam's place under the panel, which also shows a window's limit.
+    private func lookAtSeam(_ resizing: PairDrag.ResizingSeam) {
+        guard system.uptime - resizing.lastLook >= Self.seamLookInterval else { return }
+        var current = resizing
+        current.lastLook = system.uptime
+        let seam = current.seam
+        guard seam != current.lastAskedSeam else {
+            drag = .resizingSeam(current)
             return
         }
-        var current = resizing
-        let held = heldWithinLimits(now, resizing)
-        let exact = SeamFollow.partnerFrame(
-            start: resizing.partnerStart, partnerOn: resizing.side, beside: held, reach: 0)
-        if held != now {
-            // Coming back to a limit is not growing: the seam stands still there.
-            current.reach = 0
-        } else if exact.size.width != current.lastExactWidth {
-            current.reach =
-                exact.size.width > current.lastExactWidth ? SeamFollow.reachUnderHeldWindow : 0
+        current.lastAskedSeam = seam
+        let held = current.heldFrame(seamAt: seam)
+        let partner = current.partnerFrame(seamAt: seam)
+        Self.apply(held, to: current.window, from: current.lastHeldFrame)
+        Self.apply(partner, to: current.partner, from: current.lastPartnerFrame)
+        current.lastHeldFrame = held
+        current.lastPartnerFrame = partner
+        if let reached = try? current.window.frame() {
+            current.heldLimits.note(
+                asked: held.size.width, reached: reached.size.width, start: current.heldStart,
+                partnerOn: current.side.opposite)
         }
-        current.lastExactWidth = exact.size.width
-        let target = SeamFollow.partnerFrame(
-            start: resizing.partnerStart, partnerOn: resizing.side, beside: held,
-            reach: current.reach)
-        if target != current.lastPartnerFrame {
-            Self.apply(target, to: resizing.partner, from: current.lastPartnerFrame)
-            current.lastPartnerFrame = target
-            if let reached = try? resizing.partner.frame() {
-                current.limits.note(
-                    asked: target.size.width, reached: reached.size.width,
-                    start: resizing.partnerStart, partnerOn: resizing.side)
-            }
+        if let reached = try? current.partner.frame() {
+            current.partnerLimits.note(
+                asked: partner.size.width, reached: reached.size.width,
+                start: current.partnerStart, partnerOn: current.side)
         }
+        current.standIn?.setSeam(atOffset: current.seamOffset)
         drag = .resizingSeam(current)
     }
 
-    private func heldWithinLimits(
-        _ held: WindowFrame, _ resizing: PairDrag.ResizingSeam
-    ) -> WindowFrame {
-        let seam = SeamFollow.seam(of: held, partnerOn: resizing.side)
-        let allowed = resizing.limits.clamped(seamAt: seam)
-        guard allowed != seam else { return held }
-        let frame = SeamFollow.heldFrame(held, seamAt: allowed, partnerOn: resizing.side)
-        Self.apply(frame, to: resizing.window, from: held)
-        return frame
+    /// Both windows go exactly to the seam. A window with another width than asked, at its
+    /// minimum or maximum or rounding it, keeps its far edge, and the other meets it. Without
+    /// pictures, macOS has resized the held window, and the partner goes beside it.
+    func finishSeam(_ resizing: PairDrag.ResizingSeam) {
+        var seam = resizing.seam
+        if resizing.isPassing {
+            guard let held = try? resizing.window.frame() else {
+                endDrag()
+                return
+            }
+            seam = SeamFollow.seam(of: held, partnerOn: resizing.side)
+        } else {
+            Self.apply(
+                resizing.heldFrame(seamAt: seam), to: resizing.window, from: resizing.lastHeldFrame)
+        }
+        let partner = resizing.partnerFrame(seamAt: seam)
+        Self.apply(partner, to: resizing.partner, from: resizing.lastPartnerFrame)
+        meet(resizing, seamAsked: seam)
+        if let standIn = resizing.standIn {
+            drag = .settling(standIn: standIn, until: system.uptime + Self.settleTime)
+        } else {
+            endDrag()
+        }
     }
 
-    /// Both windows go exactly against each other, as the last correction. A partner with
-    /// another width than asked, at its minimum or maximum or rounding it, keeps its far edge,
-    /// and the held window comes back to meet it.
-    func finishSeam(_ resizing: PairDrag.ResizingSeam) {
-        defer { endDrag() }
-        guard let held = try? resizing.window.frame() else { return }
-        let target = SeamFollow.partnerFrame(
-            start: resizing.partnerStart, partnerOn: resizing.side, beside: held, reach: 0)
-        Self.apply(target, to: resizing.partner, from: resizing.lastPartnerFrame)
+    private func meet(_ resizing: PairDrag.ResizingSeam, seamAsked seam: Double) {
         guard let reached = try? resizing.partner.frame() else { return }
-        let partner = SeamFollow.partnerFrame(
-            start: resizing.partnerStart, partnerOn: resizing.side,
-            withWidth: reached.size.width)
+        let partner = SeamFollow.frame(
+            start: resizing.partnerStart, on: resizing.side, withWidth: reached.size.width)
         Self.apply(partner, to: resizing.partner, from: reached)
-        let meeting = SeamFollow.heldFrame(held, meeting: partner, partnerOn: resizing.side)
-        if meeting != held { Self.apply(meeting, to: resizing.window, from: held) }
+        let met = SeamFollow.seam(of: partner, partnerOn: resizing.side.opposite)
+        guard met != seam, let held = try? resizing.window.frame() else { return }
+        Self.apply(resizing.heldFrame(seamAt: met), to: resizing.window, from: held)
     }
 
     /// Asks only for what changes, as each call takes the app time.

@@ -131,6 +131,7 @@ extension PairDragModel {
         if case .placing(let placing) = drag { placing.standIn.dismiss() }
         if case .joining = drag { system.hideJoinGuide() }
         if case .settling(let standIn, _) = drag { standIn.dismiss() }
+        if case .resizingSeam(let resizing) = drag { resizing.standIn?.dismiss() }
         request += 1
         drag = .none
     }

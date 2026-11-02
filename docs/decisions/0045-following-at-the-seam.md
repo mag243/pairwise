@@ -1,6 +1,6 @@
 # 0045. Following at the seam
 
-- **Status:** Accepted
+- **Status:** Superseded by 0048
 - **Date:** 2026-11-02
 - **Milestone:** M3
 

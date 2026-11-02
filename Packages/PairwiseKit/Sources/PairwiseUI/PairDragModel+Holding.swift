@@ -12,8 +12,7 @@ extension PairDragModel {
         case .passing, .placing, .settling, .closingLock:
             return false
         case .resizingSeam(let resizing):
-            return !resizing.limits.allows(
-                seamAt: resizing.seamAtPress + point.x - resizing.pointerXAtPress)
+            return holds(resizing, at: point)
         case .clickingLock:
             return true
         case .joining(var joining):

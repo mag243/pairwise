@@ -2,6 +2,9 @@
 public enum PairSide: Equatable, Sendable {
     case left
     case right
+
+    /// The other side.
+    public var opposite: PairSide { self == .left ? .right : .left }
 }
 
 /// Two windows that move together, known by their window numbers.

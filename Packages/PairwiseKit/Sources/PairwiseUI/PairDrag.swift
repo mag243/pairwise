@@ -18,25 +18,35 @@ enum PairDrag {
     case clickingLock(SeamLock)
     /// An open lock was clicked: the next tick joins its windows, as that calls their apps.
     case closingLock(SeamLock)
-    /// macOS is resizing the window at the seam, and its partner follows (ADR 0045).
+    /// The seam moves in a panel with pictures over both windows (ADR 0048).
     case resizingSeam(ResizingSeam)
 
     @MainActor
     struct ResizingSeam {
+        /// The window macOS started to resize.
         let window: any MovableWindow
         let partner: any MovableWindow
-        /// The partner's frame at the press, which holds its far edge.
+        /// The windows' frames at the press, which hold their far edges.
+        let heldStart: WindowFrame
         let partnerStart: WindowFrame
+        /// The side of the seam the partner is on.
         let side: PairSide
         /// The seam's place and the pointer's at the press, which tell where the seam goes
         /// without asking any app.
         let seamAtPress: Double
         let pointerXAtPress: Double
-        var limits = SeamLimits()
+        let startTime: TimeInterval
+        var lastPointerX: Double
+        var lastLook: TimeInterval
+        var standIn: (any WindowStandIn)?
+        /// One per window, as a limit takes the same answer from one window in a row.
+        var heldLimits = SeamLimits()
+        var partnerLimits = SeamLimits()
+        var lastAskedSeam: Double?
+        var lastHeldFrame: WindowFrame?
         var lastPartnerFrame: WindowFrame?
-        /// The width the partner would have with no reach, to tell whether it is growing.
-        var lastExactWidth: Double
-        var reach = 0.0
+        /// There are no pictures: macOS goes on resizing the window.
+        var isPassing = false
         /// Set by the release, so that the next tick and not the event calls the apps.
         var isReleased = false
     }

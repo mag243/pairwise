@@ -172,6 +172,10 @@ public final class PairDragModel {
     }
 
     private func receive(_ result: Result<any WindowStandIn, WindowSystemError>) {
+        if case .resizingSeam(let resizing) = drag {
+            receive(result, for: resizing)
+            return
+        }
         guard case .pressed(var pressed) = drag else { return }
         let elapsed = system.uptime - pressed.startTime
         Self.logger.info(
