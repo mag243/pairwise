@@ -75,10 +75,10 @@ Done first because everything below adds code to this module.
 ## Acceptance criteria
 - [x] By hand: two windows of different apps join, move together, share their seam and come apart, without a manual.
 - [x] By hand: a window not in a pair behaves exactly as without Pairwise, including tabs, tiling and snapping, apart from a drag starting on the lock's own small place on a seam (ADR 0044).
-- [ ] The stress test covers joined pairs, a closed partner and a kill during a drag, and passes.
+- [x] The stress test covers joined pairs, a closed partner and a kill during a drag, and passes. A very short first drag, over before the pictures are there, can end a little short of the pointer, with the pair still together.
 - [x] After a kill during a drag, the next start puts the windows back.
 - [x] Coverage targets are met: Core ≥ 90 %, WindowSystem ≥ 75 %, UI state ≥ 70 %.
-- [ ] `tools/build.sh ci` is green (when the owner says so, ADR 0011).
+- [x] `tools/build.sh ci` is green (when the owner says so, ADR 0011).
 
 ## The owner's choices
 1. **Joining and coming apart:** a key held while dragging: to an edge to join, away to come apart. Normal dragging stays normal. The key is still to be chosen.
