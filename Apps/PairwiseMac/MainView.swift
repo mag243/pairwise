@@ -4,8 +4,8 @@ import SwiftUI
 
 /// The settings window: the permissions, the choices for joining, and how Pairwise works.
 struct MainView: View {
-    /// Wide enough for every tab in the bar in each language; narrower, the bar collapses.
-    private static let width: CGFloat = 600
+    /// The tabs' short names keep the bar from collapsing at this width, in each language.
+    private static let width: CGFloat = 480
     private static let height: CGFloat = 460
     #if DEBUG
     private static let millisecondsPerSecond = 1000.0
@@ -72,11 +72,11 @@ struct MainView: View {
                 .tabItem { Label("Pairs", systemImage: "rectangle.split.2x1") }
                 .tag(1)
             page { howItWorks }
-                .tabItem { Label("How it works", systemImage: "questionmark.circle") }
+                .tabItem { Label("Help", systemImage: "questionmark.circle") }
                 .tag(2)
             #if DEBUG
             page { testing }
-                .tabItem { Label("For testing", systemImage: "hammer") }
+                .tabItem { Label("Test", systemImage: "hammer") }
                 .tag(3)
             #endif
         }

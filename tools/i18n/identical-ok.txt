@@ -5,3 +5,5 @@
 # The owner's choice for the menu, though Apple's Dutch says "Stop".
 Quit Pairwise
 Live
+Help
+Test

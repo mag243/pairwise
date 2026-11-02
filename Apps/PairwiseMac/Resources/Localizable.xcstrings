@@ -239,6 +239,23 @@
         }
       }
     },
+    "Help" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hilfe"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Help"
+          }
+        }
+      },
+      "comment" : "Tab of the settings window"
+    },
     "How it works" : {
       "comment" : "Section of settings: how to use the app",
       "localizations" : {
@@ -597,6 +614,7 @@
       }
     },
     "Pairs" : {
+      "comment" : "Tab of the settings window",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -610,8 +628,7 @@
             "value" : "Paren"
           }
         }
-      },
-      "comment" : "Tab of the settings window"
+      }
     },
     "Pairwise" : {
       "comment" : "The app's name, the title of its window",
@@ -837,6 +854,23 @@
           }
         }
       }
+    },
+    "Test" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Test"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Test"
+          }
+        }
+      },
+      "comment" : "Tab of the settings window"
     },
     "The pointer cannot be watched. Quit and reopen Pairwise after granting access." : {
       "comment" : "Problem message",
