@@ -22,7 +22,7 @@ final class StandInPanel: WindowStandIn {
     }
 
     /// The layers of one picture for a seam.
-    private struct SeamLayers {
+    struct SeamLayers {
         let head = StandInPanel.stillLayer()
         let fill = StandInPanel.stillLayer()
         let tail = StandInPanel.stillLayer()
@@ -33,17 +33,17 @@ final class StandInPanel: WindowStandIn {
     private let pictures: [Picture]
     /// A layer per picture that cuts it off at the seam, the layer with the whole picture, and
     /// the layers that show its parts once a seam has been set.
-    private var slots: [CALayer] = []
-    private var images: [CALayer] = []
-    private var parts: [SeamLayers] = []
+    private(set) var slots: [CALayer] = []
+    private(set) var images: [CALayer] = []
+    private(set) var parts: [SeamLayers] = []
     /// Where each picture divides, as a share of its width, found at the first seam.
     private var splitShares: [CGFloat] = []
     private var seam: CGFloat?
     private var isPreparedForSeam = false
     /// An opaque layer under each picture, added at the first seam.
-    private var backings: [CALayer] = []
+    private(set) var backings: [CALayer] = []
     /// The amber line on the seam, added at the first seam.
-    private let seamLineLayer = StandInPanel.stillLayer()
+    let seamLineLayer = StandInPanel.stillLayer()
     private var totalWidth: CGFloat { pictures.map(\.size.width).reduce(0, +) }
 
     var liveFrames: [Int] { streams.map(\.frames) }
@@ -171,7 +171,7 @@ final class StandInPanel: WindowStandIn {
         seamLineLayer.frame = Self.seamLine(of: sizes, seamAt: seam)
     }
 
-    private func addButtonsPatch(over index: Int) {
+    func addButtonsPatch(over index: Int) {
         let picture = pictures[index]
         let patch = Self.buttonsPatch(ofPictureSize: picture.size)
         let layer = StandInPanel.stillLayer()
@@ -183,7 +183,7 @@ final class StandInPanel: WindowStandIn {
     }
 
     /// Shows a live frame in place of the picture.
-    private func show(_ surface: IOSurfaceRef, rect: CGRect, scale: Double, at index: Int) {
+    func show(_ surface: IOSurfaceRef, rect: CGRect, scale: Double, at index: Int) {
         guard images.indices.contains(index), rect.width > 0 else { return }
         let size = CGSize(width: IOSurfaceGetWidth(surface), height: IOSurfaceGetHeight(surface))
         CATransaction.begin()

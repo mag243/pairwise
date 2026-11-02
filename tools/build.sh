@@ -180,11 +180,11 @@ line_coverage() {
   local others=() binary
   for binary in "${binaries[@]:1}"; do others+=(-object "$binary"); done
   # llvm-cov records file names relative to the package; columns 8 and 9 are
-  # the line count and the missed lines. The stress test drives real windows and
-  # is not code that runs for users (ADR 0031).
+  # the line count and the missed lines. The stress test drives real windows, and it and
+  # the debug tools are not code that runs for users (ADR 0031, 0050).
   (cd "$PACKAGE_DIR" && xcrun llvm-cov report -instr-profile "$debug/codecov/default.profdata" \
     "${binaries[0]}" "${others[@]}") |
-    awk -v prefix="Sources/$1/" 'index($1, prefix) == 1 && !index($1, "DragStressTest") { lines += $8; missed += $9 }
+    awk -v prefix="Sources/$1/" 'index($1, prefix) == 1 && !index($1, "DragStressTest") && !index($1, "ScreenRecording") && !index($1, "FrameDump") { lines += $8; missed += $9 }
       END { printf "%.2f\n", lines ? 100 * (lines - missed) / lines : 100 }'
 }
 

@@ -13,7 +13,7 @@ final class SeamLockPanel: SeamLockMark {
     private static let closedSymbol = "lock.fill"
     private static let openSymbol = "lock.open.fill"
 
-    private let panel: NSPanel
+    let panel: NSPanel
     private let symbol = NSImageView()
 
     init() {
