@@ -33,6 +33,18 @@ import Testing
         #expect(JoinRule.target(for: frame(x: 790), among: [Self.other])?.side == .right)
     }
 
+    @Test func aWindowOverTheOthersRightHalfJoinsOnTheRight() {
+        #expect(JoinRule.target(for: frame(x: 660), among: [Self.other])?.side == .right)
+    }
+
+    @Test func aWindowOverTheOthersLeftHalfJoinsOnTheLeft() {
+        #expect(JoinRule.target(for: frame(x: 440), among: [Self.other])?.side == .left)
+    }
+
+    @Test func aWindowInTheMiddleJoinsOnTheSideOfItsCentre() {
+        #expect(JoinRule.target(for: frame(x: 600), among: [Self.other])?.side == .right)
+    }
+
     @Test(arguments: [(23.0, true), (24.0, true), (25.0, false)])
     func theDistanceIsALimit(distance: Double, joins: Bool) {
         let target = JoinRule.target(for: frame(x: 800 + distance), among: [Self.other])

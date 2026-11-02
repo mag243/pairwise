@@ -37,6 +37,7 @@ extension PairDragModel {
     /// leaves the window where macOS put it, and no pair.
     func finish(_ joining: PairDrag.Joining) {
         defer { endDrag() }
+        Self.logger.info("joining ended, place found: \(joining.target != nil)")
         guard let target = joining.target else { return }
         guard let other = system.window(number: target.other.number) else { return }
         do {
