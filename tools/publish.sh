@@ -3,9 +3,11 @@
 # (ADR 0058): signs the zip into the Sparkle feed, creates the GitHub Release,
 # pushes the feed and the page to the branch gh-pages, and writes the Homebrew cask (ADR 0059).
 #
-# Usage: tools/publish.sh [--dry-run]
+# Usage: tools/publish.sh [--dry-run | --page]
 #   --dry-run   Sign and write the feed under build/publish/, and stop before
 #               anything leaves this Mac.
+#   --page      Send only the page in tools/site/ to gh-pages (ADR 0065): no release,
+#               and the feed stays as it is.
 #
 # Signs with the Sparkle key in the keychain, under the account pairwise (ADR 0057).
 # It pushes to public repositories, so only the owner runs it.
@@ -21,7 +23,9 @@ MAXIMUM_VERSIONS_IN_FEED=10
 WORK="$BUILD_DIR/publish"
 
 dry_run=0
+page_only=0
 [[ "${1:-}" == --dry-run ]] && dry_run=1
+[[ "${1:-}" == --page ]] && page_only=1
 
 # The one file in build/release/ with the extension [1].
 release_file() {
@@ -67,6 +71,22 @@ commit_and_push() {
 }
 
 step "Publish"
+if ((page_only)); then
+  rm -rf "$WORK"
+  mkdir -p "$WORK"
+  git ls-remote --exit-code --heads "https://github.com/$REPOSITORY.git" "$FEED_BRANCH" >/dev/null \
+    || fail "No branch $FEED_BRANCH yet; the first release makes it."
+  clone_feed "$WORK/pages"
+  cp -R "$TOOLS_DIR/site/." "$WORK/pages/"
+  if [[ -z "$(git -C "$WORK/pages" status --porcelain)" ]]; then
+    ok "The page is already up to date"
+    exit 0
+  fi
+  commit_and_push "$WORK/pages" "Update the page" "$FEED_BRANCH"
+  ok "Page published"
+  exit 0
+fi
+
 zip="$(release_file zip)"
 dmg="$(release_file dmg)"
 name="$(basename "$zip" .zip)"

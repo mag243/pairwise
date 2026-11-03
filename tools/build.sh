@@ -20,6 +20,10 @@
 #   publish     A release from this Mac (ADR 0058): checks that the tree is clean, that the
 #               tag v<version> points at HEAD and that origin/main holds it, runs package,
 #               then tools/publish.sh. It publishes, so the owner runs it.
+#   publish-page  Only the website (ADR 0065): sends tools/site to gh-pages, without a release.
+#               It publishes, so the owner runs it.
+#   screenshots The website's pictures (ADR 0065): runs the scenes on TextEdit and Preview and
+#               writes tools/site/shots/, for you to judge with git. Takes the screen and pointer.
 #   apptest     The macOS app's tests, including the XCUITest smoke tests. Followed by
 #               a filter, only those tests, as Class or Class/testName, several
 #               separated by commas: tools/build.sh apptest LaunchTests/testShowsWindow
@@ -64,7 +68,9 @@ NOTARY_PROFILE="pairwise-notary"
 # CI has no certificate and nothing there needs the Accessibility permission (ADR 0012).
 CI_SIGNING=()
 [[ "${CI:-}" == true ]] && CI_SIGNING=(CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual DEVELOPMENT_TEAM=)
-COMMANDS=" check format test coverage build release export package publish apptest run quick verify ci clean help "
+COMMANDS=" check format test coverage build release export package publish publish-page screenshots apptest run quick verify ci clean help "
+# The width of a picture on the website, twice what the page shows, for sharp text.
+SCREENSHOT_MAX_WIDTH=1800
 declare -a SUMMARY=()
 
 usage() { sed -n '2,/^$/p' "$0" | sed 's/^# \{0,1\}//'; }
@@ -421,6 +427,27 @@ cmd_run() {
   open -W "$app" --args "$@"
 }
 
+# Makes the pictures in build/screenshots, and copies them to the website only when every
+# scene succeeded (ADR 0065).
+cmd_screenshots() {
+  local dir="$BUILD_DIR/screenshots" shots="$TOOLS_DIR/site/shots" report name width
+  report="$dir/report.txt"
+  rm -rf "$dir"
+  mkdir -p "$dir" "$shots"
+  cp "$TOOLS_DIR/screenshots/Travel notes.rtf" "$dir/"
+  python3 -I "$TOOLS_DIR/screenshots/make_landscape.py" "$dir/Coast.png"
+  cmd_run --screenshots "$report" --settings-tab 1
+  [[ -f "$report" ]] || fail "The run left no report. Is the screen unlocked?"
+  cat "$report"
+  [[ "$(tail -n 1 "$report")" == "screenshots done" ]] || fail "The run did not make every picture."
+  for name in join pair drag settings; do
+    width="$(sips -g pixelWidth "$dir/$name.png" | awk '/pixelWidth/ { print $2 }')"
+    ((width > SCREENSHOT_MAX_WIDTH)) && sips --resampleWidth "$SCREENSHOT_MAX_WIDTH" "$dir/$name.png" >/dev/null
+    cp "$dir/$name.png" "$shots/"
+  done
+  ok "The pictures are in ${shots#"$ROOT_DIR"/}. See what changed with git, then commit what you want."
+}
+
 cmd_clean() {
   step "Clean"
   rm -rf "${BUILD_DIR:?}"
@@ -438,6 +465,8 @@ run_command() {
     export) timed export cmd_export ;;
     package) timed package cmd_package ;;
     publish) timed publish cmd_publish ;;
+    publish-page) timed publish-page "$TOOLS_DIR/publish.sh" --page ;;
+    screenshots) timed screenshots cmd_screenshots ;;
     apptest) timed apptest cmd_apptest "${2:-}" ;;
     clean) timed clean cmd_clean ;;
     quick) run_command check; run_command test ;;

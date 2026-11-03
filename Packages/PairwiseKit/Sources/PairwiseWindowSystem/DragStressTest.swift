@@ -39,6 +39,8 @@ public final class DragStressTest {
     let outputPath: String
     let pressOutcome: () -> String
     private let lastLiveFrames: () -> [Int]
+    /// How many live frames per window the last drag got.
+    var lastLiveFrameCounts: [Int] { lastLiveFrames() }
     private let join: (any MovableWindow, any MovableWindow) throws -> Void
     private let leave: (any MovableWindow) -> Void
     /// Written after each line, so a test that stops halfway shows how far it came.

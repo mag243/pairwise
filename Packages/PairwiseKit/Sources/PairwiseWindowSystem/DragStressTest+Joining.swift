@@ -9,11 +9,11 @@ import ScreenCaptureKit
 extension DragStressTest {
     private static let joinKey: CGKeyCode = 55
     static let joinSteps = 50
-    private static let joinKeyStep = 10
-    private static let guideWait: UInt64 = 300
-    private static let floatingLevel = 3
+    static let joinKeyStep = 10
+    static let guideWait: UInt64 = 300
+    static let floatingLevel = 3
     /// The level of the lock on a seam, which tells it from the guide.
-    private static let lockLevel = 8
+    static let lockLevel = 8
     /// How far below the other's top the first window goes before the lock joins them.
     private static let lockTopOffset = 30.0
     private static let pictureMargin = 60.0
@@ -21,7 +21,7 @@ extension DragStressTest {
     static let leftOrigin = ScreenPoint(x: 100, y: 120)
     private static let otherOrigin = ScreenPoint(x: 900, y: 120)
     /// How far from the other window's edge the drag stops, within the snap distance.
-    private static let snapGap = 10.0
+    static let snapGap = 10.0
 
     /// Runs through joining and parting, and writes what happened to the file.
     /// Precondition: taking over drags has been started.
@@ -151,8 +151,12 @@ extension DragStressTest {
         lines.append("press: \(pressOutcome()); lock now \(ownMarks(atLevel: Self.lockLevel))")
     }
 
-    private func drag(
-        _ window: AccessibilityWindow, byX: Double, byY: Double, withJoinKey: Bool, picture: String?
+    /// Drags `window` from a place in its title bar, as a part of its width, and runs `whileHeld`
+    /// before letting go.
+    func drag(
+        _ window: AccessibilityWindow, byX: Double, byY: Double, withJoinKey: Bool,
+        picture: String?,
+        pressAt part: Double = 0.5, whileHeld: (@MainActor () async -> Void)? = nil
     ) async {
         guard let frame = window.serverFrame() else {
             lines.append("the window has no frame")
@@ -161,7 +165,7 @@ extension DragStressTest {
         try? window.raise()
         await wait(Self.settleWait)
         var point = CGPoint(
-            x: frame.origin.x + frame.size.width / 2, y: frame.origin.y + Self.titleBandY)
+            x: frame.origin.x + frame.size.width * part, y: frame.origin.y + Self.titleBandY)
         guard isOwnWindowOnTop(window, at: point) else {
             lines.append("drag skipped, another window is on top at the press")
             return
@@ -184,12 +188,13 @@ extension DragStressTest {
         await wait(Self.guideWait)
         lines.append("press: \(pressOutcome()); guide: \(guideFrames())")
         if let picture { await savePicture(named: picture, around: window) }
+        await whileHeld?()
         post(.leftMouseUp, at: point)
         if withJoinKey { pressJoinKey(false) }
         await wait(Self.settleWait)
     }
 
-    private func pressJoinKey(_ isDown: Bool) {
+    func pressJoinKey(_ isDown: Bool) {
         guard isJoinKeyDown != isDown else { return }
         isJoinKeyDown = isDown
         let source = CGEventSource(stateID: .hidSystemState)
@@ -204,7 +209,7 @@ extension DragStressTest {
         ownMarks(atLevel: Self.floatingLevel)
     }
 
-    private func ownMarks(atLevel level: Int) -> [String] {
+    func ownMarks(atLevel level: Int) -> [String] {
         LiveSystemAccess().onScreenWindows()
             .filter { description in
                 description[kCGWindowOwnerPID as String] as? pid_t

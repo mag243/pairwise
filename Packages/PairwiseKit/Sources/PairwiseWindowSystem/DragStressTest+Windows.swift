@@ -52,7 +52,7 @@ extension DragStressTest {
         return nil
     }
 
-    private func standardWindows(of app: any AccessibilityElement) -> [any AccessibilityElement] {
+    func standardWindows(of app: any AccessibilityElement) -> [any AccessibilityElement] {
         app.elements(of: kAXWindowsAttribute).filter {
             $0.attribute(kAXSubroleAttribute) as? String == kAXStandardWindowSubrole
         }

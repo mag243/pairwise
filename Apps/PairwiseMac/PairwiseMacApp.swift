@@ -91,6 +91,8 @@ extension PairwiseMacApp {
     private static let killTestFlag = "--kill-test"
     private static let killCheckFlag = "--kill-check"
     private static let settingsLookFlag = "--settings-look"
+    /// The page's pictures (ADR 0065), which show the app as a new user finds it.
+    static let screenshotsFlag = "--screenshots"
     /// Pairwise works as usual meanwhile, and quits when the recording is finished.
     private static let recordFlag = "--record"
     private static let recordingTime = Duration.seconds(40)
@@ -105,6 +107,11 @@ extension PairwiseMacApp {
         model.keepsPairs = !isTestRun
         // They measure the live pictures too, whatever the user chose.
         if isTestRun { model.dragPictures = .live }
+        if arguments.contains(screenshotsFlag) {
+            model.dragPictures = .standard
+            model.joinScope = .anyWindow
+            model.playsSounds = true
+        }
         if let flag = arguments.firstIndex(of: recordFlag), arguments.indices.contains(flag + 1) {
             model.start()
             await ScreenRecording(outputPath: arguments[flag + 1]).record(for: recordingTime)
@@ -115,7 +122,7 @@ extension PairwiseMacApp {
         let flag = arguments.firstIndex {
             [
                 stressTestFlag, joinTestFlag, seamTestFlag, seamLookFlag, killTestFlag,
-                killCheckFlag, settingsLookFlag,
+                killCheckFlag, settingsLookFlag, screenshotsFlag,
             ].contains($0)
         }
         guard let flag, arguments.indices.contains(flag + 1) else { return false }
@@ -146,6 +153,10 @@ extension PairwiseMacApp {
         } else if flag == settingsLookFlag {
             await test.savePicture(
                 of: NSHostingView(rootView: MainView(model: model, updater: Updater())))
+        } else if flag == screenshotsFlag {
+            await test.runScreenshots(
+                on: system,
+                settings: NSHostingView(rootView: MainView(model: model, updater: Updater())))
         } else if flag == killTestFlag {
             await test.runKillTest()
         } else if flag == killCheckFlag {

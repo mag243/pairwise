@@ -75,9 +75,11 @@ struct MainView: View {
                 .tabItem { Label("Help", systemImage: "questionmark.circle") }
                 .tag(2)
             #if DEBUG
-            page { testing }
-                .tabItem { Label("Test", systemImage: "hammer") }
-                .tag(3)
+            if !CommandLine.arguments.contains(PairwiseMacApp.screenshotsFlag) {
+                page { testing }
+                    .tabItem { Label("Test", systemImage: "hammer") }
+                    .tag(3)
+            }
             #endif
         }
         .frame(width: Self.width, height: Self.height)
