@@ -32,6 +32,6 @@ Not in this milestone: pictures in both light and dark, translated pictures, a f
 - [x] One command makes all four pictures, and a second run gives the same scenes.
 - [x] The menu bar reads as a bar, with Pairwise's icon, a network icon and a fixed clock, and no purple recording icon, real clock or other app's status item.
 - [x] Nothing of the owner's shows in any picture.
-- [ ] The release build holds none of this (`tools/build.sh release`).
-- [ ] `tools/build.sh ci` is green.
+- [x] The release build holds none of this (`tools/build.sh release`).
+- [x] `tools/build.sh ci` is green.
 - [ ] The owner has seen the page online.
