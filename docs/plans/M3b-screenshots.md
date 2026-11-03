@@ -21,7 +21,7 @@ Not in this milestone: pictures in both light and dark, translated pictures, a f
 
 ### 2. The command
 - [x] `tools/build.sh screenshots`: runs the scenes, fails when the run did not finish, makes the pictures smaller, and writes them to `tools/site/shots/` as WebP.
-- [ ] `tools/build.sh publish-page`: sends `tools/site/` to `gh-pages` without a release, and leaves the feed alone.
+- [x] `tools/build.sh publish-page`: sends `tools/site/` to `gh-pages` without a release, and leaves the feed alone.
 
 ### 3. The page
 - [x] The owner has judged the pictures in the chat.
@@ -34,4 +34,7 @@ Not in this milestone: pictures in both light and dark, translated pictures, a f
 - [x] Nothing of the owner's shows in any picture.
 - [x] The release build holds none of this (`tools/build.sh release`).
 - [x] `tools/build.sh ci` is green.
-- [ ] The owner has seen the page online.
+- [x] The owner has seen the page online.
+
+## Open points
+- `tools/setup.sh` checking the `webp` version, and the WebP step in `tools/build.sh screenshots`, have not run yet: the pictures on the page were converted by hand with the same setting. The next run of each shows whether they work.
