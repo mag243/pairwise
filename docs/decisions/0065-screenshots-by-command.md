@@ -10,7 +10,7 @@ The page (ADR 0061) needs pictures of Pairwise at work, and they should come out
 The pictures must show the menu bar, where Pairwise lives. That bar also holds the clock and the status items of the owner's other apps, which differ per Mac and per day.
 
 ## Decision
-`tools/build.sh screenshots` makes the pictures. It starts the debug build with `--screenshots`, a run of the test tools of ADR 0027, and writes them to `tools/site/shots/` when every scene has succeeded. Git then shows what changed, and the owner decides what to commit.
+`tools/build.sh screenshots` makes the pictures. It starts the debug build with `--screenshots`, a run of the test tools of ADR 0027, and writes them to `tools/site/shots/` when every scene has succeeded. Git then shows what changed, and the owner decides what to commit. They are WebP at quality 90 (`cwebp`, from Homebrew), about a thirteenth of the PNG's size, made by this command and not at publishing, so what git shows is what goes online.
 
 - **The windows** are real ones of other apps, as Pairwise's promise is about any app: TextEdit with a text and Preview with a picture, from fixed demo files in `tools/screenshots/`, opened and closed by the run. It refuses to run when either app is already running, so it never touches the owner's documents.
 - **The scenes:** joining with the guide, the pair with its closed lock, a drag with placeholders, and the settings tab for pairs. Each scene checks what it should show, and the run fails rather than save a wrong picture.
@@ -31,4 +31,4 @@ The pictures must show the menu bar, where Pairwise lives. That bar also holds t
 ## Consequences
 - Positive: the page's pictures can be made again in one command, with nothing of the owner's in them.
 - Negative / risks: the run depends on how TextEdit and Preview open a file, and on what macOS draws in the menu bar. The dot's place is macOS's to change, so a picture still needs a look before it is committed. TextEdit and Preview may remember the demo files among their recent documents.
-- Changes now: `--screenshots`, a scene file in the test tools, `tools/screenshots/`, `screenshots` and `publish-page` in `tools/build.sh`, `tools/publish.sh`, `tools/site/`, README, CLAUDE.md.
+- Changes now: `--screenshots`, a scene file in the test tools, `tools/screenshots/`, `webp` in `tools/setup.sh`, `screenshots` and `publish-page` in `tools/build.sh`, `tools/publish.sh`, `tools/site/`, README, CLAUDE.md.

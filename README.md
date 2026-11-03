@@ -71,6 +71,8 @@ The owner releases from their own Mac, which holds the Developer ID certificate,
 2. Run `tools/build.sh ci`, then `git push`, then `git tag vX.Y.Z`.
 3. Run `tools/build.sh publish`, which also puts `tools/site` on the website. For a trial first: `tools/build.sh package`, then `tools/publish.sh --dry-run`.
 
+The website's pictures come from `tools/build.sh screenshots`, which takes over the screen and the pointer for a moment, and uses TextEdit and Preview, so quit those and Pairwise first. Look at the pictures before committing them. `tools/build.sh publish-page` then sends the website alone, without a release ([ADR 0065](docs/decisions/0065-screenshots-by-command.md)).
+
 ## License
 
 [MIT](LICENSE). Updates come through [Sparkle](https://sparkle-project.org), whose licence is [in the app](Apps/PairwiseMac/Resources/Sparkle-LICENSE.txt). The sounds are from [Interface Sounds by Kenney](https://opengameart.org/content/interface-sounds), under CC0. See [`CONTRIBUTING.md`](CONTRIBUTING.md) on contributions.

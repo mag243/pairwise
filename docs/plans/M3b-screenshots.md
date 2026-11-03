@@ -20,18 +20,18 @@ Not in this milestone: pictures in both light and dark, translated pictures, a f
 - [x] It follows the Mac's light or dark and changes no system setting. It refuses missing Screen Recording, and TextEdit or Preview already running.
 
 ### 2. The command
-- [x] `tools/build.sh screenshots`: runs the scenes, fails when the run did not finish, makes the pictures smaller and writes them to `tools/site/shots/`.
+- [x] `tools/build.sh screenshots`: runs the scenes, fails when the run did not finish, makes the pictures smaller, and writes them to `tools/site/shots/` as WebP.
 - [ ] `tools/build.sh publish-page`: sends `tools/site/` to `gh-pages` without a release, and leaves the feed alone.
 
 ### 3. The page
-- [ ] The owner has judged the pictures in the chat.
-- [ ] The pictures on the page.
-- [ ] README and CLAUDE.md name the commands.
+- [x] The owner has judged the pictures in the chat.
+- [x] The pictures on the page.
+- [x] README and CLAUDE.md name the commands.
 
 ## Acceptance criteria
-- [ ] One command makes all four pictures, and a second run gives the same scenes.
-- [ ] The menu bar reads as a bar, with Pairwise's icon, a network icon and a fixed clock, and no purple recording icon, real clock or other app's status item.
-- [ ] Nothing of the owner's shows in any picture.
+- [x] One command makes all four pictures, and a second run gives the same scenes.
+- [x] The menu bar reads as a bar, with Pairwise's icon, a network icon and a fixed clock, and no purple recording icon, real clock or other app's status item.
+- [x] Nothing of the owner's shows in any picture.
 - [ ] The release build holds none of this (`tools/build.sh release`).
 - [ ] `tools/build.sh ci` is green.
 - [ ] The owner has seen the page online.

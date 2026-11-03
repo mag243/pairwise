@@ -43,6 +43,8 @@ tools/build.sh release                # build the app, Release, and fail if test
 tools/build.sh export                 # archive and sign with the Developer ID, not notarized (ADR 0056)
 tools/build.sh package                # a release: signed, notarized, zip and disk image; publishes nothing (ADR 0056)
 tools/build.sh publish                # package, then the release, feed and cask; only the owner runs it (ADR 0058)
+tools/build.sh screenshots            # the website's pictures, into tools/site/shots; takes the screen and pointer (ADR 0065)
+tools/build.sh publish-page           # only the website, without a release; only the owner runs it (ADR 0065)
 tools/publish.sh --dry-run            # signs the feed after package, and stops before anything leaves the Mac
 ```
 

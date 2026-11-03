@@ -4,7 +4,7 @@
 # Verifies, at the versions pinned in tools/versions.env:
 #   - Xcode (selected with xcode-select, first launch done), with Swift and swift-format
 # Installs:
-#   - bash, shellcheck, swiftlint, xcbeautify (via Homebrew)
+#   - bash, shellcheck, swiftlint, webp, xcbeautify (via Homebrew)
 # and configures git to use the hooks in tools/git-hooks.
 # With --with-claude it also checks that the Claude Code CLI is installed; it
 # never installs it.
@@ -66,6 +66,7 @@ tool_version() {
     bash) "$(brew --prefix)/bin/bash" --version 2>/dev/null | sed -n 's/.*version \([0-9]*\.[0-9]*\).*/\1/p' | head -n 1 ;;
     shellcheck) shellcheck --version 2>/dev/null | sed -n 's/^version: //p' ;;
     swiftlint) swiftlint version 2>/dev/null ;;
+    webp) cwebp -version 2>/dev/null | sed -n 1p ;;
     xcbeautify) xcbeautify --version 2>/dev/null ;;
   esac
 }
@@ -74,7 +75,7 @@ install_homebrew_tools() {
   step "Command-line tools (Homebrew)"
   has brew || fail "Homebrew missing. Install it from https://brew.sh, then run this script again."
   local pkg minimum version
-  for pkg in bash shellcheck swiftlint xcbeautify; do
+  for pkg in bash shellcheck swiftlint webp xcbeautify; do
     if brew list --formula "$pkg" >/dev/null 2>&1; then
       ok "$pkg"
     else
@@ -86,6 +87,7 @@ install_homebrew_tools() {
       bash) minimum="$BASH_MIN_VERSION" ;;
       shellcheck) minimum="$SHELLCHECK_MIN_VERSION" ;;
       swiftlint) minimum="$SWIFTLINT_MIN_VERSION" ;;
+      webp) minimum="$WEBP_MIN_VERSION" ;;
       xcbeautify) minimum="$XCBEAUTIFY_MIN_VERSION" ;;
     esac
     version="$(tool_version "$pkg")"

@@ -23,7 +23,7 @@
 #   publish-page  Only the website (ADR 0065): sends tools/site to gh-pages, without a release.
 #               It publishes, so the owner runs it.
 #   screenshots The website's pictures (ADR 0065): runs the scenes on TextEdit and Preview and
-#               writes tools/site/shots/, for you to judge with git. Takes the screen and pointer.
+#               writes tools/site/shots/ as WebP, for you to judge with git. Takes the screen and pointer.
 #   apptest     The macOS app's tests, including the XCUITest smoke tests. Followed by
 #               a filter, only those tests, as Class or Class/testName, several
 #               separated by commas: tools/build.sh apptest LaunchTests/testShowsWindow
@@ -71,6 +71,8 @@ CI_SIGNING=()
 COMMANDS=" check format test coverage build release export package publish publish-page screenshots apptest run quick verify ci clean help "
 # The width of a picture on the website, twice what the page shows, for sharp text.
 SCREENSHOT_MAX_WIDTH=1800
+# The quality of the website's pictures, where lost detail does not show in text yet.
+SCREENSHOT_QUALITY=90
 declare -a SUMMARY=()
 
 usage() { sed -n '2,/^$/p' "$0" | sed 's/^# \{0,1\}//'; }
@@ -432,6 +434,7 @@ cmd_run() {
 cmd_screenshots() {
   local dir="$BUILD_DIR/screenshots" shots="$TOOLS_DIR/site/shots" report name width
   report="$dir/report.txt"
+  has cwebp || fail "cwebp not found. Run tools/setup.sh."
   rm -rf "$dir"
   mkdir -p "$dir" "$shots"
   cp "$TOOLS_DIR/screenshots/Travel notes.rtf" "$dir/"
@@ -443,7 +446,7 @@ cmd_screenshots() {
   for name in join pair drag settings; do
     width="$(sips -g pixelWidth "$dir/$name.png" | awk '/pixelWidth/ { print $2 }')"
     ((width > SCREENSHOT_MAX_WIDTH)) && sips --resampleWidth "$SCREENSHOT_MAX_WIDTH" "$dir/$name.png" >/dev/null
-    cp "$dir/$name.png" "$shots/"
+    cwebp -quiet -q "$SCREENSHOT_QUALITY" "$dir/$name.png" -o "$shots/$name.webp"
   done
   ok "The pictures are in ${shots#"$ROOT_DIR"/}. See what changed with git, then commit what you want."
 }
