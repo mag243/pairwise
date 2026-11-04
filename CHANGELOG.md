@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.0]
+
+- Joining goes by the edge that moves: drag right to join with your window's right edge, drag left for its left edge. Overlapping windows are no longer proposed just because they overlap.
+- An edge is proposed from close by until it has passed a quarter of the other window's width.
+- The window you would join gets an amber outline.
+- While joining, scroll or press Z to choose another window: the closest first, then all the others, also those behind others. Hold Control as well for the other choice of windows in the settings, such as only windows of the same app.
+- The page moved to https://pairwise.m-domain.me/, and updates come from there too.
+
 ## [0.2.1]
 
 - No gap between two windows after dragging their seam, when a window such as Terminal rounds its width to whole characters.
