@@ -49,6 +49,32 @@ import Testing
         #expect(pick.place == Self.second)
     }
 
+    @Test func noWindowIsLeftBehindWhenGoingOn() {
+        var pick = JoinPick()
+        pick.update(to: [nil, Self.first, Self.second])
+        pick.advance()
+        pick.advance()
+        #expect(pick.place == Self.second)
+        pick.advance()
+        #expect(pick.place == Self.first)
+    }
+
+    @Test func goingBackFromNoWindowGoesToTheLast() {
+        var pick = JoinPick()
+        pick.update(to: [nil, Self.first, Self.second])
+        pick.advance(by: -1)
+        #expect(pick.place == Self.second)
+    }
+
+    @Test func aChosenWindowStaysChosenWhenItBecomesTheFirstChoice() {
+        var pick = JoinPick()
+        pick.update(to: [Self.first, Self.second])
+        pick.advance()
+        pick.update(to: [Self.second, Self.first])
+        pick.update(to: [Self.first, Self.second])
+        #expect(pick.place == Self.second)
+    }
+
     @Test func aChosenWindowStaysChosenAlsoOnTheOtherSide() {
         var pick = JoinPick()
         pick.update(to: [Self.first, Self.second])

@@ -1,28 +1,43 @@
-/// Which of the places to join is chosen during a drag (ADR 0069).
-/// Invariant: `step` lies within `choices`, or is 0 without choices.
+/// Which of the places to join applies during a drag (ADR 0069): the first choice, or a window
+/// the user went to.
 public struct JoinPick: Equatable, Sendable {
     private var choices: [JoinPlace?] = []
-    private var step = 0
+    /// The window the user went to, for as long as it is a choice.
+    private var chosen: UInt32?
 
     public init() {}
 
-    /// The place chosen, or `nil` for no window or without choices.
+    /// The place that applies, or `nil` when there is none.
     public var place: JoinPlace? {
-        choices.isEmpty ? nil : choices[step]
+        choices[safe: currentIndex].flatMap { $0 }
     }
 
-    /// Takes the choices of the moment. A window that was chosen stays chosen while it is a
-    /// choice, also on another side; otherwise the first choice applies again.
+    private var currentIndex: Int {
+        choices.firstIndex { $0 != nil && $0?.other.number == chosen } ?? 0
+    }
+
+    /// Takes the choices of the moment. A window that was chosen stays chosen, also on another
+    /// side and at another place in the order, while it is a choice.
     public mutating func update(to choices: [JoinPlace?]) {
-        let chosen = step == 0 ? nil : place?.other.number
         self.choices = choices
-        step = choices.firstIndex { $0?.other.number == chosen && chosen != nil } ?? 0
+        if !choices.contains(where: { $0 != nil && $0?.other.number == chosen }) { chosen = nil }
     }
 
-    /// Goes `steps` choices on, or back when negative, starting over past either end.
+    /// Goes `steps` windows on, or back when negative, and starts over past either end. A `nil`
+    /// first choice is left behind: going on always gives a window, when there is one.
     public mutating func advance(by steps: Int = 1) {
-        guard !choices.isEmpty else { return }
-        let count = choices.count
-        step = ((step + steps) % count + count) % count
+        let windows = choices.compactMap { $0 }
+        guard steps != 0, !windows.isEmpty else { return }
+        let hasFirstWindow = choices.first.flatMap { $0 } != nil
+        let unchosen = hasFirstWindow || steps < 0 ? 0 : -1
+        let position = (windows.firstIndex { $0.other.number == chosen } ?? unchosen) + steps
+        let count = windows.count
+        chosen = windows[(position % count + count) % count].other.number
+    }
+}
+
+extension Array {
+    fileprivate subscript(safe index: Int) -> Element? {
+        indices.contains(index) ? self[index] : nil
     }
 }

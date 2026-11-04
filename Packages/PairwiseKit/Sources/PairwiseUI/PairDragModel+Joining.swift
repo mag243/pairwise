@@ -81,10 +81,7 @@ extension PairDragModel {
         moveHeldWindow(&joining)
         joining.heading.update(x: joining.pointer.x)
         guard joining.isKeyDown else {
-            var current = joining
-            current.target = nil
-            drag = .joining(current)
-            hideJoinMarks()
+            dropJoinPlace(of: joining)
             return
         }
         guard
@@ -117,6 +114,16 @@ extension PairDragModel {
         } else {
             hideJoinMarks()
         }
+    }
+
+    /// The key is up: nothing joins, and going through the windows starts anew, with the key
+    /// pressed again (ADR 0069).
+    private func dropJoinPlace(of joining: PairDrag.Joining) {
+        var current = joining
+        current.target = nil
+        current.pick = JoinPick()
+        drag = .joining(current)
+        hideJoinMarks()
     }
 
     /// Goes through the places to join by the steps of an input, which the next tick shows.

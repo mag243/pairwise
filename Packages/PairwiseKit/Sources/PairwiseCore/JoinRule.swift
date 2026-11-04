@@ -38,9 +38,11 @@ public struct JoinTarget: Equatable, Sendable {
 public enum JoinRule {
     /// How far ahead of the moving edge the other edge may lie, in points.
     private static let snapDistance = 24.0
-    /// How far the moving edge may have passed the other edge, in points, as a fast drag
-    /// goes past the snap distance between two events.
-    private static let passDistance = 48.0
+    /// How far the moving edge may have passed the other edge, as a part of the other's width
+    /// and in points at least: a fast drag goes past the snap distance between two events, and
+    /// large windows have no room on the screen to come from outside.
+    private static let passShare = 0.25
+    private static let minimumPassDistance = 48.0
     /// How much of an edge has to show past the windows in front of it, in points: less is
     /// hard to see, with the dragged window near it.
     private static let minimumVisibleEdge = 20.0
@@ -53,10 +55,9 @@ public enum JoinRule {
         let distance: Double
     }
 
-    /// An edge that counts, with what orders it among the others.
+    /// A place with what orders it among the others.
     private struct NearEdge {
         let place: JoinPlace
-        let isVisible: Bool
         let holdsPointer: Bool
         let distance: Double
         let order: Int
@@ -93,31 +94,61 @@ public enum JoinRule {
         }
     }
 
-    /// Where a window at `frame`, moving in `heading`, could join (ADR 0069). `windows` are all
-    /// others on screen, frontmost first, also those that are not joinable, as they hide what
-    /// is behind them. These are the joinable windows with an edge that counts: first those
-    /// whose edge shows, then the hidden ones. A `nil` first says that only hidden edges count.
-    /// Without a direction there are none.
+    /// Where a window at `frame`, moving in `heading`, could join, in the order of going
+    /// through them (ADR 0069). `windows` are all others on screen, frontmost first, also those
+    /// that are not joinable, as they hide what is behind them. First what is proposed by itself,
+    /// or a `nil` when that is nothing, and then all other joinable windows, closest first.
     public static func choices(
         for frame: WindowFrame, pointer: ScreenPoint, among windows: [ScreenWindow],
         heading: MoveDirection?, isJoinable: (ScreenWindow) -> Bool
     ) -> [JoinPlace?] {
-        guard let heading else { return [] }
-        let edges = windows.enumerated().compactMap { index, window -> NearEdge? in
+        let proposed =
+            heading.map {
+                proposedPlaces(
+                    for: frame, pointer: pointer, among: windows, heading: $0,
+                    isJoinable: isJoinable)
+            } ?? []
+        let numbers = Set(proposed.map(\.other.number))
+        let others = closestPlaces(
+            for: frame, among: windows.filter { isJoinable($0) && !numbers.contains($0.number) })
+        return (proposed.isEmpty && !others.isEmpty ? [nil] : proposed) + others
+    }
+
+    /// The places proposed by themselves: joinable windows with an edge in the moving edge's
+    /// zone that shows past the windows in front of it.
+    private static func proposedPlaces(
+        for frame: WindowFrame, pointer: ScreenPoint, among windows: [ScreenWindow],
+        heading: MoveDirection, isJoinable: (ScreenWindow) -> Bool
+    ) -> [JoinPlace] {
+        windows.enumerated().compactMap { index, window -> NearEdge? in
             guard isJoinable(window), overlapVertically(window.frame, frame) else { return nil }
             let facing = edge(of: window, for: frame, heading: heading)
-            guard (-passDistance...snapDistance).contains(facing.distance) else { return nil }
+            let passDistance = max(minimumPassDistance, window.frame.size.width * passShare)
+            guard
+                (-passDistance...snapDistance).contains(facing.distance),
+                showsEdge(
+                    at: facing.position, of: window.frame, within: frame,
+                    behind: windows.prefix(index))
+            else { return nil }
             return NearEdge(
                 place: JoinPlace(other: window, side: facing.side),
-                isVisible: showsEdge(
-                    at: facing.position, of: window.frame, within: frame,
-                    behind: windows.prefix(index)),
                 holdsPointer: window.frame.origin.y <= pointer.y && pointer.y < window.frame.maxY,
                 distance: abs(facing.distance), order: index)
-        }.sorted { $0.comesBefore($1) }
-        let visible = edges.filter(\.isVisible).map(\.place)
-        let hidden = edges.filter { !$0.isVisible }.map(\.place)
-        return (visible.isEmpty && !hidden.isEmpty ? [nil] : visible) + hidden
+        }.sorted { $0.comesBefore($1) }.map(\.place)
+    }
+
+    /// `windows` on their closest side, by the gap between the edges that face each other, and
+    /// at the same gap the frontmost first.
+    private static func closestPlaces(
+        for frame: WindowFrame, among windows: [ScreenWindow]
+    ) -> [JoinPlace] {
+        windows.enumerated().map { index, window -> NearEdge in
+            let onLeft = abs(window.frame.origin.x - frame.maxX)
+            let onRight = abs(frame.origin.x - window.frame.maxX)
+            return NearEdge(
+                place: JoinPlace(other: window, side: onLeft < onRight ? .left : .right),
+                holdsPointer: false, distance: min(onLeft, onRight), order: index)
+        }.sorted { $0.comesBefore($1) }.map(\.place)
     }
 
     /// The place for a window at `frame` at the place chosen, with the other's height only

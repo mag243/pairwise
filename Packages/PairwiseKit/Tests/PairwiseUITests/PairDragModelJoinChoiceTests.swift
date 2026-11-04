@@ -101,6 +101,64 @@ import Testing
         #expect(system.outlineFrames.last == Self.backFrame)
     }
 
+    @Test func theKeyGivesAProposalWhereThereIsNone() {
+        drag(through: Self.goingRight, to: Self.beside)
+        #expect(!system.isOutlineShowing)
+        _ = system.send(.joinChoiceKey(isRepeat: false))
+        system.tick()
+        #expect(system.isOutlineShowing)
+        #expect(system.outlineFrames.last == Self.frontFrame)
+    }
+
+    @Test func aChosenWindowStaysChosenAsTheDragGoesOn() {
+        drag(through: Self.goingLeft, to: Self.beside)
+        _ = system.send(.joinChoiceKey(isRepeat: false))
+        system.tick()
+        window.currentFrame.origin = ScreenPoint(x: 2000, y: 100)
+        system.tick()
+        #expect(system.outlineFrames.last == Self.backFrame)
+    }
+
+    @Test func lettingGoOfTheKeyForgetsTheChosenWindow() {
+        drag(through: Self.goingLeft, to: Self.beside)
+        _ = system.send(.joinChoiceKey(isRepeat: false))
+        system.tick()
+        _ = system.send(.keysChanged(isJoinKeyDown: false, isEqualHeightKeyDown: false))
+        system.tick()
+        #expect(!system.isOutlineShowing)
+        _ = system.send(.keysChanged(isJoinKeyDown: true, isEqualHeightKeyDown: false))
+        system.tick()
+        #expect(system.outlineFrames.last == Self.frontFrame)
+    }
+
+    @Test func controlGoesOnlyThroughWindowsOfTheSameApp() {
+        window.owner = 40
+        front.owner = 41
+        back.owner = 40
+        system.isScopeKeyDown = true
+        drag(through: Self.goingRight, to: Self.beside)
+        _ = system.send(.joinChoiceKey(isRepeat: false))
+        system.tick()
+        #expect(system.outlineFrames.last == Self.backFrame)
+        _ = system.send(.joinChoiceKey(isRepeat: false))
+        system.tick()
+        #expect(system.outlineFrames.last == Self.backFrame)
+    }
+
+    @Test func aChosenWindowOutOfScopeGivesWayToWhatRemains() {
+        window.owner = 40
+        front.owner = 40
+        back.owner = 41
+        drag(through: Self.goingLeft, to: Self.beside)
+        _ = system.send(.joinChoiceKey(isRepeat: false))
+        system.tick()
+        #expect(system.outlineFrames.last == Self.backFrame)
+        _ = system.send(
+            .keysChanged(isJoinKeyDown: true, isEqualHeightKeyDown: false, isScopeKeyDown: true))
+        system.tick()
+        #expect(system.outlineFrames.last == Self.frontFrame)
+    }
+
     @Test func aKeyThatRepeatsIsWithheldAndDoesNotMoveOn() {
         drag(through: Self.goingLeft, to: Self.beside)
         #expect(!system.send(.joinChoiceKey(isRepeat: true)))
