@@ -1,6 +1,6 @@
 # 0038. Joining the window under the pointer
 
-- **Status:** Accepted
+- **Status:** Superseded by 0069
 - **Date:** 2026-11-02
 - **Milestone:** M3
 

@@ -43,7 +43,7 @@ Use `0000-template.md` as the basis.
 | 0035 | Joining and coming apart with Option | Accepted, the key changed by 0036 |
 | 0036 | Joining with Command | Accepted |
 | 0037 | Joining when dragged over the other window | Superseded by 0038 |
-| 0038 | Joining the window under the pointer | Accepted |
+| 0038 | Joining the window under the pointer | Superseded by 0069 |
 | 0039 | The join key during the drag | Accepted |
 | 0040 | Own heights, and parting during a drag | Accepted |
 | 0041 | Seeing keys as they change | Accepted |
@@ -74,4 +74,4 @@ Use `0000-template.md` as the basis.
 | 0066 | The copyright year comes from the build | Accepted |
 | 0067 | The download page | Accepted |
 | 0068 | The site on our own domain | Accepted |
-| 0069 | Choosing a window in a stack | Accepted |
+| 0069 | Joining by the edge that moves | Accepted |
