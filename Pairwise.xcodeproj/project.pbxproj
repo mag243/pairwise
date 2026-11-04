@@ -323,6 +323,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				COPYRIGHT_HOLDER = "Maarten Ghijsen";
 				DEVELOPMENT_TEAM = SP255JXLVN;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
@@ -330,7 +331,6 @@
 				INFOPLIST_FILE = "Apps/PairwiseMac-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Pairwise Debug";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
-				INFOPLIST_KEY_NSHumanReadableCopyright = "© 2026 Maarten Ghijsen";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -353,6 +353,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				COPYRIGHT_HOLDER = "Maarten Ghijsen";
 				DEVELOPMENT_TEAM = SP255JXLVN;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
@@ -360,7 +361,6 @@
 				INFOPLIST_FILE = "Apps/PairwiseMac-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = Pairwise;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
-				INFOPLIST_KEY_NSHumanReadableCopyright = "© 2026 Maarten Ghijsen";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",

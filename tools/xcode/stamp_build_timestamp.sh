@@ -16,6 +16,9 @@
 # "<YYYYMMDDHHMM>|<counter>", shared by the macOS and iOS targets: a build of
 # both in one minute gives one target ...01 and the other ...02.
 #
+# On a target with the build setting COPYRIGHT_HOLDER it also stamps
+# NSHumanReadableCopyright as "© <year of the build> <holder>" (ADR 0066).
+#
 # The phase needs ENABLE_USER_SCRIPT_SANDBOXING = NO on its target, because
 # the sandbox blocks writing the counter file.
 
@@ -69,8 +72,16 @@ echo "${current_minute}|${counter}" > "${COUNTER_FILE}"
 
 bundle_version="$(date +"%Y.%m%d.%H%M")$(printf "%02d" "${counter}")"
 
+copyright=""
+if [ -n "${COPYRIGHT_HOLDER:-}" ]; then
+    copyright="© $(date +"%Y") ${COPYRIGHT_HOLDER}"
+fi
+
 plutil -convert xml1 "${PLIST}"
 /usr/libexec/PlistBuddy -c "Set :CFBundleVersion ${bundle_version}" "${PLIST}"
+if [ -n "${copyright}" ]; then
+    plutil -replace NSHumanReadableCopyright -string "${copyright}" "${PLIST}"
+fi
 plutil -convert binary1 "${PLIST}"
 
 # Read the value back: if Xcode regenerates the plist after this phase,
@@ -80,6 +91,14 @@ actual=$(/usr/libexec/PlistBuddy -c "Print :CFBundleVersion" "${PLIST}" 2>/dev/n
 if [ "${actual}" != "${bundle_version}" ]; then
     echo "error: stamp verification failed: CFBundleVersion is '${actual}', expected '${bundle_version}' in ${PLIST}" >&2
     exit 1
+fi
+
+if [ -n "${copyright}" ]; then
+    actual=$(/usr/libexec/PlistBuddy -c "Print :NSHumanReadableCopyright" "${PLIST}" 2>/dev/null || echo "<missing>")
+    if [ "${actual}" != "${copyright}" ]; then
+        echo "error: stamp verification failed: NSHumanReadableCopyright is '${actual}', expected '${copyright}' in ${PLIST}" >&2
+        exit 1
+    fi
 fi
 
 echo "stamped CFBundleVersion=${bundle_version} into ${PLIST}"
