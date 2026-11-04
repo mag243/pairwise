@@ -63,6 +63,21 @@ update_feed() {
   cp "$feed/appcast.xml" "$clone/appcast.xml"
 }
 
+# Replaces the site in the clone [1] with tools/site/: only the feed stays, so a file that left
+# tools/site/ also leaves the site. The download link comes from the feed's newest item, whose
+# zip has the name of its disk image, as the source holds no release (ADR 0067).
+update_page() {
+  local clone="$1" zip_url dmg_url
+  zip_url="$(grep -oE 'url="https://[^"]+\.zip"' "$clone/appcast.xml" | head -n 1 | cut -d'"' -f2)"
+  [[ -n "$zip_url" ]] || fail "The feed names no zip to link the download button to."
+  dmg_url="${zip_url%.zip}.dmg"
+  find "$clone" -mindepth 1 -maxdepth 1 ! -name .git ! -name appcast.xml -exec rm -rf {} +
+  cp -R "$TOOLS_DIR/site/." "$clone/"
+  sed -E "s#(data-download href=\")[^\"]*#\\1$dmg_url#" "$TOOLS_DIR/site/index.html" >"$clone/index.html"
+  grep -qF "data-download href=\"$dmg_url\"" "$clone/index.html" \
+    || fail "The page has no download button to update."
+}
+
 commit_and_push() {
   local clone="$1" message="$2" branch="$3"
   git -C "$clone" add -A
@@ -77,7 +92,7 @@ if ((page_only)); then
   git ls-remote --exit-code --heads "https://github.com/$REPOSITORY.git" "$FEED_BRANCH" >/dev/null \
     || fail "No branch $FEED_BRANCH yet; the first release makes it."
   clone_feed "$WORK/pages"
-  cp -R "$TOOLS_DIR/site/." "$WORK/pages/"
+  update_page "$WORK/pages"
   if [[ -z "$(git -C "$WORK/pages" status --porcelain)" ]]; then
     ok "The page is already up to date"
     exit 0
@@ -99,9 +114,8 @@ mkdir -p "$WORK"
 "$TOOLS_DIR/release_notes.sh" "$version" >"$WORK/notes.md"
 clone_feed "$WORK/pages"
 update_feed "$zip" "$tag" "$WORK/notes.md" "$WORK/pages"
-# The page goes out with the feed, built by Pages with Jekyll (ADR 0061).
-cp -R "$TOOLS_DIR/site/." "$WORK/pages/"
-rm -f "$WORK/pages/.nojekyll"
+# The page goes out with the feed.
+update_page "$WORK/pages"
 ok "The feed has $APP_NAME $version, signed"
 
 if ((dry_run)); then
