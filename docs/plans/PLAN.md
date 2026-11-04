@@ -25,7 +25,8 @@ A separate app cannot make another app's window a child window (`addChildWindow`
 2. **One window while dragging.** Pairwise holds the drag back with an event tap, takes a picture of both windows (ScreenCaptureKit), shows them in one window of its own that it moves itself, parks the real windows, and puts them in place on release (ADR 0024, 0028). A picture of the partner alone beside a window macOS drags was tried first and could not keep step. No visible lag; needs the screen recording permission as well.
 3. **A Pairwise plug-in for apps** (an SDK apps embed), as an extra on top, never a requirement:
    - It does **not** remove the limit between two apps: the dragged window reports where it is, and the plug-in in the other app moves its own window; still a message between two processes, so a frame or two behind. Faster than the Accessibility API, not instant.
-   - Two windows of the **same** app can be joined as child windows by the plug-in: smooth, as in an earlier project.
+   - Child windows are **not** the route, also for two windows of the same app. Treewise joined its windows that way and took it out again (its ADR 0043): tabs hide joined windows and a window with a child cannot become a tab, one missed case crashed AppKit in endless recursion, AppKit reports moves about ten times a second and no end of a drag, and every case of tabs, full screen and Spaces needs its own check.
+   - So Pairwise keeps doing the joining and the dragging, and the app only tells and asks. Dragging stays on the route of step 2, with placeholders; the plug-in does not bring real windows during a drag.
    - Its real worth is knowledge: which windows are documents (not palettes or dialogs), minimum widths, tabs, full screen, restoring after a restart. Those were the cases that broke an earlier project's magnetic windows.
    - The catch: other developers embed it only once Pairwise has many users, which needs it to work well without it. First and mainly for our own apps.
 
@@ -40,7 +41,7 @@ A separate app cannot make another app's window a child window (`addChildWindow`
 1. A spike: an app that follows the pointer and moves a Finder window beside the dragged one through the Accessibility API. Does it feel smooth enough?
 2. If not, one window while dragging.
 3. Pairwise without plug-in: join, move together, the shared seam, coming apart, restoring.
-4. The plug-in, first in our own apps only; magnetic windows could come back to our own apps through Pairwise.
+4. The plug-in, first in our own apps only, as a thin link between the app and Pairwise rather than a large SDK. Magnetic windows come back to our own apps through Pairwise, without child windows.
 5. Only if Pairwise has users: the plug-in public for other developers.
 
 ## Milestones
@@ -49,7 +50,10 @@ A separate app cannot make another app's window a child window (`addChildWindow`
 - **M2, moving together while dragging:** step 2, since M1 was not smooth enough.
 - **M3, Pairwise without plug-in:** step 3.
 - **M3a, release:** signed and notarized, Homebrew and Sparkle; `M3a-release.md`.
-- **M4, the plug-in in our own apps:** step 4.
+- **M4, the plug-in in our own apps:** step 4, starting with Treewise. Before any code: use two Treewise windows with Pairwise as it is, and watch what tabs do to a pair, added or pulled out while joined, as that broke the magnetic windows and is not yet tried with Pairwise. If that feels right, in order of work against gain:
+  1. Treewise's Window Beside opens the second window joined at once: the smallest first step.
+  2. Treewise tells which folder or tab belongs to the pair, so the pair survives a restart.
+  3. An idea, not yet decided: the two windows work together, as a two-pane file manager, such as copying to the folder in the other window, or a folder clicked on the left opening on the right.
 - **M5, the plug-in public:** step 5, only if Pairwise has users.
 
 ## Modules
