@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pairwise: snap groups for your Mac</title>
+<meta name="description" content="Bring two windows of any app together and they join: they move together, share their seam and come apart again easily. Free and open source.">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="icon.png">
+<style>
+/* The page is a pair (ADR 0067): two panes in the colours of the icon, joined by its seam. */
+:root {
+  --left: #fbfcfd; --right: #dfe4ea; --ink: #1e2227; --soft: #4d5663; --line: #c5ccd6;
+  --seam: #f5a623; --seam-ink: #1e2227; --seam-hover: #ffb93f; --code: #c5ccd6;
+  --shadow: #1e222766;
+  --seam-width: 3px; --gutter: 40px; --picture: min(1160px, calc((100vw - 48px) * .94));
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --left: #2c3138; --right: #1e2227; --ink: #f2f4f7; --soft: #a7b1bf; --line: #454c57;
+    --code: #454c57; --shadow: #00000099;
+  }
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; color: var(--ink); overflow-x: clip;
+  background: linear-gradient(90deg, var(--left) 50%, var(--right) 50%);
+  font: 17px/1.5 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, sans-serif;
+}
+a { color: inherit; text-underline-offset: .18em; text-decoration-color: var(--seam); text-decoration-thickness: 2px; }
+:focus-visible { outline: 3px solid var(--seam); outline-offset: 3px; border-radius: 4px; }
+code, kbd { font: .92em ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+kbd { padding: 0 .3em; border-radius: 4px; background: var(--code); white-space: nowrap; font-family: inherit; }
+
+/* The seam runs from the top of the page to the bottom, behind the pictures. */
+.page { position: relative; }
+.page::before {
+  content: ""; position: absolute; top: 0; bottom: 0; left: 50%; width: var(--seam-width);
+  margin-left: calc(var(--seam-width) / -2); background: var(--seam);
+}
+
+.pair { position: relative; display: grid; grid-template-columns: 1fr 1fr; column-gap: calc(var(--gutter) * 2); padding-inline: 24px; }
+.pair > :first-child { justify-self: end; text-align: right; max-width: 30em; }
+.pair > :last-child { max-width: 32em; }
+
+.brand { display: flex; align-items: center; gap: 10px; padding-top: 24px; font-weight: 600; }
+.brand img { width: 32px; height: 32px; }
+
+h1 {
+  margin: 72px 0 0; position: relative;
+  font: 700 clamp(44px, 6.6vw, 88px)/1.02 -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", system-ui, sans-serif;
+  letter-spacing: -.03em;
+}
+h1 span { display: block; }
+h1 .pair > span:first-child { max-width: none; }
+
+.lock {
+  position: absolute; left: 50%; top: 50%; width: 48px; height: 48px; margin: -24px 0 0 -24px;
+  border-radius: 50%; background: var(--seam); box-shadow: 0 0 0 6px var(--left);
+}
+.lock svg { display: block; width: 100%; height: 100%; }
+.lock .body { fill: var(--seam-ink); }
+.lock .shackle { fill: none; stroke: var(--seam-ink); stroke-width: 2.4; stroke-linecap: round; }
+
+.intro { margin-top: 36px; align-items: start; }
+.intro p { margin: 0; font-size: 21px; line-height: 1.38; }
+.intro .soft { margin-top: 12px; }
+.soft { color: var(--soft); }
+.download {
+  display: inline-block; padding: 13px 26px; border-radius: 10px;
+  background: var(--seam); color: var(--seam-ink); font-size: 18px; font-weight: 650; text-decoration: none;
+}
+.download:hover { background: var(--seam-hover); }
+.needs { margin: 12px 0 0; color: var(--soft); font-size: 15px; }
+
+/* A picture of a pair lies across the seam, with its own seam on the page's: --at says where that is. */
+.across { position: relative; margin: 64px 0 0; }
+.across img {
+  display: block; position: relative; left: 50%; width: var(--picture); max-width: none; height: auto;
+  transform: translateX(calc(var(--at) * -1)); border-radius: 12px;
+  box-shadow: 0 1px 2px var(--shadow), 0 24px 56px -20px var(--shadow);
+}
+.across figcaption { position: relative; margin: 14px 0 0 calc(50% + var(--gutter)); max-width: 30em; padding-right: 24px; color: var(--soft); font-size: 15px; }
+
+section { padding-top: 96px; }
+h2 { margin: 0; font-size: 34px; line-height: 1.12; font-weight: 700; letter-spacing: -.02em; }
+h3 { margin: 0; font-size: 21px; line-height: 1.25; font-weight: 650; letter-spacing: -.01em; padding-top: 2px; }
+.lead { margin: 10px 0 0; color: var(--soft); text-wrap: balance; }
+.rows li, .text p, figcaption { text-wrap: pretty; }
+.rows { list-style: none; margin: 0; padding: 0; }
+.rows li { padding: 12px 0; border-top: 1px solid var(--line); }
+.rows li:first-child { padding-top: 0; border-top: 0; }
+.rows b { font-weight: 650; }
+.text p { margin: 0 0 14px; }
+.text p:last-child { margin-bottom: 0; }
+.steps { margin: 0; padding-left: 1.3em; }
+.steps li { padding: 3px 0; }
+.brew { display: block; overflow-x: auto; margin: 8px 0 14px; padding: 10px 14px; border-radius: 8px; background: var(--code); white-space: nowrap; }
+.settings { display: block; width: 100%; height: auto; margin-top: 22px; border-radius: 12px; box-shadow: 0 1px 2px var(--shadow), 0 18px 40px -18px var(--shadow); }
+
+.small { padding-top: 36px; }
+.end { padding-block: 96px 64px; }
+.end .text { color: var(--soft); font-size: 15px; }
+
+/* One movement (ADR 0067): the halves of the title come together, and then the lock closes. */
+@keyframes join-left { from { transform: translateX(-7vw); } }
+@keyframes join-right { from { transform: translateX(7vw); } }
+@keyframes appear { from { opacity: 0; } }
+@keyframes close-lock { from { transform: translateY(-3.5px); } }
+h1 .pair > span:first-child { animation: join-left .7s cubic-bezier(.2, .8, .2, 1) .15s both; }
+h1 .pair > span:last-child { animation: join-right .7s cubic-bezier(.2, .8, .2, 1) .15s both; }
+.lock { animation: appear .2s ease-out .55s both; }
+.lock .shackle { animation: close-lock .16s ease-in .85s both; }
+@media (prefers-reduced-motion: reduce) {
+  h1 .pair > span, .lock, .lock .shackle { animation: none; }
+}
+
+/* On a narrow screen the panes become one, and the seam runs along the left edge. */
+@media (max-width: 720px) {
+  :root { --picture: calc(100vw - 44px); }
+  body { background: var(--left); font-size: 16px; }
+  .page::before { left: 16px; margin-left: 0; }
+  .pair { display: block; padding-inline: 32px 16px; }
+  .pair > :first-child { text-align: left; }
+  .pair > :first-child, .pair > :last-child { max-width: none; }
+  .pair > * + * { margin-top: 14px; }
+  h1 { margin-top: 40px; }
+  h1 .pair > * + * { margin-top: 0; }
+  .lock { display: none; }
+  .intro { display: flex; flex-direction: column-reverse; gap: 22px; }
+  .intro > * + * { margin-top: 0; }
+  .intro p { font-size: 18px; }
+  .across { margin-top: 36px; }
+  .across img { left: 32px; width: calc(100vw - 44px); transform: none; }
+  .across figcaption { margin: 12px 0 0; padding: 0 16px 0 32px; max-width: none; }
+  section { padding-top: 56px; }
+  h2 { font-size: 28px; }
+  .small { padding-top: 28px; }
+  .end { padding-block: 56px 40px; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+  <header class="pair">
+    <div class="brand"><img src="icon.png" alt="" width="32" height="32">Pairwise</div>
+    <div></div>
+  </header>
+
+  <main>
+    <h1>
+      <span class="pair"><span>Two windows,</span><span>one pair.</span></span>
+      <span class="lock" aria-hidden="true"><svg viewBox="0 0 48 48"><path class="shackle" d="M18.5 22v-4a5.5 5.5 0 0 1 11 0v4"/><rect class="body" x="15" y="22" width="18" height="13" rx="2.5"/></svg></span>
+    </h1>
+
+    <div class="pair intro">
+      <div>
+        <a class="download" data-download href="https://github.com/mag243/pairwise/releases/download/v0.2.1/Pairwise-0.2.1-2026.1102.192601.dmg">Download for Mac</a>
+        <p class="needs">Free and open source. Needs macOS 15 or later.</p>
+      </div>
+      <div>
+        <p>Snap groups for your Mac. Bring two windows of any app together and they join: they move together, share their seam, come to the front together and come apart again easily.</p>
+        <p class="soft">Pairwise works with the apps you already have, and needs nothing from them.</p>
+      </div>
+    </div>
+
+    <figure class="across" style="--at: 47.4%">
+      <img src="shots/pair.webp" width="1800" height="675" alt="TextEdit and Preview joined side by side, with the closed lock on their seam.">
+    </figure>
+
+    <section class="pair">
+      <div>
+        <h2>Join, move, come apart</h2>
+        <p class="lead">All of it with the windows themselves.</p>
+      </div>
+      <ul class="rows">
+        <li><b>Join.</b> Drag a window to another and press <kbd>⌘</kbd>, or click the open lock on the seam of two windows side by side. Add <kbd>⇧</kbd> for the same height.</li>
+        <li><b>Move together.</b> Drag either window of a pair.</li>
+        <li><b>Share the seam.</b> Drag the edge between them to resize both.</li>
+        <li><b>Come apart.</b> Click the closed lock on the seam, or press <kbd>⌘</kbd> while dragging one of them.</li>
+        <li><b>Pairs that last.</b> A pair comes back after a quit and a restart of your Mac.</li>
+      </ul>
+    </section>
+
+    <figure class="across" style="--at: 47.4%">
+      <img loading="lazy" src="shots/join.webp" width="1800" height="675" alt="TextEdit being dragged to Preview with Command pressed, and the guide showing where it will join.">
+      <figcaption>While you drag with <kbd>⌘</kbd> pressed, a guide shows where the window will join.</figcaption>
+    </figure>
+
+    <section class="pair">
+      <div>
+        <h2>What you see while dragging</h2>
+        <p class="lead">Moving the real windows lags visibly behind the pointer, so while you drag a pair you see something else in their place. You choose what.</p>
+      </div>
+      <ul class="rows">
+        <li><b>Placeholder</b> is what Pairwise starts with: an empty plane with the window’s icon and title. Nothing is recorded, and Pairwise does not even ask for Screen Recording.</li>
+        <li><b>Still</b> shows one picture of the two windows when you start dragging. Video stands still during the drag, and the seam can look stretched.</li>
+        <li><b>Live</b> keeps video playing and the seam sharp. macOS then shows its purple recording icon during the drag, as it does for every app that captures a window continuously.</li>
+      </ul>
+    </section>
+
+    <figure class="across" style="--at: 45.2%">
+      <img loading="lazy" src="shots/drag.webp" width="1800" height="675" alt="A pair being dragged, shown as two empty planes with each app’s icon and title.">
+    </figure>
+
+    <section class="pair">
+      <div>
+        <h2>Your windows stay yours</h2>
+        <p class="lead">Pairwise lives in the menu bar and needs one permission: Accessibility, to move and resize the windows you join.</p>
+      </div>
+      <div class="text">
+        <p>Still and Live take the Screen Recording permission, which Pairwise asks for when you choose one. They capture only the two windows of a pair, and only from the moment you press one of them or their seam until you let go.</p>
+        <p>The pictures stay in memory, and are not saved or sent anywhere. Pairwise is open source, so you can <a href="https://github.com/mag243/pairwise/tree/main/Packages/PairwiseKit/Sources/PairwiseWindowSystem">check this in the code</a>.</p>
+        <img class="settings" loading="lazy" src="shots/settings.webp" width="1520" height="1226" alt="The Pairs tab of Pairwise’s settings, with the choice of pictures while dragging.">
+      </div>
+    </section>
+
+    <section class="pair" id="install">
+      <div>
+        <h2>Install</h2>
+        <p class="lead">It is signed and notarized by Apple, so it opens without a warning.</p>
+      </div>
+      <div class="text">
+        <ol class="steps">
+          <li><a data-download href="https://github.com/mag243/pairwise/releases/download/v0.2.1/Pairwise-0.2.1-2026.1102.192601.dmg">Download the disk image</a>.</li>
+          <li>Open it and drag Pairwise onto Applications.</li>
+          <li>Start Pairwise from Applications.</li>
+        </ol>
+        <p style="margin-top: 14px">Or use Homebrew:</p>
+        <code class="brew">brew install --cask mag243/tap/pairwise</code>
+        <p>Started from anywhere else, Pairwise offers once to move itself into Applications, where it can keep itself up to date. <a href="https://github.com/mag243/pairwise/releases">All versions and what changed in each</a>.</p>
+      </div>
+    </section>
+
+    <section class="pair">
+      <div><h3>Updates</h3></div>
+      <div class="text">
+        <p>Pairwise checks for a new version once a day and asks before it installs one. You can check by hand with Check for Updates… in its menu, and turn the daily check off in its settings. The check only reads a list of versions from this site.</p>
+        <p>Every update is signed twice, by Apple’s Developer ID and by Pairwise’s own update key, and is installed only when both check out.</p>
+      </div>
+    </section>
+
+    <section class="pair small">
+      <div><h3>Requirements</h3></div>
+      <div class="text">
+        <p>macOS 15 Sequoia or later, on Apple silicon or Intel. Pairwise speaks English, Dutch and German, following your system language.</p>
+      </div>
+    </section>
+
+    <section class="pair small">
+      <div><h3>Uninstall</h3></div>
+      <div class="text">
+        <p>Quit Pairwise and drag it from Applications to the Trash. With Homebrew, <code>brew uninstall --zap --cask pairwise</code> also removes its settings. macOS keeps the permissions under Privacy &amp; Security in System Settings, where you can remove them.</p>
+      </div>
+    </section>
+
+    <section class="pair small">
+      <div><h3>Feedback and source</h3></div>
+      <div class="text">
+        <p>Found a bug? <a href="https://github.com/mag243/pairwise/issues">Open an issue</a>. The source is <a href="https://github.com/mag243/pairwise">on GitHub</a>, under the MIT license.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="pair end">
+    <div></div>
+    <div class="text">Pairwise is in beta (version 0.x).</div>
+  </footer>
+</div>
+</body>
+</html>
