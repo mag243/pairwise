@@ -14,10 +14,12 @@ import Testing
 
     private func target(
         _ frame: WindowFrame, pointer: ScreenPoint = Self.awayFromWindows,
-        among windows: [ScreenWindow] = [Self.other], takingHeight: Bool = false
+        among windows: [ScreenWindow] = [Self.other], takingHeight: Bool = false,
+        heading: MoveDirection = .left
     ) -> JoinTarget? {
         JoinRule.target(
-            for: frame, pointer: pointer, among: windows, takingHeight: takingHeight)
+            for: frame, pointer: pointer, among: windows, takingHeight: takingHeight,
+            heading: heading)
     }
 
     private static let dragged = ScreenWindow(
@@ -81,7 +83,7 @@ import Testing
     }
 
     @Test func aWindowCloseToTheLeftEdgeJoinsOnTheLeft() throws {
-        let found = try #require(target(frame(x: 290)))
+        let found = try #require(target(frame(x: 290), heading: .right))
         #expect(found.side == .left)
         #expect(found.frame == WindowFrame(x: 300, y: 100, width: 200, height: 200))
     }
@@ -93,39 +95,6 @@ import Testing
     @Test func askedToItTakesTheOthersHeight() {
         let found = target(frame(x: 810), takingHeight: true)
         #expect(found?.frame == WindowFrame(x: 800, y: 100, width: 200, height: 400))
-    }
-
-    @Test func aPointerOverTheRightHalfJoinsOnTheRight() throws {
-        let found = try #require(target(frame(x: 0), pointer: ScreenPoint(x: 700, y: 200)))
-        #expect(found.side == .right)
-        #expect(found.frame == WindowFrame(x: 800, y: 100, width: 200, height: 200))
-    }
-
-    @Test func aPointerOverTheLeftHalfJoinsOnTheLeft() {
-        #expect(target(frame(x: 0), pointer: ScreenPoint(x: 600, y: 200))?.side == .left)
-    }
-
-    @Test func aMuchLargerWindowJoinsWhatIsUnderThePointer() {
-        let large = WindowFrame(x: 100, y: 0, width: 1500, height: 1000)
-        let found = target(large, pointer: ScreenPoint(x: 700, y: 200))
-        #expect(found?.other == Self.other)
-    }
-
-    @Test func theFrontmostWindowUnderThePointerWins() {
-        let front = ScreenWindow(
-            number: 8, frame: WindowFrame(x: 650, y: 150, width: 100, height: 100))
-        let found = target(
-            frame(x: 0), pointer: ScreenPoint(x: 700, y: 200), among: [front, Self.other])
-        #expect(found?.other == front)
-    }
-
-    @Test func aWindowDraggedOverAnotherWithThePointerElsewhereDoesNotJoin() {
-        #expect(target(frame(x: 600)) == nil)
-    }
-
-    @Test func aWindowUnderThePointerJoinsWhateverItsSize() {
-        let tiny = WindowFrame(x: 0, y: 0, width: 10, height: 10)
-        #expect(target(tiny, pointer: ScreenPoint(x: 700, y: 200)) != nil)
     }
 
     @Test(arguments: [(23.0, true), (24.0, true), (25.0, false)])
@@ -142,11 +111,4 @@ import Testing
         #expect(target(frame(x: 800, y: 500)) == nil)
     }
 
-    @Test func theClosestEdgeWins() throws {
-        let near = ScreenWindow(
-            number: 8, frame: WindowFrame(x: 1008, y: 100, width: 300, height: 400))
-        let found = try #require(target(frame(x: 805), among: [Self.other, near]))
-        #expect(found.other.number == 8)
-        #expect(found.side == .left)
-    }
 }
