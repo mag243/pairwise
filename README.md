@@ -1,6 +1,6 @@
 # Pairwise
 
-*Snap groups for your Mac.* ([Website](https://mag243.github.io/pairwise/)) Two windows of any app, brought together side by side, join: they move together, share their seam and come apart again easily, without anything from the apps.
+*Snap groups for your Mac.* ([Website](https://pairwise.m-domain.me/)) Two windows of any app, brought together side by side, join: they move together, share their seam and come apart again easily, without anything from the apps.
 
 Status: early, version 0.x. Joining, moving together, the shared seam and coming apart work, and pairs last through a quit and a restart.
 
@@ -59,7 +59,7 @@ tools/build.sh --help   # every command
 | `docs/plans` | The master plan and one plan per milestone |
 | `docs/decisions` | Architecture decision records |
 | `docs/reference` | Reference material |
-| `tools` | Setup, build, release, git hooks and pinned versions; `tools/site` is the [website](https://mag243.github.io/pairwise/) |
+| `tools` | Setup, build, release, git hooks and pinned versions; `tools/site` is the [website](https://pairwise.m-domain.me/) |
 
 The rules for working in this repository are in [`CLAUDE.md`](CLAUDE.md).
 
