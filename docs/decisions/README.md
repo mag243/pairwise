@@ -71,3 +71,4 @@ Use `0000-template.md` as the basis.
 | 0063 | Still or live pictures | Superseded by 0064 |
 | 0064 | Placeholders by default | Accepted |
 | 0065 | Screenshots by command | Accepted |
+| 0066 | The copyright year comes from the build | Accepted |
