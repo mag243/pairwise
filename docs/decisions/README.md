@@ -66,9 +66,11 @@ Use `0000-template.md` as the basis.
 | 0058 | Publishing a release | Accepted |
 | 0059 | A Homebrew cask | Accepted |
 | 0060 | Starting at login, and the right place | Accepted |
-| 0061 | A page for Pairwise | Accepted |
+| 0061 | A page for Pairwise | Superseded by 0067 |
 | 0062 | A debug build of its own | Accepted |
 | 0063 | Still or live pictures | Superseded by 0064 |
 | 0064 | Placeholders by default | Accepted |
 | 0065 | Screenshots by command | Accepted |
 | 0066 | The copyright year comes from the build | Accepted |
+| 0067 | The download page | Accepted |
+| 0068 | The site on our own domain | Accepted |
