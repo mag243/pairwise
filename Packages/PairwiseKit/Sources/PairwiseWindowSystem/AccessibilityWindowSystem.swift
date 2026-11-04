@@ -24,12 +24,14 @@ public final class AccessibilityWindowSystem: WindowSystemProviding {
     var onlyNormalWindows: Set<UInt32>?
     private let capture: WindowCapture
     private let makeMark: () -> any ScreenMark
+    private let makeOutline: () -> any ScreenMark
     private let makeLock: () -> any SeamLockMark
     private let recordsFolder: URL
     private let parkingRecordName = "parked-windows.json"
     private let pairsRecordName = "pairs.json"
     private let makeHold: (@escaping @MainActor (PointerButtonEvent) -> Bool) -> any PointerHold
     private var joinGuide: (any ScreenMark)?
+    private var joinOutline: (any ScreenMark)?
     private var seamLock: (any SeamLockMark)?
     private var pointerTimer: Timer?
     private var holdingTap: (any PointerHold)?
@@ -43,6 +45,7 @@ public final class AccessibilityWindowSystem: WindowSystemProviding {
     init(
         access: any SystemAccess, captureService: any CaptureService,
         makeMark: @escaping () -> any ScreenMark = { JoinMarkPanel() },
+        makeOutline: @escaping () -> any ScreenMark = { JoinOutlinePanel() },
         makeLock: @escaping () -> any SeamLockMark = { SeamLockPanel() },
         makeHold: @escaping (@escaping @MainActor (PointerButtonEvent) -> Bool) -> any PointerHold =
             { HoldingTap(decide: $0) },
@@ -51,6 +54,7 @@ public final class AccessibilityWindowSystem: WindowSystemProviding {
         self.recordsFolder = recordsFolder
         self.access = access
         self.makeMark = makeMark
+        self.makeOutline = makeOutline
         self.makeLock = makeLock
         self.makeHold = makeHold
         capture = WindowCapture(service: captureService)
@@ -156,17 +160,6 @@ public final class AccessibilityWindowSystem: WindowSystemProviding {
         }
         return AccessibilityWindow(
             element: elements[index], serverWindowNumber: window.number, access: access)
-    }
-
-    public func showJoinGuide(at frame: WindowFrame) {
-        let guide = joinGuide ?? makeMark()
-        joinGuide = guide
-        guide.show(at: frame)
-    }
-
-    public func hideJoinGuide() {
-        joinGuide?.hide()
-        joinGuide = nil
     }
 
     public func saveParkingRecord(_ record: Data?) {
@@ -300,5 +293,34 @@ public final class AccessibilityWindowSystem: WindowSystemProviding {
         ticker = nil
         timer?.invalidate()
         timer = nil
+    }
+}
+
+/// The marks and the input of a joining drag (ADR 0069).
+extension AccessibilityWindowSystem {
+    public func showJoinGuide(at frame: WindowFrame) {
+        let guide = joinGuide ?? makeMark()
+        joinGuide = guide
+        guide.show(at: frame)
+    }
+
+    public func hideJoinGuide() {
+        joinGuide?.hide()
+        joinGuide = nil
+    }
+
+    public func showJoinTargetOutline(at frame: WindowFrame) {
+        let outline = joinOutline ?? makeOutline()
+        joinOutline = outline
+        outline.show(at: frame)
+    }
+
+    public func hideJoinTargetOutline() {
+        joinOutline?.hide()
+        joinOutline = nil
+    }
+
+    public func setJoinChoiceInputWatched(_ isWatched: Bool) {
+        holdingTap?.setChoiceInputWatched(isWatched)
     }
 }

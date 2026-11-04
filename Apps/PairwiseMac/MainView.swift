@@ -196,6 +196,7 @@ struct MainView: View {
                 Text(
                     "While joining, add Shift for the same height, or Control for the other choice of windows."
                 )
+                Text("While joining, scroll or press Z to choose another window.")
                 Text("To move a pair, drag either window.")
                 Text("To resize both, drag the seam between them.")
                 Text(

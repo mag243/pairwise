@@ -117,9 +117,9 @@ import Testing
         system.knownWindows.append(third)
         startDragWithPanel()
         part()
-        _ = system.send(.dragged(ScreenPoint(x: 1050, y: 150)))
+        _ = system.send(.dragged(ScreenPoint(x: 640, y: 150)))
         system.tick()
-        _ = system.send(.released(ScreenPoint(x: 1050, y: 150)))
+        _ = system.send(.released(ScreenPoint(x: 640, y: 150)))
         #expect(window.currentFrame.origin == ScreenPoint(x: 600, y: 100))
     }
 

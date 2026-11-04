@@ -73,6 +73,11 @@ enum PairDrag {
         let number: UInt32
         let frame: WindowFrame
         var pointer: ScreenPoint
+        /// Where the drag is going, which says which edge joins (ADR 0069).
+        var heading: DragHeading
+        /// Which of the places to join is chosen (ADR 0069).
+        var pick = JoinPick()
+        var scroll = JoinScroll()
         var isKeyDown = true
         /// Whether the window is to take the other's height.
         var isTakingHeight = false

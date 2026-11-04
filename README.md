@@ -22,7 +22,7 @@ If a permission shows as on but Pairwise says it is missing, turn it off and on 
 
 Pairwise lives in the menu bar and needs one permission: Accessibility, to move other apps' windows.
 
-- **Join:** drag a window and press Command over another window, or click the open lock on the seam of two windows side by side. Add Shift to give the dragged window the other's height, and Control for the other choice of windows in the settings.
+- **Join:** drag a window's edge to another window's edge and press Command: moving right joins your right edge, moving left your left edge. An amber outline shows the window it joins; scroll or press Z to choose another. Or click the open lock on the seam of two windows side by side. Add Shift to give the dragged window the other's height, and Control for the other choice of windows in the settings.
 - **Move together:** drag either window of a pair.
 - **Share the seam:** drag the edge between the two windows.
 - **Come apart:** click the closed lock on the seam, or press Command while dragging one of the windows.

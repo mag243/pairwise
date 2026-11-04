@@ -58,6 +58,16 @@ public protocol WindowSystemProviding: AnyObject {
     /// Takes the guide away, if it shows.
     func hideJoinGuide()
 
+    /// Outlines the window a dragged window would join, or moves that outline there (ADR 0069).
+    func showJoinTargetOutline(at frame: WindowFrame)
+
+    /// Takes the outline away, if it shows.
+    func hideJoinTargetOutline()
+
+    /// Whether the hold also asks about the key and scrolling that choose a window to join.
+    /// Pairwise sees no such input otherwise (ADR 0069).
+    func setJoinChoiceInputWatched(_ isWatched: Bool)
+
     /// Keeps `record` outside this process, so that it survives a crash, or removes what is
     /// kept when it is `nil` (ADR 0053).
     func saveParkingRecord(_ record: Data?)

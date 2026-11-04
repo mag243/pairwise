@@ -7,6 +7,8 @@ import Testing
 @MainActor
 @Suite struct PairDragModelJoinScopeTests {
     private static let press = ScreenPoint(x: 50, y: 110)
+    /// Far enough from the press for the drag to have a direction.
+    private static let goingLeft = ScreenPoint(x: 30, y: 110)
     private static let nearRightEdge = ScreenPoint(x: 810, y: 150)
     private static let joined = WindowFrame(x: 800, y: 100, width: 200, height: 200)
 
@@ -30,7 +32,7 @@ import Testing
 
     private func dragNearTheEdge() {
         _ = system.send(.pressed(Self.press))
-        _ = system.send(.dragged(Self.press))
+        _ = system.send(.dragged(Self.goingLeft))
         window.currentFrame.origin = Self.nearRightEdge
         system.tick()
     }

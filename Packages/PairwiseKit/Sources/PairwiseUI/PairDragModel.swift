@@ -54,6 +54,8 @@ public final class PairDragModel {
     /// The window of this press, when it is in no pair: the join key can still come during
     /// the drag (ADR 0039).
     @ObservationIgnored var freeWindowPressed: UInt32?
+    /// The pointer's place across the screen at that press, where the drag's direction starts.
+    @ObservationIgnored var freeWindowPressX = 0.0
     @ObservationIgnored var book = PairBook()
     /// The windows in `book`, by number.
     @ObservationIgnored var pairedWindows: [UInt32: any MovableWindow] = [:]
@@ -134,6 +136,12 @@ public final class PairDragModel {
                 isJoinKeyDown: isJoinKeyDown, isEqualHeightKeyDown: isEqualHeightKeyDown,
                 isScopeKeyDown: isScopeKeyDown)
             return true
+        case .joinChoiceKey(let isRepeat):
+            return !chooseJoinPlace { _ in isRepeat ? 0 : 1 }
+        case .scrolledWheel(let lines):
+            return !chooseJoinPlace { $0.steps(forWheelLines: lines) }
+        case .scrolledTrackpad(let points):
+            return !chooseJoinPlace { $0.steps(forTrackpadPoints: points) }
         }
     }
 
@@ -164,6 +172,7 @@ public final class PairDragModel {
             let partnerWindow = pairedWindows[partnerEntry.window]
         else {
             freeWindowPressed = number
+            freeWindowPressX = point.x
             return "not in a pair"
         }
         guard window.isAvailable, partnerWindow.isAvailable else {

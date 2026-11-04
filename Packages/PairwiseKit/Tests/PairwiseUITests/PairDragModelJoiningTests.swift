@@ -6,6 +6,9 @@ import Testing
 @MainActor
 @Suite struct PairDragModelJoiningTests {
     private static let press = ScreenPoint(x: 50, y: 110)
+    /// Far enough from the press for the drag to have a direction.
+    private static let goingLeft = ScreenPoint(x: 30, y: 110)
+    private static let goingRight = ScreenPoint(x: 70, y: 110)
     private static let far = ScreenPoint(x: 0, y: 150)
     private static let nearRightEdge = ScreenPoint(x: 810, y: 150)
     private static let joined = WindowFrame(x: 800, y: 100, width: 200, height: 200)
@@ -28,8 +31,9 @@ import Testing
     }
 
     /// Presses with the key, and has macOS move the window to `place`.
-    private func drag(to place: ScreenPoint) {
+    private func drag(to place: ScreenPoint, through point: ScreenPoint = Self.goingLeft) {
         _ = system.send(.pressed(Self.press))
+        _ = system.send(.dragged(point))
         window.currentFrame.origin = place
         system.tick()
     }
@@ -39,9 +43,9 @@ import Testing
         _ = system.send(.pressed(Self.press))
         #expect(!system.isTicking)
         system.isJoinKeyDown = true
-        #expect(system.send(.dragged(ScreenPoint(x: 700, y: 200))))
+        #expect(system.send(.dragged(Self.goingLeft)))
         #expect(system.isTicking)
-        window.currentFrame.origin = Self.far
+        window.currentFrame.origin = Self.nearRightEdge
         system.tick()
         #expect(system.guideFrames.last == Self.joined)
     }
@@ -93,7 +97,7 @@ import Testing
 
     @Test func eventsAlwaysPassWhileJoining() {
         drag(to: Self.nearRightEdge)
-        #expect(system.send(.dragged(Self.press)))
+        #expect(system.send(.dragged(Self.goingLeft)))
         #expect(system.standInRequests == 0)
     }
 
@@ -103,12 +107,12 @@ import Testing
         #expect(system.isGuideShowing)
     }
 
-    @Test func aPointerOverAWindowShowsItsGuideWhereverTheWindowIs() {
+    @Test func aPointerOverAWindowWithNoEdgeNearShowsNoGuide() {
         _ = system.send(.pressed(Self.press))
         _ = system.send(.dragged(ScreenPoint(x: 700, y: 200)))
         window.currentFrame.origin = Self.far
         system.tick()
-        #expect(system.guideFrames.last == Self.joined)
+        #expect(!system.isGuideShowing)
     }
 
     @Test func aWindowThatLeavesTheEdgeLosesTheGuide() {
@@ -134,7 +138,7 @@ import Testing
     @Test func shiftTakesTheOthersHeightAndTheGuideShowsIt() {
         system.isEqualHeightKeyDown = true
         _ = system.send(.pressed(Self.press))
-        _ = system.send(.dragged(Self.press))
+        _ = system.send(.dragged(Self.goingLeft))
         window.currentFrame.origin = Self.nearRightEdge
         system.tick()
         #expect(system.guideFrames.last == Self.joinedAtItsHeight)
@@ -145,11 +149,11 @@ import Testing
     @Test func lettingGoOfShiftKeepsTheOwnHeight() {
         system.isEqualHeightKeyDown = true
         _ = system.send(.pressed(Self.press))
-        _ = system.send(.dragged(Self.press))
+        _ = system.send(.dragged(Self.goingLeft))
         window.currentFrame.origin = Self.nearRightEdge
         system.tick()
         system.isEqualHeightKeyDown = false
-        _ = system.send(.dragged(Self.press))
+        _ = system.send(.dragged(Self.goingLeft))
         system.tick()
         _ = system.send(.released(Self.press))
         #expect(window.currentFrame == Self.joined)
@@ -179,7 +183,7 @@ import Testing
     }
 
     @Test func aSeamOnTheLeftLightsUpThere() {
-        drag(to: ScreenPoint(x: 290, y: 150))
+        drag(to: ScreenPoint(x: 290, y: 150), through: Self.goingRight)
         _ = system.send(.released(Self.press))
         #expect(system.seamFlashes.first?.origin.x == 497)
     }
@@ -197,7 +201,7 @@ import Testing
         window.resizeError = .windowRefused
         system.isEqualHeightKeyDown = true
         _ = system.send(.pressed(Self.press))
-        _ = system.send(.dragged(Self.press))
+        _ = system.send(.dragged(Self.goingLeft))
         window.currentFrame.origin = Self.nearRightEdge
         system.tick()
         _ = system.send(.released(Self.press))

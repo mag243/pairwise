@@ -57,6 +57,8 @@ protocol PointerHold: AnyObject {
     func start() throws(WindowSystemError)
     /// Removes the tap.
     func stop()
+    /// Whether the tap also decides on the key and scrolling that choose a window to join.
+    func setChoiceInputWatched(_ isWatched: Bool)
 }
 
 /// A coloured area above other windows (ADR 0031).

@@ -18,6 +18,7 @@ import Testing
 
     private final class MarkBox {
         var marks: [FakeMark] = []
+        var outlines: [FakeMark] = []
         var locks: [FakeLockMark] = []
     }
 
@@ -34,6 +35,11 @@ import Testing
                 let mark = FakeMark()
                 markBox.marks.append(mark)
                 return mark
+            },
+            makeOutline: {
+                let outline = FakeMark()
+                markBox.outlines.append(outline)
+                return outline
             },
             makeLock: {
                 let lock = FakeLockMark()
@@ -70,6 +76,28 @@ import Testing
         #expect(throws: WindowSystemError.eventTapUnavailable) {
             try system.startHoldingDrags { _ in true }
         }
+    }
+
+    @Test func theOutlineIsOneMarkThatMoves() {
+        system.showJoinTargetOutline(at: Self.frame)
+        system.showJoinTargetOutline(at: Self.frame)
+        #expect(markBox.outlines.count == 1)
+        #expect(markBox.outlines.first?.frames.count == 2)
+        #expect(marks.isEmpty)
+    }
+
+    @Test func hidingTheOutlineTakesItAway() {
+        system.showJoinTargetOutline(at: Self.frame)
+        system.hideJoinTargetOutline()
+        #expect(markBox.outlines.first?.isHidden == true)
+    }
+
+    @Test func choiceInputIsWatchedOnTheHold() throws {
+        try system.startHoldingDrags { _ in true }
+        system.setJoinChoiceInputWatched(true)
+        #expect(holds.first?.isChoiceInputWatched == true)
+        system.setJoinChoiceInputWatched(false)
+        #expect(holds.first?.isChoiceInputWatched == false)
     }
 
     @Test func theGuideIsOneMarkThatMoves() {

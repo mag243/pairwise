@@ -4,7 +4,7 @@ import PairwiseCore
 extension PairDragModel {
     /// Parts a window in a pair, and watches where it goes. macOS drags it alone.
     func startJoining(
-        _ number: UInt32, pointer: ScreenPoint, held: PairDrag.Held? = nil
+        _ number: UInt32, pointer: ScreenPoint, pressX: Double? = nil, held: PairDrag.Held? = nil
     ) -> String {
         if book.pair(containing: number) != nil { sound(.part) }
         endPair(of: number)
@@ -12,9 +12,14 @@ extension PairDragModel {
             let window = system.window(number: number),
             let frame = window.serverFrame() ?? (try? window.frame())
         else { return "no window to join with" }
+        // The direction counts from the press, so that the key can come with the window at an edge.
+        var heading = DragHeading(startingAt: pressX ?? pointer.x)
+        heading.update(x: pointer.x)
         drag = .joining(
             PairDrag.Joining(
-                window: window, number: number, frame: frame, pointer: pointer, held: held))
+                window: window, number: number, frame: frame, pointer: pointer, heading: heading,
+                held: held))
+        system.setJoinChoiceInputWatched(true)
         system.startTicking(every: Self.tickInterval) { [weak self] in self?.tick() }
         return "joining"
     }
@@ -27,7 +32,8 @@ extension PairDragModel {
             pressed.hasWindowMoved
             ? PairDrag.Held(frame: pressed.frame, pointer: pressed.pointer) : nil
         endDrag()
-        lastPressOutcome = startJoining(pressed.number, pointer: point, held: held)
+        lastPressOutcome = startJoining(
+            pressed.number, pointer: point, pressX: pressed.pointer.x, held: held)
         return held != nil
     }
 
@@ -40,7 +46,7 @@ extension PairDragModel {
         forgetParking()
         endDrag()
         lastPressOutcome = startJoining(
-            moving.number, pointer: moving.lastPointer,
+            moving.number, pointer: moving.lastPointer, pressX: moving.pointer.x,
             held: PairDrag.Held(frame: moving.frame, pointer: moving.pointer))
     }
 
@@ -48,7 +54,7 @@ extension PairDragModel {
     func startJoiningFreeWindow(at point: ScreenPoint) {
         guard let number = freeWindowPressed else { return }
         freeWindowPressed = nil
-        lastPressOutcome = startJoining(number, pointer: point)
+        lastPressOutcome = startJoining(number, pointer: point, pressX: freeWindowPressX)
         hasSeenButtonDown = true
     }
 
@@ -73,11 +79,12 @@ extension PairDragModel {
     func watch(_ joining: PairDrag.Joining) {
         var joining = joining
         moveHeldWindow(&joining)
+        joining.heading.update(x: joining.pointer.x)
         guard joining.isKeyDown else {
             var current = joining
             current.target = nil
             drag = .joining(current)
-            system.hideJoinGuide()
+            hideJoinMarks()
             return
         }
         guard
@@ -87,21 +94,43 @@ extension PairDragModel {
             drag = .joining(joining)
             return
         }
+        let windows = system.normalWindows()
         let candidates = JoinRule.candidates(
-            for: joining.number, among: system.normalWindows(),
+            for: joining.number, among: windows,
             scope: joinScope.switched(if: joining.isScopeKeyDown)
         ).filter { book.pair(containing: $0.number) == nil }
+        let joinable = Set(candidates.map(\.number))
         var current = joining
-        current.target = JoinRule.target(
-            for: now, pointer: joining.pointer, among: candidates,
-            takingHeight: joining.isTakingHeight)
+        current.pick.update(
+            to: JoinRule.choices(
+                for: now, pointer: joining.pointer,
+                among: windows.filter { $0.number != joining.number },
+                heading: joining.heading.direction, isJoinable: { joinable.contains($0.number) }))
+        current.target = current.pick.place.map {
+            JoinRule.target(at: $0, for: now, takingHeight: joining.isTakingHeight)
+        }
         drag = .joining(current)
         if current.target != joining.target { Self.log(current, frame: now, candidates) }
         if let target = current.target {
             system.showJoinGuide(at: target.frame)
+            system.showJoinTargetOutline(at: target.other.frame)
         } else {
-            system.hideJoinGuide()
+            hideJoinMarks()
         }
+    }
+
+    /// Goes through the places to join by the steps of an input, which the next tick shows.
+    /// Says whether the input is Pairwise's own: only while the join key is down in a join.
+    func chooseJoinPlace(steps: (inout JoinScroll) -> Int) -> Bool {
+        guard case .joining(var joining) = drag, joining.isKeyDown else { return false }
+        joining.pick.advance(by: steps(&joining.scroll))
+        drag = .joining(joining)
+        return true
+    }
+
+    func hideJoinMarks() {
+        system.hideJoinGuide()
+        system.hideJoinTargetOutline()
     }
 
     private func moveHeldWindow(_ joining: inout PairDrag.Joining) {

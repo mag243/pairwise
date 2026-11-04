@@ -7,6 +7,8 @@ import Testing
 @MainActor
 @Suite struct PairDragModelJoinFeedbackTests {
     private static let press = ScreenPoint(x: 50, y: 110)
+    /// Far enough from the press for the drag to have a direction.
+    private static let goingLeft = ScreenPoint(x: 30, y: 110)
     private static let nearRightEdge = ScreenPoint(x: 810, y: 150)
     private static let onLock = ScreenPoint(x: 500, y: 200)
 
@@ -35,6 +37,7 @@ import Testing
         system.isJoinKeyDown = true
         system.isPrimaryButtonDown = true
         _ = system.send(.pressed(Self.press))
+        _ = system.send(.dragged(Self.goingLeft))
         window.currentFrame.origin = Self.nearRightEdge
         system.tick()
         _ = system.send(.released(Self.press))

@@ -37,6 +37,9 @@ public final class FakeWindowSystem: WindowSystemProviding {
     public private(set) var standInRequests = 0
     public private(set) var normalWindowsRequests = 0
     public var pointerLocation = ScreenPoint(x: 0, y: 0)
+    public private(set) var outlineFrames: [WindowFrame] = []
+    public private(set) var isOutlineShowing = false
+    public private(set) var isJoinChoiceInputWatched = false
     public private(set) var lockFrames: [WindowFrame] = []
     public private(set) var isLockShowing = false
     public private(set) var isLockClosed = false
@@ -88,6 +91,19 @@ public final class FakeWindowSystem: WindowSystemProviding {
 
     public func hideJoinGuide() {
         isGuideShowing = false
+    }
+
+    public func showJoinTargetOutline(at frame: WindowFrame) {
+        outlineFrames.append(frame)
+        isOutlineShowing = true
+    }
+
+    public func hideJoinTargetOutline() {
+        isOutlineShowing = false
+    }
+
+    public func setJoinChoiceInputWatched(_ isWatched: Bool) {
+        isJoinChoiceInputWatched = isWatched
     }
 
     public func saveParkingRecord(_ record: Data?) {

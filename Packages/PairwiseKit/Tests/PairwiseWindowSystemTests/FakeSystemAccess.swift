@@ -123,6 +123,7 @@ final class FakeHold: PointerHold {
     var startError: WindowSystemError?
     private(set) var starts = 0
     private(set) var stops = 0
+    private(set) var isChoiceInputWatched = false
 
     func start() throws(WindowSystemError) {
         if let startError { throw startError }
@@ -131,6 +132,10 @@ final class FakeHold: PointerHold {
 
     func stop() {
         stops += 1
+    }
+
+    func setChoiceInputWatched(_ isWatched: Bool) {
+        isChoiceInputWatched = isWatched
     }
 }
 

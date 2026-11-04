@@ -1093,6 +1093,23 @@
         }
       }
     },
+    "While joining, scroll or press Z to choose another window." : {
+      "comment" : "Text in the settings window",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scrolle beim Verbinden oder drücke Z, um ein anderes Fenster zu wählen."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scrol tijdens het koppelen of druk op Z om een ander venster te kiezen."
+          }
+        }
+      }
+    },
     "Windows of the same app" : {
       "comment" : "Setting value: Command joins only windows of the same app",
       "localizations" : {

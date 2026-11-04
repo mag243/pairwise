@@ -10,4 +10,10 @@ public enum PointerButtonEvent: Equatable, Sendable {
     /// A modifier key went down or up, which also happens with the pointer standing still
     /// (ADR 0041). This event is only read: it always passes.
     case keysChanged(isJoinKeyDown: Bool, isEqualHeightKeyDown: Bool, isScopeKeyDown: Bool = false)
+    /// The key that goes to the next place to join, with the join key down (ADR 0069).
+    case joinChoiceKey(isRepeat: Bool)
+    /// A mouse wheel turned while joining, by this many lines (ADR 0069).
+    case scrolledWheel(lines: Int)
+    /// A trackpad moved while joining, by this many points (ADR 0069).
+    case scrolledTrackpad(points: Double)
 }
