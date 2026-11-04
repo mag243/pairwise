@@ -74,3 +74,4 @@ Use `0000-template.md` as the basis.
 | 0066 | The copyright year comes from the build | Accepted |
 | 0067 | The download page | Accepted |
 | 0068 | The site on our own domain | Accepted |
+| 0069 | Choosing a window in a stack | Accepted |
