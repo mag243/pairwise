@@ -3,6 +3,20 @@
     <channel>
         <title>Pairwise</title>
         <item>
+            <title>0.3.0</title>
+            <pubDate>Wed, 04 Nov 2026 17:57:19 +0100</pubDate>
+            <sparkle:version>2026.1104.175501</sparkle:version>
+            <sparkle:shortVersionString>0.3.0</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+            <description sparkle:format="markdown"><![CDATA[- Joining goes by the edge that moves: drag right to join with your window's right edge, drag left for its left edge. Overlapping windows are no longer proposed just because they overlap.
+- An edge is proposed from close by until it has passed a quarter of the other window's width.
+- The window you would join gets an amber outline.
+- While joining, scroll or press Z to choose another window: the closest first, then all the others, also those behind others. Hold Control as well for the other choice of windows in the settings, such as only windows of the same app.
+- The page moved to https://pairwise.m-domain.me/, and updates come from there too.
+]]></description>
+            <enclosure url="https://github.com/mag243/pairwise/releases/download/v0.3.0/Pairwise-0.3.0-2026.1104.175501.zip" length="1680362" type="application/octet-stream" sparkle:edSignature="WPCLmd3VS5W3l8UqMnqyhjx1FpzhvZqqReZMNvYQO3E6gy4vD9k4rRzx7GKsfs4kK6AIt+igZeduJu+ty5X1Cg=="/>
+        </item>
+        <item>
             <title>0.2.1</title>
             <pubDate>Mon, 02 Nov 2026 19:27:50 +0100</pubDate>
             <sparkle:version>2026.1102.192601</sparkle:version>
